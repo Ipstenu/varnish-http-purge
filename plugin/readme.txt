@@ -40,6 +40,9 @@ No WordPress configuration needed.
 * Pretty Permalinks enabled
 * Varnish 3.x or higher
 
+= Languages =
+Until the WordPress Language Pack system is deployable, I'm storing them <a href="https://github.com/Ipstenu/varnish-http-purge">on Github</a> for now.
+
 = Varnish Config Best Practices =
 
 <em>Coming Soon</em>

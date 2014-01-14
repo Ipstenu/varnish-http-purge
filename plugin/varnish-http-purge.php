@@ -35,6 +35,7 @@ class VarnishPurger {
     }
     
     public function init() {
+        load_plugin_textdomain( 'varnish-http-purge' );
         foreach ($this->getRegisterEvents() as $event) {
             add_action( $event, array($this, 'purgePost'), 10, 2 );
         }

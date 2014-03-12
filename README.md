@@ -1,9 +1,7 @@
-varnish-http-purge
+Varnish HTTP Purge
 ==================
 
-Varnish HTTP Purge
-
-''THIS IS NOT WHERE YOU SHOULD DOWNLOAD THIS PLUGIN FROM!''
+**THIS IS NOT WHERE YOU SHOULD DOWNLOAD THIS PLUGIN FROM!**
 
 Yes, I accept pull requests and stuff here, but if you're installing the plugin from this location directly, you're silly. This is where dev things live. 
 

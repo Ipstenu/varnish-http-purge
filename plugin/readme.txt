@@ -2,15 +2,15 @@
 Contributors: techpriester, Ipstenu, DH-Shredder
 Tags: varnish, purge, cache
 Requires at least: 3.4
-Tested up to: 3.7
-Stable tag: 3.3.1
+Tested up to: 3.8
+Stable tag: 3.3.4
 
-Purge Varnish Cache when pages are modified.
+Purge Varnish Cache when post content on your site is modified.
 
 == Description ==
 Varnish HTTP Purge sends a PURGE request to the URL of a page or post every time it it modified. This occurs when editing, publishing, commenting or deleting an item, and when changing themes.
 
-<a href="https://www.varnish-cache.org/">Varnish</a> is a web application accelerator also known as a caching HTTP reverse proxy. You install it in front of any server that speaks HTTP and configure it to cache the contents. This plugin <em>does not</em> install Varnish for you. It's expected you already did that.
+<a href="https://www.varnish-cache.org/">Varnish</a> is a web application accelerator also known as a caching HTTP reverse proxy. You install it in front of any server that speaks HTTP and configure it to cache the contents. This plugin <em>does not</em> install Varnish for you, nor does it configure Varnish for WordPress. It's expected you already did that on your own.
 
 Not all pages are purged every time, depending on your Varnish configuration. When a post, page, or custom post type is edited, or a new comment is added, <em>only</em> the following pages will purge:
 
@@ -22,7 +22,10 @@ In addition, your entire cache will be purged on the following actions:
 
 * <del>Changing permalinks</del>
 * Changing themes
-* Press the 'flush cache' button
+* Press the 'Purge Varnish Cache' button on the dashboard
+* Press the 'Purge Varnish' button on the toolbar
+
+Please note: On a multisite network using subfolders, only the <strong>network admins</strong> can purge the main site.
 
 = The future ... =
 
@@ -35,6 +38,8 @@ We're going to sit down and look into how the plugin is structured to make it ev
 
 == Installation ==
 No WordPress configuration needed.
+
+When used on Multisite, the plugin is Network Activatable Only.
 
 = Requirements =
 * Pretty Permalinks enabled
@@ -63,13 +68,23 @@ In the interests of design, we decided that the KISS principle was key. Since yo
 
 = Why doesn't my cache purge when I edit my theme? =
 
-Because the plugin only purges your <em>content</em> when you edit it. That means if you edit a page/post, or someone leaves a comment, it'll change. Otherwise, you have to purge the whole cache. The plugin will do this for you if you change your theme, but not when you edit your theme. 
+Because the plugin only purges your <em>content</em> when you edit it. That means if you edit a page/post, or someone leaves a comment, it'll change. Otherwise, you have to purge the whole cache. The plugin will do this for you if you ''change'' your theme, but not when you edit your theme. 
 
-That said, if you use Jetpack's CSS editor, it will purge the whole cache on save.
+That said, if you use Jetpack's CSS editor, it will purge the whole cache for your site on save.
 
 = How do I manually purge the whole cache? =
 
 Click the 'Purge Varnish Cache' button on the "Right Now" Dashboard (see the screenshot if you can't find it).
+
+There's also a "Purge Varnish" button on the admin toolbar.
+
+= I don't see a button! =
+
+Are you using Multisite? Are you on the main site on the network? You know, the one in example.com? And are you using subfolders?
+
+Only the multisite <em>network</em> admins can purge that site, because on a subfolder network if you flush the site at example.com, then everything under that (like example.com/site1 and example.com/siten and everything else) would also get flushed. That means that a purge on the main site purges the entire network.
+
+I don't know about you, but I don't want my random site-admins to be able to do that. So to mitigate that, only the network admins can purge everything on the main site of a subfolder network.
 
 = Why is nothing caching when I use PageSpeed? =
 
@@ -80,8 +95,6 @@ If you're using nginx, it's `pagespeed ModifyCachingHeaders off;`
 = Can I use this with a proxy service like CloudFlare? =
 
 Yes, but you'll need to make some additonal changes (see "Why aren't my changes showing when I use CloudFlare or another proxy?" below).
-
-If you use the Jetpack CSS editor, however, your changes will show up.
 
 = Why aren't my changes showing when I use CloudFlare or another proxy? =
 
@@ -121,13 +134,28 @@ The plugin sends a PURGE command of <code>/.*</code> and `X-Purge-Method` in the
 
 = How do I configure my VCL? =
 
-This is a beyond this plugin question in a way, since I don't offer any Varnish Config help. I will say this, you absolutely must have PURGE set up in your VCL. This is still supported in Varnish v3, though may not be set up by default. Also, here are some links to other people who use this plugin and have made public their VCLs:
+This is a question beyond the support of plugin. I don't offer any Varnish Config help due to resources. I will say this, you absolutely must have PURGE set up in your VCL. This is still supported in Varnish v3, though may not be set up by default. Also, here are some links to other people who use this plugin and have made public their VCLs:
 
 * <a href="https://github.com/dreamhost/varnish-vcl-collection">DreamHost's Varnish VCL Collection</a>
 
 All of these VCLs work with this plugin.
 
 == Changelog ==
+
+= 3.4 =
+* Multisite support
+* Button in toolbar
+* Fix define message in debug mode
+* Better parsing for if you set the define in the DB or config.
+
+= 3.3.4 =
+* Rollback. Sorry.
+
+= 3.3.3 =
+* Per request of Jetpack team, added in a <code>wp_cache_flush()</code> call when manually purging. This should only impact server side PHP caches (APC, Memcached etc)
+
+= 3.3.2 =
+* Varnish IP was too persnickity in PHP 5.4 (added in an 'and if not null' check - props <a href="http://wordpress.org/support/topic/patch-a-little-patch-to-purge-on-comment-posting">colinleroy</a>)
 
 = 3.3.1 =
 * Language Pack fixing.

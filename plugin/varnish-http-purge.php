@@ -66,7 +66,7 @@ class VarnishPurger {
     }
 
     function purgeMessage() {
-        echo "<div id='message' class='updated fade'><p><strong>".__('Varnish purge flushed!', 'varnish-http-purge')."</strong></p></div>";
+        echo "<div id='message' class='updated fade'><p><strong>".__('Varnish cache purged!', 'varnish-http-purge')."</strong></p></div>";
     }
     
     function prettyPermalinksMessage() {

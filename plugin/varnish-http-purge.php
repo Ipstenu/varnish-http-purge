@@ -180,6 +180,12 @@ class VarnishPurger {
     
         // If this is a valid post we want to purge the post, the home page and any associated tags & cats
         // If not, purge everything on the site.
+        // We should ignore revisions though.
+
+        if( get_post_type($postId) == 'revision' ) {
+            return;
+        }
+
     
         $validPostStatus = array("publish", "trash");
         $thisPostStatus  = get_post_status($postId);

@@ -2,8 +2,8 @@
 Contributors: techpriester, Ipstenu, DH-Shredder
 Tags: varnish, purge, cache
 Requires at least: 3.4
-Tested up to: 3.8
-Stable tag: 3.3.4
+Tested up to: 3.9
+Stable tag: 3.4
 
 Purge Varnish Cache when post content on your site is modified.
 
@@ -141,6 +141,9 @@ This is a question beyond the support of plugin. I don't offer any Varnish Confi
 All of these VCLs work with this plugin.
 
 == Changelog ==
+
+= 3.4.1 =
+* Isset wrap for URL path and query which may not be set in rare conditions (props <a href="https://wordpress.org/support/topic/undefined-index-notices-4">hsz</a>)
 
 = 3.4 =
 * Multisite support

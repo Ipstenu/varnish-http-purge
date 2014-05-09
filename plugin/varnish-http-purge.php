@@ -150,7 +150,7 @@ class VarnishPurger {
         $p = parse_url($url);
         
         
-        if ( isset($p['query']) && $p['query'] == 'vhp=regex' ) {
+        if ( isset($p['query']) && ( $p['query'] == 'vhp=regex' ) ) {
             $pregex = '.*';
             $varnish_x_purgemethod = 'regex';
         } else {
@@ -165,7 +165,7 @@ class VarnishPurger {
             $varniship = get_option('vhp_varnish_ip');
         }
 
-        if isset($p['path']) { 
+        if (isset($p['path'] ) ) { 
 	        $path = $p['path'];
         } else {
 	        $path = '';

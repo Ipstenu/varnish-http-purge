@@ -3,7 +3,7 @@
 Plugin Name: Varnish HTTP Purge
 Plugin URI: http://wordpress.org/extend/plugins/varnish-http-purge/ 
 Description: Sends HTTP PURGE requests to URLs of changed posts/pages when they are modified. 
-Version: 3.4.1
+Version: 3.5
 Author: Mika Epstein
 Author URI: http://halfelf.org/
 License: http://www.apache.org/licenses/LICENSE-2.0
@@ -84,7 +84,6 @@ class VarnishPurger {
         ));
     }
 
-
     function varnish_rightnow() {
         global $blog_id;
         $url = wp_nonce_url(admin_url('?vhp_flush_all'), 'varnish-http-purge');
@@ -107,16 +106,6 @@ class VarnishPurger {
             $text = $intro.' '.$nobutton;       
         }
         echo "<p class='varnish-rightnow'>$text</p>\n";
-    }
-
-    // For the not being used at this moment admin bar
-    function varnish_links() {
-        global $wp_admin_bar;
-          if ( !is_super_admin() || !is_admin_bar_showing() || !is_admin() )
-        return;
-
-        $url = wp_nonce_url(admin_url('?vhp_flush_all'), 'varnish-http-purge');
-        $wp_admin_bar->add_menu( array( 'id' => 'varnish_text', 'title' => __( 'Purge Varnish', 'varnish-http-purge' ), 'href' => $url ) );
     }
 
     protected function getRegisterEvents() {
@@ -213,8 +202,19 @@ class VarnishPurger {
                     array_push($this->purgeUrls, home_url( $tag_base . $tag->slug . '/' ) );
                 }
             }
+            
+            // Post URL
             array_push($this->purgeUrls, get_permalink($postId) );
+
+			// Feeds
+			$feeds = array(get_bloginfo('rdf_url') , get_bloginfo('rss_url') , get_bloginfo('rss2_url'), get_bloginfo('atom_url'), get_bloginfo('comments_atom_url'), get_bloginfo('comments_rss2_url'), get_post_comments_feed_link($postId) );
+			foreach ( $feeds as $feed ) {
+				array_push($this->purgeUrls, $feed );
+			}			
+
+			// Home URL
             array_push($this->purgeUrls, home_url() );
+
         } else {
             array_push($this->purgeUrls, home_url( '?vhp=regex') );
         }

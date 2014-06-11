@@ -3,7 +3,7 @@ Contributors: techpriester, Ipstenu, DH-Shredder
 Tags: varnish, purge, cache
 Requires at least: 3.4
 Tested up to: 3.9
-Stable tag: 3.4
+Stable tag: 3.5
 
 Purge Varnish Cache when post content on your site is modified.
 
@@ -121,7 +121,7 @@ Your Varnish IP must be one of the IPs that Varnish is listening on. If you use 
 If your webhost set up Varnish for you, you may need to ask them for the specifics if they don't have it documented. I've listed the ones I know about here, however you should still check with them if you're not sure.
 
 <ul>
-    <li><strong>DreamHost</strong> - If you're using DreamPress, go into the Panel and click on the DNS settings for the domain. The entry for <em>resolve-to.domain</em> is your varnish server: `resolve-to.www A 208.97.157.172`</li>
+    <li><strong>DreamHost</strong> - If you're using DreamPress and Cloudflare, go into the Panel and click on the DNS settings for the domain. The entry for <em>resolve-to.domain</em> is your varnish server: `resolve-to.www A 208.97.157.172` -- If you're <em>NOT</em> using Cloudflare, you don't need it, but it's just your normal IP.</li>
 </ul>
 
 = Why don't my gzip'd pages flush? =
@@ -142,8 +142,9 @@ All of these VCLs work with this plugin.
 
 == Changelog ==
 
-= 3.4.1 =
+= 3.5 =
 * Isset wrap for URL path and query which may not be set in rare conditions (props <a href="https://wordpress.org/support/topic/undefined-index-notices-4">hsz</a>)
+* Added in flushing for feeds (requested by <a href="https://wordpress.org/support/topic/feed-not-purged">heypete</a>)
 
 = 3.4 =
 * Multisite support

@@ -66,7 +66,7 @@ class VarnishPurger {
     }
 
     function purgeMessage() {
-        echo "<div id='message' class='updated fade'><p><strong>".__('Varnish purge flushed!', 'varnish-http-purge')."</strong></p></div>";
+        echo "<div id='message' class='updated fade'><p><strong>".__('Varnish cache purged!', 'varnish-http-purge')."</strong></p></div>";
     }
     
     function prettyPermalinksMessage() {
@@ -77,7 +77,7 @@ class VarnishPurger {
         $admin_bar->add_menu( array(
             'id'    => 'purge-varnish-cache-all',
             'title' => 'Purge Varnish',
-            'href'  => wp_nonce_url('?vhp_flush_all', 'varnish-http-purge'),
+            'href'  => wp_nonce_url(add_query_arg('vhp_flush_all', 1), 'varnish-http-purge'),
             'meta'  => array(
                 'title' => __('Purge Varnish','varnish-http-purge'),
             ),
@@ -170,12 +170,20 @@ class VarnishPurger {
         // Cleanup CURL functions to be wp_remote_request and thus better
         // http://wordpress.org/support/topic/incompatability-with-editorial-calendar-plugin
         wp_remote_request($purgeme, array('method' => 'PURGE', 'headers' => array( 'host' => $p['host'], 'X-Purge-Method' => $varnish_x_purgemethod ) ) );
+
+        do_action('after_purge_url', $url, $purgeme);
     }
 
     public function purgePost($postId) {
     
         // If this is a valid post we want to purge the post, the home page and any associated tags & cats
         // If not, purge everything on the site.
+        // We should ignore revisions though.
+
+        if( get_post_type($postId) == 'revision' ) {
+            return;
+        }
+
     
         $validPostStatus = array("publish", "trash");
         $thisPostStatus  = get_post_status($postId);

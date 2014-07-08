@@ -31,6 +31,7 @@ class VarnishPurger {
     public function __construct() {
         defined('varnish-http-purge') ||define('varnish-http-purge', true);
         defined('VHP_VARNISH_IP') || define('VHP_VARNISH_IP', false );
+        defined('VHP_LOGGING') || define('VHP_LOGGING', false );
         add_action( 'init', array( &$this, 'init' ) );
         add_action( 'activity_box_end', array( $this, 'varnish_rightnow' ), 100 );
     }
@@ -159,6 +160,11 @@ class VarnishPurger {
 	        $path = '';
         }
 
+        // Should we enable logging?
+        if ( VHP_LOGGING != false ) {
+            $logging = VHP_LOGGING;
+        }
+
         // If we made varniship, let it sail
         if ( isset($varniship) && $varniship != null ) {
             // Explode in case we have a comma seperated list. If it's a single IP, then it will be used in the first (and only) loop iteration
@@ -167,10 +173,16 @@ class VarnishPurger {
             $varniships = array_map('trim', $varniships);
             foreach ($varniships as $varniship) {
                 $purgeme = $p['scheme'].'://'.$varniship.$path.$pregex;
-                $this->logPurge('Purge request sent - '.$purgeme);
+                if ($logging) {
+                    $this->logPurge('Purge request sent - '.$purgeme);
+                }
                 // Cleanup CURL functions to be wp_remote_request and thus better
                 // http://wordpress.org/support/topic/incompatability-with-editorial-calendar-plugin
-                $this->logPurge(json_encode(wp_remote_request($purgeme, array('sslverify' => false, 'method' => 'PURGE', 'headers' => array( 'host' => $p['host'], 'X-Purge-Method' => $varnish_x_purgemethod ) ) ) ) );
+                if ($logging) {
+                    $this->logPurge(json_encode(wp_remote_request($purgeme, array('sslverify' => false, 'method' => 'PURGE', 'headers' => array( 'host' => $p['host'], 'X-Purge-Method' => $varnish_x_purgemethod ) ) ) ) );
+                } else {
+                    wp_remote_request($purgeme, array('sslverify' => false, 'method' => 'PURGE', 'headers' => array( 'host' => $p['host'], 'X-Purge-Method' => $varnish_x_purgemethod ) ) );
+                }
             }
         } else {
             // No $varniship is set, send the request to the host
@@ -178,7 +190,11 @@ class VarnishPurger {
             $this->logPurge('Purge request sent - '.$purgeme);
             // Cleanup CURL functions to be wp_remote_request and thus better
             // http://wordpress.org/support/topic/incompatability-with-editorial-calendar-plugin
-            $this->logPurge(json_encode(wp_remote_request($purgeme, array('method' => 'PURGE', 'headers' => array( 'host' => $p['host'], 'X-Purge-Method' => $varnish_x_purgemethod ) ) ) ) );
+            if ($logging) {
+                $this->logPurge(json_encode(wp_remote_request($purgeme, array('sslverify' => false, 'method' => 'PURGE', 'headers' => array( 'host' => $p['host'], 'X-Purge-Method' => $varnish_x_purgemethod ) ) ) ) );
+            } else {
+                wp_remote_request($purgeme, array('sslverify' => false, 'method' => 'PURGE', 'headers' => array( 'host' => $p['host'], 'X-Purge-Method' => $varnish_x_purgemethod ) ) );
+            }
         }
 
 

@@ -138,7 +138,6 @@ class VarnishPurger {
         // Parse the URL for proxy proxies
         $p = parse_url($url);
 
-
         if ( isset($p['query']) && ( $p['query'] == 'vhp=regex' ) ) {
             $pregex = '.*';
             $varnish_x_purgemethod = 'regex';
@@ -168,19 +167,27 @@ class VarnishPurger {
             $varniships = array_map('trim', $varniships);
             foreach ($varniships as $varniship) {
                 $purgeme = $p['scheme'].'://'.$varniship.$path.$pregex;
+                $this->logPurge('Purge request sent - '.$purgeme);
                 // Cleanup CURL functions to be wp_remote_request and thus better
                 // http://wordpress.org/support/topic/incompatability-with-editorial-calendar-plugin
-                wp_remote_request($purgeme, array('method' => 'PURGE', 'headers' => array( 'host' => $p['host'], 'X-Purge-Method' => $varnish_x_purgemethod ) ) );
+                $this->logPurge(json_encode(wp_remote_request($purgeme, array('method' => 'PURGE', 'headers' => array( 'host' => $p['host'], 'X-Purge-Method' => $varnish_x_purgemethod ) ) ) ) );
             }
         } else {
             // No $varniship is set, send the request to the host
             $purgeme = $p['scheme'].'://'.$p['host'].$path.$pregex;
+            $this->logPurge('Purge request sent - '.$purgeme);
             // Cleanup CURL functions to be wp_remote_request and thus better
             // http://wordpress.org/support/topic/incompatability-with-editorial-calendar-plugin
-            wp_remote_request($purgeme, array('method' => 'PURGE', 'headers' => array( 'host' => $p['host'], 'X-Purge-Method' => $varnish_x_purgemethod ) ) );
+            $this->logPurge(json_encode(wp_remote_request($purgeme, array('method' => 'PURGE', 'headers' => array( 'host' => $p['host'], 'X-Purge-Method' => $varnish_x_purgemethod ) ) ) ) );
         }
 
 
+    }
+
+    protected function logPurge($string) {
+        $logfile = plugin_dir_path(__FILE__).'purgelog.log';
+        $timestamp = date('Y-m-d H:i:s');
+        file_put_contents($logfile, $timestamp.' - '.$string."\n", FILE_APPEND);
     }
 
     public function purgePost($postId) {

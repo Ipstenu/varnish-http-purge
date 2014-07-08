@@ -66,7 +66,7 @@ class VarnishPurger {
     }
 
     function purgeMessage() {
-        echo "<div id='message' class='updated fade'><p><strong>".__('Varnish purge flushed!', 'varnish-http-purge')."</strong></p></div>";
+        echo "<div id='message' class='updated fade'><p><strong>".__('Varnish cache purged!', 'varnish-http-purge')."</strong></p></div>";
     }
 
     function prettyPermalinksMessage() {
@@ -162,8 +162,10 @@ class VarnishPurger {
 
         // If we made varniship, let it sail
         if ( isset($varniship) && $varniship != null ) {
-            $varniships = explode(',', $varniship); // Explode in case we have a comma seperated list. If it's a single IP, then it will be used in the first (and only) loop iteration
-            $varniships = array_map('trim', $varniships); // Trim all array values in case it was a ', ' seperated list.
+            // Explode in case we have a comma seperated list. If it's a single IP, then it will be used in the first (and only) loop iteration
+            $varniships = explode(',', $varniship);
+            // Trim all array values in case it was a ', ' seperated list.
+            $varniships = array_map('trim', $varniships);
             foreach ($varniships as $varniship) {
                 $purgeme = $p['scheme'].'://'.$varniship.$path.$pregex;
                 // Cleanup CURL functions to be wp_remote_request and thus better
@@ -185,6 +187,11 @@ class VarnishPurger {
 
         // If this is a valid post we want to purge the post, the home page and any associated tags & cats
         // If not, purge everything on the site.
+        // We should ignore revisions though
+
+        if ( get_post_type($postId) == 'revision' ) {
+            return;
+        }
 
         $validPostStatus = array("publish", "trash");
         $thisPostStatus  = get_post_status($postId);

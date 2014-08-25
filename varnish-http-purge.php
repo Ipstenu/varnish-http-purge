@@ -43,7 +43,7 @@ class VarnishPurger {
                 'tested' => '3.3', // which version of WordPress is your plugin tested up to?
                 'readme' => 'README.md' // which file to use as the readme for the version number
             );
-            new WPGitHubUpdater($config);
+            new WP_GitHub_Updater($config);
         }
         defined('varnish-http-purge') || define('varnish-http-purge', true);
         defined('VHP_VARNISH_IP') || define('VHP_VARNISH_IP', false );

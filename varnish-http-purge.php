@@ -1,18 +1,18 @@
 <?php
 /*
-Plugin Name: Varnish HTTP Purge
-Plugin URI: http://wordpress.org/extend/plugins/varnish-http-purge/ 
-Description: Sends HTTP PURGE requests to URLs of changed posts/pages when they are modified. 
-Version: 3.5
-Author: Mika Epstein
-Author URI: http://halfelf.org/
+Plugin Name: Varnish HTTP Purge - Multi
+Description: Sends HTTP PURGE requests to URLs of changed posts/pages when they are modified.
+Version: 1.2
+Author: Oliver Payne
+Author URI: https://github.com/olipayne/varnish-http-purge-multi
 License: http://www.apache.org/licenses/LICENSE-2.0
-Text Domain: varnish-http-purge
+Text Domain: varnish-http-purge-multi
 Network: true
 
 Copyright 2013-2014: Mika A. Epstein (email: ipstenu@ipstenu.org)
 
 Original Author: Leon Weidauer ( http:/www.lnwdr.de/ )
+Modified By: Oliver Payne
 
     This file is part of Varnish HTTP Purge, a plugin for WordPress.
 
@@ -27,14 +27,32 @@ Original Author: Leon Weidauer ( http:/www.lnwdr.de/ )
 
 class VarnishPurger {
     protected $purgeUrls = array();
-    
+
     public function __construct() {
-        defined('varnish-http-purge') ||define('varnish-http-purge', true);
+
+        if (is_admin()) { // note the use of is_admin() to double check that this is happening in the admin
+            require_once('updater.php');
+            $config = array(
+                'slug' => plugin_basename(__FILE__), // this is the slug of your plugin
+                'proper_folder_name' => 'varnish-http-purge-multi', // this is the name of the folder your plugin lives in
+                'api_url' => 'https://api.github.com/repos/olipayne/varnish-http-purge-multi', // the github API url of your github repo
+                'raw_url' => 'https://raw.github.com/olipayne/varnish-http-purge-multi/master', // the github raw url of your github repo
+                'github_url' => 'https://github.com/olipayne/varnish-http-purge-multi', // the github url of your github repo
+                'zip_url' => 'https://github.com/olipayne/varnish-http-purge-multi/zipball/master', // the zip url of the github repo
+                'sslverify' => true, // wether WP should check the validity of the SSL cert when getting an update, see https://github.com/jkudish/WordPress-GitHub-Plugin-Updater/issues/2 and https://github.com/jkudish/WordPress-GitHub-Plugin-Updater/issues/4 for details
+                'requires' => '3.0', // which version of WordPress does your plugin require?
+                'tested' => '3.9.2', // which version of WordPress is your plugin tested up to?
+                'readme' => 'README.md' // which file to use as the readme for the version number
+            );
+            new WP_GitHub_Updater($config);
+        }
+        defined('varnish-http-purge') || define('varnish-http-purge', true);
         defined('VHP_VARNISH_IP') || define('VHP_VARNISH_IP', false );
+        defined('VHP_LOGGING') || define('VHP_LOGGING', false );
         add_action( 'init', array( &$this, 'init' ) );
         add_action( 'activity_box_end', array( $this, 'varnish_rightnow' ), 100 );
     }
-    
+
     public function init() {
         global $blog_id;
         load_plugin_textdomain( 'varnish-http-purge' );
@@ -66,13 +84,13 @@ class VarnishPurger {
     }
 
     function purgeMessage() {
-        echo "<div id='message' class='updated fade'><p><strong>".__('Varnish purge flushed!', 'varnish-http-purge')."</strong></p></div>";
+        echo "<div id='message' class='updated fade'><p><strong>".__('Varnish cache purged!', 'varnish-http-purge')."</strong></p></div>";
     }
-    
+
     function prettyPermalinksMessage() {
         echo "<div id='message' class='error'><p>".__( 'Varnish HTTP Purge requires you to use custom permalinks. Please go to the <a href="options-permalink.php">Permalinks Options Page</a> to configure them.', 'varnish-http-purge' )."</p></div>";
     }
-    
+
     function varnish_rightnow_adminbar($admin_bar){
         $admin_bar->add_menu( array(
             'id'    => 'purge-varnish-cache-all',
@@ -103,7 +121,7 @@ class VarnishPurger {
         ) {
             $text = $intro.' '.$button;
         } else {
-            $text = $intro.' '.$nobutton;       
+            $text = $intro.' '.$nobutton;
         }
         echo "<p class='varnish-rightnow'>$text</p>\n";
     }
@@ -121,12 +139,12 @@ class VarnishPurger {
 
     public function executePurge() {
         $purgeUrls = array_unique($this->purgeUrls);
-        
+
         if (empty($purgeUrls)) {
-            if ( isset($_GET['vhp_flush_all']) && current_user_can('manage_options') && check_admin_referer('varnish-http-purge') ) { 
+            if ( isset($_GET['vhp_flush_all']) && current_user_can('manage_options') && check_admin_referer('varnish-http-purge') ) {
                 $this->purgeUrl( home_url() .'/?vhp=regex' );
                // wp_cache_flush();
-            } 
+            }
         } else {
             foreach($purgeUrls as $url) {
                 $this->purgeUrl($url);
@@ -137,8 +155,7 @@ class VarnishPurger {
     protected function purgeUrl($url) {
         // Parse the URL for proxy proxies
         $p = parse_url($url);
-        
-        
+
         if ( isset($p['query']) && ( $p['query'] == 'vhp=regex' ) ) {
             $pregex = '.*';
             $varnish_x_purgemethod = 'regex';
@@ -154,32 +171,71 @@ class VarnishPurger {
             $varniship = get_option('vhp_varnish_ip');
         }
 
-        if (isset($p['path'] ) ) { 
+        if (isset($p['path'] ) ) {
 	        $path = $p['path'];
         } else {
 	        $path = '';
         }
 
-        // If we made varniship, let it sail
-        if ( isset($varniship) && $varniship != null ) {
-            $purgeme = $p['scheme'].'://'.$varniship.$path.$pregex;
-        } else {
-            $purgeme = $p['scheme'].'://'.$p['host'].$path.$pregex;
+        // Should we enable logging?
+        if ( VHP_LOGGING != false ) {
+            $logging = VHP_LOGGING;
         }
 
-        // Cleanup CURL functions to be wp_remote_request and thus better
-        // http://wordpress.org/support/topic/incompatability-with-editorial-calendar-plugin
-        wp_remote_request($purgeme, array('method' => 'PURGE', 'headers' => array( 'host' => $p['host'], 'X-Purge-Method' => $varnish_x_purgemethod ) ) );
+        // If we made varniship, let it sail
+        if ( isset($varniship) && $varniship != null ) {
+            // Explode in case we have a comma seperated list. If it's a single IP, then it will be used in the first (and only) loop iteration
+            $varniships = explode(',', $varniship);
+            // Trim all array values in case it was a ', ' seperated list.
+            $varniships = array_map('trim', $varniships);
+            foreach ($varniships as $varniship) {
+                $purgeme = $p['scheme'].'://'.$varniship.$path.$pregex;
+                if ($logging) {
+                    $this->logPurge('Purge request sent - '.$purgeme);
+                }
+                // Cleanup CURL functions to be wp_remote_request and thus better
+                // http://wordpress.org/support/topic/incompatability-with-editorial-calendar-plugin
+                if ($logging) {
+                    $this->logPurge(json_encode(wp_remote_request($purgeme, array('sslverify' => false, 'method' => 'PURGE', 'headers' => array( 'host' => $p['host'], 'X-Purge-Method' => $varnish_x_purgemethod ) ) ) ) );
+                } else {
+                    wp_remote_request($purgeme, array('sslverify' => false, 'method' => 'PURGE', 'headers' => array( 'host' => $p['host'], 'X-Purge-Method' => $varnish_x_purgemethod ) ) );
+                }
+            }
+        } else {
+            // No $varniship is set, send the request to the host
+            $purgeme = $p['scheme'].'://'.$p['host'].$path.$pregex;
+            $this->logPurge('Purge request sent - '.$purgeme);
+            // Cleanup CURL functions to be wp_remote_request and thus better
+            // http://wordpress.org/support/topic/incompatability-with-editorial-calendar-plugin
+            if ($logging) {
+                $this->logPurge(json_encode(wp_remote_request($purgeme, array('sslverify' => false, 'method' => 'PURGE', 'headers' => array( 'host' => $p['host'], 'X-Purge-Method' => $varnish_x_purgemethod ) ) ) ) );
+            } else {
+                wp_remote_request($purgeme, array('sslverify' => false, 'method' => 'PURGE', 'headers' => array( 'host' => $p['host'], 'X-Purge-Method' => $varnish_x_purgemethod ) ) );
+            }
+        }
+
+
+    }
+
+    protected function logPurge($string) {
+        $logfile = plugin_dir_path(__FILE__).'purgelog.log';
+        $timestamp = date('Y-m-d H:i:s');
+        file_put_contents($logfile, $timestamp.' - '.$string."\n", FILE_APPEND);
     }
 
     public function purgePost($postId) {
-    
+
         // If this is a valid post we want to purge the post, the home page and any associated tags & cats
         // If not, purge everything on the site.
-    
+        // We should ignore revisions though
+
+        if ( get_post_type($postId) == 'revision' ) {
+            return;
+        }
+
         $validPostStatus = array("publish", "trash");
         $thisPostStatus  = get_post_status($postId);
-    
+
         if ( get_permalink($postId) == true && in_array($thisPostStatus, $validPostStatus) ) {
             // Category & Tag purge based on Donnacha's work in WP Super Cache
             $categories = get_the_category($postId);
@@ -191,18 +247,18 @@ class VarnishPurger {
                 foreach ($categories as $cat) {
                     array_push($this->purgeUrls, home_url( $category_base . $cat->slug . '/' ) );
                 }
-            }            
+            }
             $tags = get_the_tags($postId);
             if ( $tags ) {
                 $tag_base = get_option( 'tag_base' );
                 if ( $tag_base == '' )
                     $tag_base = '/tag/';
-                $tag_base = trailingslashit( str_replace( '..', '', $tag_base ) ); 
+                $tag_base = trailingslashit( str_replace( '..', '', $tag_base ) );
                 foreach ($tags as $tag) {
                     array_push($this->purgeUrls, home_url( $tag_base . $tag->slug . '/' ) );
                 }
             }
-            
+
             // Post URL
             array_push($this->purgeUrls, get_permalink($postId) );
 
@@ -210,7 +266,7 @@ class VarnishPurger {
 			$feeds = array(get_bloginfo('rdf_url') , get_bloginfo('rss_url') , get_bloginfo('rss2_url'), get_bloginfo('atom_url'), get_bloginfo('comments_atom_url'), get_bloginfo('comments_rss2_url'), get_post_comments_feed_link($postId) );
 			foreach ( $feeds as $feed ) {
 				array_push($this->purgeUrls, $feed );
-			}			
+			}
 
 			// Home URL
             array_push($this->purgeUrls, home_url() );

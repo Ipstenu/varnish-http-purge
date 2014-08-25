@@ -2,7 +2,7 @@
 /*
 Plugin Name: Varnish HTTP Purge - Multi
 Description: Sends HTTP PURGE requests to URLs of changed posts/pages when they are modified.
-Version: 5.0
+Version: 1.0
 Author: Oliver Payne
 License: http://www.apache.org/licenses/LICENSE-2.0
 Text Domain: varnish-http-purge-multi

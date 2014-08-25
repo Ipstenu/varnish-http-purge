@@ -1,18 +1,17 @@
 <?php
 /*
-Plugin Name: Varnish HTTP Purge
-Plugin URI: http://wordpress.org/extend/plugins/varnish-http-purge/
+Plugin Name: Varnish HTTP Purge - Multi
 Description: Sends HTTP PURGE requests to URLs of changed posts/pages when they are modified.
-Version: 3.5
-Author: Mika Epstein
-Author URI: http://halfelf.org/
+Version: 5.0
+Author: Oliver Payne
 License: http://www.apache.org/licenses/LICENSE-2.0
-Text Domain: varnish-http-purge
+Text Domain: varnish-http-purge-multi
 Network: true
 
 Copyright 2013-2014: Mika A. Epstein (email: ipstenu@ipstenu.org)
 
 Original Author: Leon Weidauer ( http:/www.lnwdr.de/ )
+Modified By: Oliver Payne
 
     This file is part of Varnish HTTP Purge, a plugin for WordPress.
 
@@ -29,7 +28,22 @@ class VarnishPurger {
     protected $purgeUrls = array();
 
     public function __construct() {
-        defined('varnish-http-purge') ||define('varnish-http-purge', true);
+        if (is_admin()) { // note the use of is_admin() to double check that this is happening in the admin
+            $config = array(
+                'slug' => plugin_basename(__FILE__), // this is the slug of your plugin
+                'proper_folder_name' => 'varnish-http-purge', // this is the name of the folder your plugin lives in
+                'api_url' => 'https://api.github.com/repos/username/repository-name', // the github API url of your github repo
+                'raw_url' => 'https://raw.github.com/username/repository-name/master', // the github raw url of your github repo
+                'github_url' => 'https://github.com/username/repository-name', // the github url of your github repo
+                'zip_url' => 'https://github.com/username/repository-name/zipball/master', // the zip url of the github repo
+                'sslverify' => true // wether WP should check the validity of the SSL cert when getting an update, see https://github.com/jkudish/WordPress-GitHub-Plugin-Updater/issues/2 and https://github.com/jkudish/WordPress-GitHub-Plugin-Updater/issues/4 for details
+                'requires' => '3.0', // which version of WordPress does your plugin require?
+                'tested' => '3.3', // which version of WordPress is your plugin tested up to?
+                'readme' => 'README.MD' // which file to use as the readme for the version number
+            );
+            new WPGitHubUpdater($config);
+        }
+        defined('varnish-http-purge') || define('varnish-http-purge', true);
         defined('VHP_VARNISH_IP') || define('VHP_VARNISH_IP', false );
         defined('VHP_LOGGING') || define('VHP_LOGGING', false );
         add_action( 'init', array( &$this, 'init' ) );

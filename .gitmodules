@@ -1,3 +1,0 @@
-[submodule "vcls/dreamhost"]
-	path = vcls/dreamhost
-	url = git@github.com:dreamhost/varnish-vcl-collection.git

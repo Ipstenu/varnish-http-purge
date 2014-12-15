@@ -2,8 +2,8 @@
 Contributors: techpriester, Ipstenu, DH-Shredder
 Tags: varnish, purge, cache
 Requires at least: 3.4
-Tested up to: 4.0
-Stable tag: 3.5.1
+Tested up to: 4.1
+Stable tag: 3.6
 
 Purge Varnish Cache when post content on your site is modified.
 
@@ -145,6 +145,9 @@ This is a question beyond the support of plugin. I don't offer any Varnish Confi
 All of these VCLs work with this plugin.
 
 == Changelog ==
+
+= 3.6 =
+* Making purge be http only, since Varnish doesn't support https. This will prevent other issues for people using SSL with Varnish (though goodness knows why...)
 
 = 3.5.1 =
 * Language fix

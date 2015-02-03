@@ -164,7 +164,7 @@ class VarnishPurger {
 		if ( isset($varniship) && $varniship != null ) {
 			$purgeme = 'http://'.$varniship.$path.$pregex;
 		} else {
-			$purgeme = 'http://'://'.$p['host'].$path.$pregex;
+			$purgeme = 'http://'.$p['host'].$path.$pregex;
 		}
 
 		// Cleanup CURL functions to be wp_remote_request and thus better

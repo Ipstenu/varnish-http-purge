@@ -148,6 +148,7 @@ All of these VCLs work with this plugin.
 
 = 3.6 =
 * Making purge be http only, since Varnish doesn't support https. This will prevent other issues for people using SSL with Varnish (though goodness knows why...)
+* Forcing backslash on home_url. Why WP doesn't, I have no idea, but this will help sites not running regex.
 
 = 3.5.1 =
 * Language fix

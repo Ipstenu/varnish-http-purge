@@ -206,15 +206,16 @@ class VarnishPurger {
 
 			// Author URL
 			$authorurls = array (
-				get_author_posts_url( get_the_author( $postId ) , 
-				get_the_author( $postId ) ).'/feed/', 
+				get_author_posts_url( get_the_author( $postId ) ),
+				get_author_feed_link( get_the_author( $postId ) ),
 			);
 			array_push($this->purgeUrls, $authorurls ) ;
 			
-			// Archives
+			// Archives and their feeds
 			$archiveurls = array();
 			if ( get_post_type_archive_link($postID) == true ) {
-				array_push( $archiveurls, get_post_type_archive_link($postId) );
+				array_push( $archiveurls, get_post_type_archive_link( get_post_type( $postId ) ) );
+				array_push( $archiveurls, get_post_type_archive_feed_link( get_post_type( $postId ) ) );
 			}
 			array_push($this->purgeUrls, $archiveurls ) ;
 
@@ -222,7 +223,14 @@ class VarnishPurger {
 			array_push($this->purgeUrls, get_permalink($postId) );
 
 			// Feed Purge
-			$feeds = array(get_bloginfo('rdf_url') , get_bloginfo('rss_url') , get_bloginfo('rss2_url'), get_bloginfo('atom_url'), get_bloginfo('comments_atom_url'), get_bloginfo('comments_rss2_url'), get_post_comments_feed_link($postId) );
+			$feeds = array(
+				get_bloginfo_rss('rdf_url') , 
+				get_bloginfo_rss('rss_url') , 
+				get_bloginfo_rss('rss2_url'), 
+				get_bloginfo_rss('atom_url'), 
+				get_bloginfo_rss('comments_rss2_url'), 
+				get_post_comments_feed_link($postId) 
+			);
 			foreach ( $feeds as $feed ) {
 				array_push($this->purgeUrls, $feed );
 			}

@@ -3,7 +3,7 @@
 Plugin Name: Varnish HTTP Purge
 Plugin URI: http://wordpress.org/extend/plugins/varnish-http-purge/
 Description: Sends HTTP PURGE requests to URLs of changed posts/pages when they are modified.
-Version: 3.6
+Version: 3.7
 Author: Mika Epstein
 Author URI: http://halfelf.org/
 License: http://www.apache.org/licenses/LICENSE-2.0
@@ -179,7 +179,7 @@ class VarnishPurger {
 		// If this is a revision, stop.
 		if( get_post_type($postId) == 'revision' ) {
 			return;
-			}
+		}
 
 		// If this is a valid post we want to purge the post, the home page and any associated tags & cats
 		// If not, purge everything on the site.
@@ -188,40 +188,52 @@ class VarnishPurger {
 		$thisPostStatus  = get_post_status($postId);
 	
 		if ( get_permalink($postId) == true && in_array($thisPostStatus, $validPostStatus) ) {
-			// Category & Tag purge based on Donnacha's work in WP Super Cache
+
+			// Category purge based on Donnacha's work in WP Super Cache
 			$categories = get_the_category($postId);
 			if ( $categories ) {
-				$category_base = get_option( 'category_base');
-				if ( $category_base == '' )
-					$category_base = '/category/';
-				$category_base = trailingslashit( $category_base );
 				foreach ($categories as $cat) {
-					array_push($this->purgeUrls, home_url( $category_base . $cat->slug . '/' ) );
+					array_push($this->purgeUrls, get_category_link( $cat->term_id ) );
 				}
 			}
+			// Tag purge based on Donnacha's work in WP Super Cache
 			$tags = get_the_tags($postId);
 			if ( $tags ) {
-				$tag_base = get_option( 'tag_base' );
-				if ( $tag_base == '' ) {
-					$tag_base = '/tag/';
-				}
-				$tag_base = trailingslashit( str_replace( '..', '', $tag_base ) ); 
 				foreach ($tags as $tag) {
-					array_push($this->purgeUrls, home_url( $tag_base . $tag->slug . '/' ) );
+					array_push($this->purgeUrls, get_tag_link( $tag->term_id ) );
 				}
 			}
 
-			// Post URL
+			// Author URL
+			$authorurls = array (
+				get_author_posts_url( get_the_author( $postId ) , 
+				get_the_author( $postId ) ).'/feed/', 
+			);
+			array_push($this->purgeUrls, $authorurls ) ;
+			
+			// Archives
+			$archiveurls = array();
+			if ( get_post_type_archive_link($postID) == true ) {
+				array_push( $archiveurls, get_post_type_archive_link($postId) );
+			}
+			array_push($this->purgeUrls, $archiveurls ) ;
+
+			// Post URL Purge
 			array_push($this->purgeUrls, get_permalink($postId) );
 
-			// Feeds
+			// Feed Purge
 			$feeds = array(get_bloginfo('rdf_url') , get_bloginfo('rss_url') , get_bloginfo('rss2_url'), get_bloginfo('atom_url'), get_bloginfo('comments_atom_url'), get_bloginfo('comments_rss2_url'), get_post_comments_feed_link($postId) );
 			foreach ( $feeds as $feed ) {
 				array_push($this->purgeUrls, $feed );
 			}
 
-			// Home URL
-			array_push($this->purgeUrls, home_url('/') );
+			// Home Page:
+			// Flush the front page IF we're showing posts, otherwise fush page used for posts 
+			if( get_option('show_on_front') == 'posts' ) {
+				array_push($this->purgeUrls, home_url('/') );
+			} elseif ( get_option('show_on_front') == 'page' ) {
+				array_push($this->purgeUrls, get_permalink( get_option('page_for_posts') ) );
+			}
 
 		} else {
 			array_push($this->purgeUrls, home_url( '/?vhp=regex') );

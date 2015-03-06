@@ -189,41 +189,44 @@ class VarnishPurger {
 	
 		if ( get_permalink($postId) == true && in_array($thisPostStatus, $validPostStatus) ) {
 
+			// array to collect all our URLs
+			$listofurls = array();
+
 			// Category purge based on Donnacha's work in WP Super Cache
 			$categories = get_the_category($postId);
 			if ( $categories ) {
 				foreach ($categories as $cat) {
-					array_push($this->purgeUrls, get_category_link( $cat->term_id ) );
+					array_push($listofurls, get_category_link( $cat->term_id ) );
 				}
 			}
 			// Tag purge based on Donnacha's work in WP Super Cache
 			$tags = get_the_tags($postId);
 			if ( $tags ) {
 				foreach ($tags as $tag) {
-					array_push($this->purgeUrls, get_tag_link( $tag->term_id ) );
+					array_push($listofurls, get_tag_link( $tag->term_id ) );
 				}
 			}
 
 			// Author URL
-			$authorurls = array (
+			array_push($listofurls,
 				get_author_posts_url( get_post_field( 'post_author', $postId ) ),
-				get_author_feed_link( get_post_field( 'post_author', $postId ) ),
+				get_author_feed_link( get_post_field( 'post_author', $postId ) )
 			);
-			array_push($this->purgeUrls, $authorurls ) ;
 			
 			// Archives and their feeds
 			$archiveurls = array();
 			if ( get_post_type_archive_link($postId) == true ) {
-				array_push( $archiveurls, get_post_type_archive_link( get_post_type( $postId ) ) );
-				array_push( $archiveurls, get_post_type_archive_feed_link( get_post_type( $postId ) ) );
+				array_push($listofurls,
+					get_post_type_archive_link( get_post_type( $postId ) ),
+					get_post_type_archive_feed_link( get_post_type( $postId ) )
+				);
 			}
-			array_push($this->purgeUrls, $archiveurls ) ;
 
-			// Post URL Purge
-			array_push($this->purgeUrls, get_permalink($postId) );
+			// Post URL
+			array_push($listofurls, get_permalink($postId) );
 
-			// Feed Purge
-			$feeds = array(
+			// Feeds
+			array_push($listofurls, 
 				get_bloginfo_rss('rdf_url') , 
 				get_bloginfo_rss('rss_url') , 
 				get_bloginfo_rss('rss2_url'), 
@@ -231,16 +234,16 @@ class VarnishPurger {
 				get_bloginfo_rss('comments_rss2_url'), 
 				get_post_comments_feed_link($postId) 
 			);
-			foreach ( $feeds as $feed ) {
-				array_push($this->purgeUrls, $feed );
+
+			// Home Page and (if used) posts page
+			array_push($listofurls, home_url('/') ); 
+			if ( get_option('show_on_front') == 'page' ) {
+				array_push($listofurls, get_permalink( get_option('page_for_posts') ) );
 			}
 
-			// Home Page:
-			// Flush the front page IF we're showing posts, otherwise fush page used for posts 
-			if( get_option('show_on_front') == 'posts' ) {
-				array_push($this->purgeUrls, home_url('/') );
-			} elseif ( get_option('show_on_front') == 'page' ) {
-				array_push($this->purgeUrls, get_permalink( get_option('page_for_posts') ) );
+			// Now flush all the URLs we've collected
+			foreach ($listofurls as $url) {
+				array_push($this->purgeUrls, $url ) ;
 			}
 
 		} else {

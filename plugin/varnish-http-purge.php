@@ -206,14 +206,14 @@ class VarnishPurger {
 
 			// Author URL
 			$authorurls = array (
-				get_author_posts_url( get_the_author( $postId ) ),
-				get_author_feed_link( get_the_author( $postId ) ),
+				get_author_posts_url( get_post_field( 'post_author', $postId ) ),
+				get_author_feed_link( get_post_field( 'post_author', $postId ) ),
 			);
 			array_push($this->purgeUrls, $authorurls ) ;
 			
 			// Archives and their feeds
 			$archiveurls = array();
-			if ( get_post_type_archive_link($postID) == true ) {
+			if ( get_post_type_archive_link($postId) == true ) {
 				array_push( $archiveurls, get_post_type_archive_link( get_post_type( $postId ) ) );
 				array_push( $archiveurls, get_post_type_archive_feed_link( get_post_type( $postId ) ) );
 			}

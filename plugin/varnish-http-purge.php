@@ -246,6 +246,10 @@ class VarnishPurger {
 		} else {
 			array_push($this->purgeUrls, home_url( '/?vhp=regex') );
 		}
+
+        // Filter to add or remove urls to the array of purged urls
+        // @param array $purgeUrls the urls (paths) to be purged
+        $this->purgeUrls = apply_filters( 'vhp_purge_urls', $this->purgeUrls );
 	}
 
 }

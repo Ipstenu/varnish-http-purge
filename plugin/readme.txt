@@ -148,6 +148,7 @@ All of these VCLs work with this plugin.
 
 = 3.7 = 
 * Optimizing flushes.
+* Add filter to allow other people to hook in when 3rd party plugins are abjectly weird (props jnachtigall)
 
 = 3.6 =
 * Making purge be http only, since Varnish doesn't support https. This will prevent other issues for people using SSL with Varnish (though goodness knows why...)

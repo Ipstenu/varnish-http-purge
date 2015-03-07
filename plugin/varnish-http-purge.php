@@ -249,7 +249,8 @@ class VarnishPurger {
 
         // Filter to add or remove urls to the array of purged urls
         // @param array $purgeUrls the urls (paths) to be purged
-        $this->purgeUrls = apply_filters( 'vhp_purge_urls', $this->purgeUrls );
+        // @param int $postId the id of the new/edited post
+        $this->purgeUrls = apply_filters( 'vhp_purge_urls', $this->purgeUrls, $postId );
 	}
 
 }

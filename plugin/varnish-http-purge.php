@@ -76,10 +76,10 @@ class VarnishPurger {
 	function varnish_rightnow_adminbar($admin_bar){
 		$admin_bar->add_menu( array(
 			'id'	=> 'purge-varnish-cache-all',
-			'title' => 'Purge Varnish',
+			'title' => 'Purge Varnish Cache',
 			'href'  => wp_nonce_url(add_query_arg('vhp_flush_all', 1), 'varnish-http-purge'),
 			'meta'  => array(
-				'title' => __('Purge Varnish','varnish-http-purge'),
+				'title' => __('Purge your entire Varnish Cache','varnish-http-purge'),
 			),
 		));
 	}

@@ -90,7 +90,7 @@ class VarnishPurger {
 		$intro = sprintf( __('<a href="%1$s">Varnish HTTP Purge</a> automatically purges your posts when published or updated. Sometimes you need a manual flush.', 'varnish-http-purge' ), 'http://wordpress.org/plugins/varnish-http-purge/' );
 		$button =  __('Press the button below to force it to purge your entire cache.', 'varnish-http-purge' );
 		$button .= '</p><p><span class="button"><a href="'.$url.'"><strong>';
-		$button .= __('Purge Varnish Cache', 'varnish-http-purge' );
+		$button .= __('Purge Varnish', 'varnish-http-purge' );
 		$button .= '</strong></a></span>';
 		$nobutton =  __('You do not have permission to purge the cache for the whole site. Please contact your adminstrator.', 'varnish-http-purge' );
 		if (

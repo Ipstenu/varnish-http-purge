@@ -3,7 +3,7 @@ Contributors: techpriester, Ipstenu, DH-Shredder
 Tags: varnish, purge, cache
 Requires at least: 3.4
 Tested up to: 4.1
-Stable tag: 3.6
+Stable tag: 3.7
 
 Purge Varnish Cache when post content on your site is modified.
 
@@ -56,7 +56,7 @@ Until the WordPress Language Pack system is deployable, I'm storing them <a href
 
 = What version of Varnish is supported? =
 
-This was built and tested on Varnish 3.x, however it is reported to work on 2.x. It is only supported on v3 at this time.
+This was built and tested on Varnish 3.x, however it is reported to work on 2.x and 4.x. It is only supported on v3 at this time.
 
 = Why doesn't every page flush when I make a new post? =
 
@@ -224,5 +224,3 @@ All of these VCLs work with this plugin.
 1. What the button looks like
 
 == Upgrade Notice ==
-
-3.3.1 is just a language pack fix. Enjoy!

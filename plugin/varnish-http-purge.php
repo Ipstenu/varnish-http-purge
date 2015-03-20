@@ -3,7 +3,7 @@
 Plugin Name: Varnish HTTP Purge
 Plugin URI: http://wordpress.org/extend/plugins/varnish-http-purge/
 Description: Sends HTTP PURGE requests to URLs of changed posts/pages when they are modified.
-Version: 3.7
+Version: 3.7.1
 Author: Mika Epstein
 Author URI: http://halfelf.org/
 License: http://www.apache.org/licenses/LICENSE-2.0
@@ -121,12 +121,12 @@ class VarnishPurger {
 
 	public function executePurge() {
 		$purgeUrls = array_unique($this->purgeUrls);
-		
+
 		if (empty($purgeUrls)) {
-			if ( isset($_GET['vhp_flush_all']) && current_user_can('manage_options') && check_admin_referer('varnish-http-purge') ) { 
+			if ( isset($_GET['vhp_flush_all']) && current_user_can('manage_options') && check_admin_referer('varnish-http-purge') ) {
 				$this->purgeUrl( home_url() .'/?vhp=regex' );
 			   // wp_cache_flush();
-			} 
+			}
 		} else {
 			foreach($purgeUrls as $url) {
 				$this->purgeUrl($url);
@@ -137,8 +137,8 @@ class VarnishPurger {
 	protected function purgeUrl($url) {
 		// Parse the URL for proxy proxies
 		$p = parse_url($url);
-		
-		
+
+
 		if ( isset($p['query']) && ( $p['query'] == 'vhp=regex' ) ) {
 			$pregex = '.*';
 			$varnish_x_purgemethod = 'regex';
@@ -154,7 +154,7 @@ class VarnishPurger {
 			$varniship = get_option('vhp_varnish_ip');
 		}
 
-		if (isset($p['path'] ) ) { 
+		if (isset($p['path'] ) ) {
 			$path = $p['path'];
 		} else {
 			$path = '';
@@ -170,7 +170,7 @@ class VarnishPurger {
 		// Cleanup CURL functions to be wp_remote_request and thus better
 		// http://wordpress.org/support/topic/incompatability-with-editorial-calendar-plugin
 		wp_remote_request($purgeme, array('method' => 'PURGE', 'headers' => array( 'host' => $p['host'], 'X-Purge-Method' => $varnish_x_purgemethod ) ) );
-		
+
 		do_action('after_purge_url', $url, $purgeme);
 	}
 
@@ -183,10 +183,10 @@ class VarnishPurger {
 
 		// If this is a valid post we want to purge the post, the home page and any associated tags & cats
 		// If not, purge everything on the site.
-	
+
 		$validPostStatus = array("publish", "trash");
 		$thisPostStatus  = get_post_status($postId);
-	
+
 		if ( get_permalink($postId) == true && in_array($thisPostStatus, $validPostStatus) ) {
 
 			// array to collect all our URLs
@@ -212,10 +212,10 @@ class VarnishPurger {
 				get_author_posts_url( get_post_field( 'post_author', $postId ) ),
 				get_author_feed_link( get_post_field( 'post_author', $postId ) )
 			);
-			
+
 			// Archives and their feeds
 			$archiveurls = array();
-			if ( get_post_type_archive_link($postId) == true ) {
+			if ( get_post_type_archive_link( get_post_type( $postId ) ) == true ) {
 				array_push($listofurls,
 					get_post_type_archive_link( get_post_type( $postId ) ),
 					get_post_type_archive_feed_link( get_post_type( $postId ) )
@@ -226,17 +226,17 @@ class VarnishPurger {
 			array_push($listofurls, get_permalink($postId) );
 
 			// Feeds
-			array_push($listofurls, 
-				get_bloginfo_rss('rdf_url') , 
-				get_bloginfo_rss('rss_url') , 
-				get_bloginfo_rss('rss2_url'), 
-				get_bloginfo_rss('atom_url'), 
-				get_bloginfo_rss('comments_rss2_url'), 
-				get_post_comments_feed_link($postId) 
+			array_push($listofurls,
+				get_bloginfo_rss('rdf_url') ,
+				get_bloginfo_rss('rss_url') ,
+				get_bloginfo_rss('rss2_url'),
+				get_bloginfo_rss('atom_url'),
+				get_bloginfo_rss('comments_rss2_url'),
+				get_post_comments_feed_link($postId)
 			);
 
 			// Home Page and (if used) posts page
-			array_push($listofurls, home_url('/') ); 
+			array_push($listofurls, home_url('/') );
 			if ( get_option('show_on_front') == 'page' ) {
 				array_push($listofurls, get_permalink( get_option('page_for_posts') ) );
 			}

@@ -3,7 +3,7 @@ Contributors: techpriester, Ipstenu, DH-Shredder
 Tags: varnish, purge, cache
 Requires at least: 4.0
 Tested up to: 4.2
-Stable tag: 3.7.1
+Stable tag: 3.7.2
 
 Purge Varnish Cache when post content on your site is modified.
 
@@ -146,8 +146,10 @@ All of these VCLs work with this plugin.
 
 == Changelog ==
 
-= 3.7.1 =
+= 3.7.2 = 
+* Revisions were being mishandled and purging all inappropriately. (props Cha0sgr)
 
+= 3.7.1 =
 * Archives weren't purging. (props Ingraye)
 
 = 3.7 =
@@ -228,3 +230,5 @@ All of these VCLs work with this plugin.
 1. What the button looks like
 
 == Upgrade Notice ==
+
+Version 3.7.2 fixes a performance issue that would cause the purge-all to run when creating a new post.

@@ -3,14 +3,14 @@
 Plugin Name: Varnish HTTP Purge
 Plugin URI: http://wordpress.org/extend/plugins/varnish-http-purge/
 Description: Sends HTTP PURGE requests to URLs of changed posts/pages when they are modified.
-Version: 3.7.1
+Version: 3.7.2
 Author: Mika Epstein
 Author URI: http://halfelf.org/
 License: http://www.apache.org/licenses/LICENSE-2.0
 Text Domain: varnish-http-purge
 Network: true
 
-Copyright 2013-2014: Mika A. Epstein (email: ipstenu@ipstenu.org)
+Copyright 2013-2015: Mika A. Epstein (email: ipstenu@ipstenu.org)
 
 Original Author: Leon Weidauer ( http:/www.lnwdr.de/ )
 
@@ -124,7 +124,7 @@ class VarnishPurger {
 
 		if (empty($purgeUrls)) {
 			if ( isset($_GET['vhp_flush_all']) && current_user_can('manage_options') && check_admin_referer('varnish-http-purge') ) {
-				$this->purgeUrl( home_url() .'/?vhp=regex' );
+				$this->purgeUrl( home_url() .'/?vhp-regex' );
 			   // wp_cache_flush();
 			}
 		} else {
@@ -139,7 +139,7 @@ class VarnishPurger {
 		$p = parse_url($url);
 
 
-		if ( isset($p['query']) && ( $p['query'] == 'vhp=regex' ) ) {
+		if ( isset($p['query']) && ( $p['query'] == 'vhp-regex' ) ) {
 			$pregex = '.*';
 			$varnish_x_purgemethod = 'regex';
 		} else {
@@ -176,19 +176,16 @@ class VarnishPurger {
 
 	public function purgePost($postId) {
 
-		// If this is a revision, stop.
-		if( get_post_type($postId) == 'revision' ) {
-			return;
-		}
-
 		// If this is a valid post we want to purge the post, the home page and any associated tags & cats
 		// If not, purge everything on the site.
 
 		$validPostStatus = array("publish", "trash");
 		$thisPostStatus  = get_post_status($postId);
 
-		if ( get_permalink($postId) == true && in_array($thisPostStatus, $validPostStatus) ) {
-
+		// If this is a revision, stop.
+		if( get_permalink($postId) !== true && !in_array($thisPostStatus, $validPostStatus) ) {
+			return;
+		} else {
 			// array to collect all our URLs
 			$listofurls = array();
 
@@ -246,9 +243,13 @@ class VarnishPurger {
 				array_push($this->purgeUrls, $url ) ;
 			}
 
-		} else {
-			array_push($this->purgeUrls, home_url( '/?vhp=regex') );
+		} 
+		/*
+		// Commenting out - This was causing things to flush cache on page save.
+		else {
+			array_push($this->purgeUrls, home_url( '/?vhp-regex') );
 		}
+		*/
 
         // Filter to add or remove urls to the array of purged urls
         // @param array $purgeUrls the urls (paths) to be purged

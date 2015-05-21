@@ -160,11 +160,16 @@ class VarnishPurger {
 			$path = '';
 		}
 
+		/**
+		 * You can use this filter to change the default http:// schema to https://
+		 */
+		$schema = apply_filters( 'varnish_http_purge_schema', 'http://' );
+
 		// If we made varniship, let it sail
 		if ( isset($varniship) && $varniship != null ) {
-			$purgeme = 'http://'.$varniship.$path.$pregex;
+			$purgeme = $schema.$varniship.$path.$pregex;
 		} else {
-			$purgeme = 'http://'.$p['host'].$path.$pregex;
+			$purgeme = $schema.$p['host'].$path.$pregex;
 		}
 
 		// Cleanup CURL functions to be wp_remote_request and thus better

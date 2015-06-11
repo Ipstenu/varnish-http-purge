@@ -3,7 +3,7 @@
 Plugin Name: Varnish HTTP Purge
 Plugin URI: http://wordpress.org/extend/plugins/varnish-http-purge/
 Description: Sends HTTP PURGE requests to URLs of changed posts/pages when they are modified.
-Version: 3.7.2
+Version: 3.7.3
 Author: Mika Epstein
 Author URI: http://halfelf.org/
 License: http://www.apache.org/licenses/LICENSE-2.0
@@ -161,8 +161,15 @@ class VarnishPurger {
 		}
 
 		/**
-		 * You can use this filter to change the default http:// schema to https://
+		 * Schema filter
+		 *
+		 * Allows default http:// schema to be changed to https
+		 * varnish_http_purge_schema()
+		 *
+		 * @since 3.7.3
+		 *
 		 */
+
 		$schema = apply_filters( 'varnish_http_purge_schema', 'http://' );
 
 		// If we made varniship, let it sail
@@ -248,13 +255,7 @@ class VarnishPurger {
 				array_push($this->purgeUrls, $url ) ;
 			}
 
-		} 
-		/*
-		// Commenting out - This was causing things to flush cache on page save.
-		else {
-			array_push($this->purgeUrls, home_url( '/?vhp-regex') );
 		}
-		*/
 
         // Filter to add or remove urls to the array of purged urls
         // @param array $purgeUrls the urls (paths) to be purged

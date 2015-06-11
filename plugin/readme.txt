@@ -3,7 +3,7 @@ Contributors: techpriester, Ipstenu, DH-Shredder
 Tags: varnish, purge, cache
 Requires at least: 4.0
 Tested up to: 4.2
-Stable tag: 3.7.2
+Stable tag: 3.7.3
 
 Purge Varnish Cache when post content on your site is modified.
 
@@ -145,6 +145,9 @@ This is a question beyond the support of plugin. I don't offer any Varnish Confi
 All of these VCLs work with this plugin.
 
 == Changelog ==
+
+= 3.7.3 = 
+* Add varnish_http_purge_schema filter for changing the default schema. The default remains http (even if you set your home and/or site URL to https) because of sanity, but in order to support some edge cases, they can filter if they want. (props Drumba)
 
 = 3.7.2 = 
 * Revisions were being mishandled and purging all inappropriately. (props Cha0sgr)

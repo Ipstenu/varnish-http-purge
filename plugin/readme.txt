@@ -231,7 +231,3 @@ All of these VCLs work with this plugin.
 == Screenshots ==
 
 1. What the button looks like
-
-== Upgrade Notice ==
-
-Version 3.7.2 fixes a performance issue that would cause the purge-all to run when creating a new post.

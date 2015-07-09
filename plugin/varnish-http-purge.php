@@ -181,9 +181,9 @@ class VarnishPurger {
 
 		// Cleanup CURL functions to be wp_remote_request and thus better
 		// http://wordpress.org/support/topic/incompatability-with-editorial-calendar-plugin
-		wp_remote_request($purgeme, array('method' => 'PURGE', 'headers' => array( 'host' => $p['host'], 'X-Purge-Method' => $varnish_x_purgemethod ) ) );
+		$response = wp_remote_request($purgeme, array('method' => 'PURGE', 'headers' => array( 'host' => $p['host'], 'X-Purge-Method' => $varnish_x_purgemethod ) ) );
 
-		do_action('after_purge_url', $url, $purgeme);
+		do_action('after_purge_url', $url, $purgeme, $response);
 	}
 
 	public function purgePost($postId) {

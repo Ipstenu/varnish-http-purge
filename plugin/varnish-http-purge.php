@@ -39,8 +39,19 @@ class VarnishPurger {
 		global $blog_id;
 		load_plugin_textdomain( 'varnish-http-purge' );
 
-		foreach ($this->getRegisterEvents() as $event) {
-			add_action( $event, array($this, 'purgePost'), 10, 2 );
+		// get my events
+		$events = $this->getRegisterEvents();
+
+		// make sure we have events
+		if ( ! empty( $events ) ) {
+
+			// make sure it's an array
+			$events = (array) $events;
+
+			// and loop them
+			foreach ( $events as $event) {
+				add_action( $event, array($this, 'purgePost'), 10, 2 );
+			}
 		}
 		add_action( 'shutdown', array($this, 'executePurge') );
 
@@ -109,7 +120,9 @@ class VarnishPurger {
 	}
 
 	protected function getRegisterEvents() {
-		return array(
+
+		// set my base actions
+		$actions = array(
 			'save_post',
 			'deleted_post',
 			'trashed_post',
@@ -117,6 +130,9 @@ class VarnishPurger {
 			'delete_attachment',
 			'switch_theme',
 		);
+
+		// send back the actions array, filtered
+		return apply_filters( 'varnish_http_purge_actions', $actions );
 	}
 
 	public function executePurge() {

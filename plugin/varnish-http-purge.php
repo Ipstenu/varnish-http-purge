@@ -160,16 +160,23 @@ class VarnishPurger {
 		echo "<p class='varnish-rightnow'>$text</p>\n";
 	}
 
+	/**
+	 * Registered Events
+	 * These are when the purge is triggered
+	 *
+	 * @since 1.0
+	 * @access protected
+	 */
 	protected function getRegisterEvents() {
 
 		// Define registered purge events
 		$actions = array(
-			'save_post', 			// Save a post
-			'deleted_post',			// Delete a post
-			'trashed_post',			// Empty Trashed post
-			'edit_post',				// Edit a post - includes leaving comments
-			'delete_attachment',		// Delete an attachment - includes re-uploading
-			'switch_theme',			// Change theme
+			'save_post',            // Save a post
+			'deleted_post',         // Delete a post
+			'trashed_post',         // Empty Trashed post
+			'edit_post',            // Edit a post - includes leaving comments
+			'delete_attachment',    // Delete an attachment - includes re-uploading
+			'switch_theme',         // Change theme
 		);
 
 		// send back the actions array, filtered
@@ -177,13 +184,19 @@ class VarnishPurger {
 		return apply_filters( 'varnish_http_purge_events', $actions );
 	}
 
+	/**
+	 * Execute Purge
+	 * Run the purge command for the URLs. Calls $this->purgeUrl for each URL
+	 *
+	 * @since 1.0
+	 * @access protected
+	 */
 	public function executePurge() {
 		$purgeUrls = array_unique($this->purgeUrls);
 
 		if (empty($purgeUrls)) {
 			if ( isset($_GET['vhp_flush_all']) && current_user_can('manage_options') && check_admin_referer('varnish-http-purge') ) {
 				$this->purgeUrl( home_url() .'/?vhp-regex' );
-			   // wp_cache_flush();
 			}
 		} else {
 			foreach($purgeUrls as $url) {
@@ -192,8 +205,15 @@ class VarnishPurger {
 		}
 	}
 
+	/**
+	 * Purge URL
+	 * Parse the URL for proxy proxies
+	 *
+	 * @since 1.0
+	 * @param array $url the url to be purged
+	 * @access protected
+	 */
 	protected function purgeUrl($url) {
-		// Parse the URL for proxy proxies
 		$p = parse_url($url);
 
 		if ( isset($p['query']) && ( $p['query'] == 'vhp-regex' ) ) {
@@ -243,6 +263,14 @@ class VarnishPurger {
 		do_action('after_purge_url', $url, $purgeme, $response);
 	}
 
+	/**
+	 * Purge Post
+	 * Flush the post
+	 *
+	 * @since 1.0
+	 * @param array $url the url to be purged
+	 * @access public
+	 */
 	public function purgePost($postId) {
 
 		// If this is a valid post we want to purge the post, the home page and any associated tags & cats
@@ -323,3 +351,8 @@ class VarnishPurger {
 }
 
 $purger = new VarnishPurger();
+
+// WP-CLI
+if ( defined('WP_CLI') && WP_CLI ) {
+	include( 'wp-cli.php' );
+}

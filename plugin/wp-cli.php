@@ -16,14 +16,39 @@ if (!defined('ABSPATH')) {
     die();
 }
 
+// Bail if WP-CLI is not present
+if ( !defined( 'WP_CLI' ) ) return;
+
 /**
  * Purges Varnish Cache
  */
 class WP_CLI_Varnish_Purge_Command extends WP_CLI_Command {
+
+	public function __construct() {
+		$this->varnish_purge = new VarnishPurger();
+	}
 	
-	function purge( ) {
+    /**
+     * Forces a Varnish Purge
+     * 
+     * ## EXAMPLES
+     * 
+     *     wp varnish purge
+     *
+     */
+	
+	function purge( ) {	
+			
+		wp_create_nonce('varnish-http-purge-cli');
+
+		$this->varnish_purge->purgeUrl( home_url() .'/?vhp-regex' );
 		
-		$url = parse_url( site_url() );
+		WP_CLI::success( "Testing." );
+	}
+	
+	function oldpurge( ) {
+		
+		$url = parse_url( home_url() );
 	
 		// Build a varniship
 		if ( VHP_VARNISH_IP != false ) {
@@ -34,26 +59,13 @@ class WP_CLI_Varnish_Purge_Command extends WP_CLI_Command {
 
 		// If we have a varnish ip, use that
 		if ( isset($varniship) && $varniship != null ) {
-			$purgeme = 'http://'.$varniship.'/\.*';
+			$purgeme = 'http://'.$varniship.'/.*';
 		} else {
-			$purgeme = 'http://'.$url['host'].'/\.*';
+			$purgeme = 'http://'.$url['host'].'/.*';
 		}
 	
-		$response = wp_remote_request($purgeme, array('method' => 'PURGE', 'headers' => array( 'host' => $p['host'], 'X-Purge-Method' => 'regex' ) ) );	
+		$response = wp_remote_request($purgeme, array('method' => 'PURGE', 'headers' => array( 'host' => $url['host'], 'X-Purge-Method' => 'regex' ) ) );	
 		WP_CLI::success( 'The Varnish cache was purged.' );
-	}
-
-	/**
-	 * Help function for this command
-	 */
-	public static function help() {
-		WP_CLI::line( <<<EOB
-usage: wp varnish
-
-	purge    purges the entire Varnish cache
-
-EOB
-		);
 	}
 
 }

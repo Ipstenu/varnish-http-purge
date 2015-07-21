@@ -41,7 +41,7 @@ class VarnishPurger {
 	 * @access public
 	 */
 	public function __construct() {
-		defined('varnish-http-purge') ||define('varnish-http-purge', true);
+		defined('varnish-http-purge') || define('varnish-http-purge', true);
 		defined('VHP_VARNISH_IP') || define('VHP_VARNISH_IP', false );
 		add_action( 'init', array( &$this, 'init' ) );
 		add_action( 'activity_box_end', array( $this, 'varnish_rightnow' ), 100 );
@@ -61,7 +61,11 @@ class VarnishPurger {
 		$events = $this->getRegisterEvents();
 
 		// make sure we have events and it's an array
-		if ( ! empty( $events ) && ( $events = (array) $events ) ) {
+		if ( ! empty( $events ) ) {
+			
+			// Force it to be an array, in case someone's stupid
+			$events = (array) $events;
+			
 			// Add the action for each event
 			foreach ( $events as $event) {
 				add_action( $event, array($this, 'purgePost'), 10, 2 );
@@ -137,7 +141,7 @@ class VarnishPurger {
 	function varnish_rightnow() {
 		global $blog_id;
 		
-		$url = wp_nonce_url(admin_url('?vhp_flush_all'), 'varnish-http-purge');
+		$url = wp_nonce_url(add_query_arg('vhp_flush_all', 1), 'varnish-http-purge');
 		$intro = sprintf( __('<a href="%1$s">Varnish HTTP Purge</a> automatically purges your posts when published or updated. Sometimes you need a manual flush.', 'varnish-http-purge' ), 'http://wordpress.org/plugins/varnish-http-purge/' );
 		$button =  __('Press the button below to force it to purge your entire cache.', 'varnish-http-purge' );
 		$button .= '</p><p><span class="button"><a href="'.$url.'"><strong>';
@@ -195,7 +199,7 @@ class VarnishPurger {
 		$purgeUrls = array_unique($this->purgeUrls);
 
 		if (empty($purgeUrls)) {
-			if ( isset($_GET['vhp_flush_all']) && current_user_can('manage_options') && check_admin_referer('varnish-http-purge') ) {
+			if ( check_admin_referer('varnish-http-purge') || wp_verify_nonce( 'varnish-http-purge-cli' ) ) {
 				$this->purgeUrl( home_url() .'/?vhp-regex' );
 			}
 		} else {
@@ -339,7 +343,6 @@ class VarnishPurger {
 			foreach ($listofurls as $url) {
 				array_push($this->purgeUrls, $url ) ;
 			}
-
 		}
 
         // Filter to add or remove urls to the array of purged urls

@@ -37,34 +37,11 @@ class WP_CLI_Varnish_Purge_Command extends WP_CLI_Command {
      *
      */
 	
-	function purge( ) {	
-			
+	function purge() {	
 		wp_create_nonce('varnish-http-purge-cli');
 
 		$this->varnish_purge->purgeUrl( home_url() .'/?vhp-regex' );
-		
-		WP_CLI::success( "Testing." );
-	}
-	
-	function oldpurge( ) {
-		
-		$url = parse_url( home_url() );
-	
-		// Build a varniship
-		if ( VHP_VARNISH_IP != false ) {
-			$varniship = VHP_VARNISH_IP;
-		} else {
-			$varniship = get_option('vhp_varnish_ip');
-		}
 
-		// If we have a varnish ip, use that
-		if ( isset($varniship) && $varniship != null ) {
-			$purgeme = 'http://'.$varniship.'/.*';
-		} else {
-			$purgeme = 'http://'.$url['host'].'/.*';
-		}
-	
-		$response = wp_remote_request($purgeme, array('method' => 'PURGE', 'headers' => array( 'host' => $url['host'], 'X-Purge-Method' => 'regex' ) ) );	
 		WP_CLI::success( 'The Varnish cache was purged.' );
 	}
 

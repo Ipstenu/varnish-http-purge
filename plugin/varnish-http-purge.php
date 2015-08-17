@@ -140,7 +140,6 @@ class VarnishPurger {
 	 */
 	function varnish_rightnow() {
 		global $blog_id;
-		
 		$url = wp_nonce_url(add_query_arg('vhp_flush_all', 1), 'varnish-http-purge');
 		$intro = sprintf( __('<a href="%1$s">Varnish HTTP Purge</a> automatically purges your posts when published or updated. Sometimes you need a manual flush.', 'varnish-http-purge' ), 'http://wordpress.org/plugins/varnish-http-purge/' );
 		$button =  __('Press the button below to force it to purge your entire cache.', 'varnish-http-purge' );
@@ -199,7 +198,7 @@ class VarnishPurger {
 		$purgeUrls = array_unique($this->purgeUrls);
 
 		if (empty($purgeUrls)) {
-			if ( check_admin_referer('varnish-http-purge') || wp_verify_nonce( 'varnish-http-purge-cli' ) ) {
+			if ( isset($_GET['vhp_flush_all']) && check_admin_referer('varnish-http-purge') ) {
 				$this->purgeUrl( home_url() .'/?vhp-regex' );
 			}
 		} else {
@@ -217,7 +216,7 @@ class VarnishPurger {
 	 * @param array $url the url to be purged
 	 * @access protected
 	 */
-	protected function purgeUrl($url) {
+	public function purgeUrl($url) {
 		$p = parse_url($url);
 
 		if ( isset($p['query']) && ( $p['query'] == 'vhp-regex' ) ) {

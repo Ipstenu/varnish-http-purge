@@ -136,6 +136,41 @@ Make sure your Varnish VCL is configured correctly to purge all the right pages.
 
 The plugin sends a PURGE command of <code>/.*</code> and `X-Purge-Method` in the header with a value of regex. If your Varnish server doesn't doesn't understand the wildcard, you can configure it to check for the header.
 
+= How can I debug? =
+
+If `WP_DEBUG` is on and you're not seeing any errors, you'll have to jump into the command line.
+
+To see every request made to varnish, use this:
+`varnishncsa -F "%m %U"`
+
+If you want to grab the last purge requests, it's this:
+`varnishlog -d -c -m RxRequest:PURGE`
+
+And this will show you if the WP button was used:
+`varnishlog -d -c -m RxURL:.*vhp_flush_all.*`
+
+In general, I leave the first command up and test the plugin. 
+
+A full Varnish flush looks like this:
+`PURGE /.*`
+
+And a new-post (or edited post) would look like this:
+```
+PURGE /category/uncategorized/
+PURGE /author/ipstenu/
+PURGE /author/ipstenu/feed/
+PURGE /2015/08/test-post/
+PURGE /feed/rdf/
+PURGE /feed/rss/
+PURGE /feed/
+PURGE /feed/atom/
+PURGE /comments/feed/
+PURGE /2015/08/test-post/feed/
+PURGE /
+```
+
+It's just a matter of poking at things from then on.
+
 = How do I configure my VCL? =
 
 This is a question beyond the support of plugin. I don't offer any Varnish Config help due to resources. I will say this, you absolutely must have PURGE set up in your VCL. This is still supported in Varnish v3, though may not be set up by default. Also, here are some links to other people who use this plugin and have made public their VCLs:

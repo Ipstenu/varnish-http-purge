@@ -71,6 +71,7 @@ class VarnishPurger {
 				add_action( $event, array($this, 'purgePost'), 10, 2 );
 			}
 		}
+		add_action( 'transition_comment_status', array($this, 'onCommentTransition'), 10, 3 );
 		add_action( 'shutdown', array($this, 'executePurge') );
 
 		// Success: Admin notice when purging
@@ -350,6 +351,22 @@ class VarnishPurger {
         $this->purgeUrls = apply_filters( 'vhp_purge_urls', $this->purgeUrls, $postId );
 	}
 
+	/**
+	 * Comment statuses might be 'trash', 'approved', 'unapproved', 'spam'.
+	 *
+	 * @param int|string $newStatus
+	 * @param int|string $oldStatus
+	 * @param object $comment
+	 */
+	public function onCommentTransition($newStatus, $oldStatus, $comment)
+	{
+		if ($oldStatus == 'unapproved' && $newStatus != 'approved') {
+			// unapproved comment was sent to trash or marked as spam => no need to flush cache
+		} else {
+			// a comment was published or removed => flush cache
+			$this->purgePost($comment->comment_post_ID);
+		}
+	}
 }
 
 $purger = new VarnishPurger();

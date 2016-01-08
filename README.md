@@ -12,3 +12,26 @@ Install the plugin from the [WordPress.org Repository](http://wordpress.org/plug
 * A beta copy of the plugin, for testing
 * Language packs
 * VCLs
+
+## Note about Varnish 4
+
+Supposedly this VCL works:
+
+```
+acl invalidators {
+        "127.0.0.1"
+        "localhost";
+        "<servers_hostname>";
+        "<servers_ip>";
+}
+sub vcl_recv {
+        if (req.method == "PURGE") {
+               if (!client.ip ~ invalidators) {
+                        return (synth(405, "Not allowed"));
+               }
+        return (purge);
+        }
+}
+```
+
+You will also need to add your servers public IP in the authorized client list. 

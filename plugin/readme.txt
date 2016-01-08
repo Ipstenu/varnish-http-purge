@@ -2,8 +2,8 @@
 Contributors: techpriester, Ipstenu, DH-Shredder
 Tags: varnish, purge, cache
 Requires at least: 4.0
-Tested up to: 4.3
-Stable tag: 3.7.3
+Tested up to: 4.4
+Stable tag: 3.8
 
 Purge Varnish Cache when post content on your site is modified.
 
@@ -48,10 +48,6 @@ When used on Multisite, the plugin is Network Activatable Only.
 = Languages =
 Until the WordPress Language Pack system is deployable, I'm storing them <a href="https://github.com/Ipstenu/varnish-http-purge">on Github</a> for now.
 
-= Varnish Config Best Practices =
-
-<em>Coming Soon</em>
-
 == Frequently Asked Questions ==
 
 = What version of Varnish is supported? =
@@ -70,7 +66,7 @@ In the interests of design, we decided that the KISS principle was key. Since yo
 
 Because the plugin only purges your <em>content</em> when you edit it. That means if you edit a page/post, or someone leaves a comment, it'll change. Otherwise, you have to purge the whole cache. The plugin will do this for you if you ''change'' your theme, but not when you edit your theme.
 
-That said, if you use Jetpack's CSS editor, it will purge the whole cache for your site on save.
+If you use Jetpack's CSS editor, it will purge the whole cache for your site on save.
 
 = How do I manually purge the whole cache? =
 
@@ -80,25 +76,27 @@ There's also a "Purge Varnish" button on the admin toolbar.
 
 = I don't see a button! =
 
-Are you using Multisite? Are you on the main site on the network? You know, the one in example.com? And are you using subfolders?
+If you're on a Multisite Network and you're on the primary site in the network, only the <em>network</em> admins can purge that site
 
-Only the multisite <em>network</em> admins can purge that site, because on a subfolder network if you flush the site at example.com, then everything under that (like example.com/site1 and example.com/siten and everything else) would also get flushed. That means that a purge on the main site purges the entire network.
+On a subfolder network if you flush the site at `example.com`, then everything under that (like `example.com/site1` and `example.com/siten` and everything else) would also get flushed. That means that a purge on the main site purges the entire network.
 
-I don't know about you, but I don't want my random site-admins to be able to do that. So to mitigate that, only the network admins can purge everything on the main site of a subfolder network.
+In order to mitigate the destructive nature of that power, only the network admins can purge everything on the main site of a subfolder network.
 
 = Why is nothing caching when I use PageSpeed? =
 
-Because PageSpeed likes to put in Caching headers to say <em>not</em> to cache. To fix this, you need to put this in your .htaccess section for PageSpeed: `ModPagespeedModifyCachingHeaders off`
+PageSpeed likes to put in Caching headers to say <em>not</em> to cache. To fix this, you need to put this in your .htaccess section for PageSpeed:
+
+`ModPagespeedModifyCachingHeaders off`
 
 If you're using nginx, it's `pagespeed ModifyCachingHeaders off;`
 
 = Can I use this with a proxy service like CloudFlare? =
 
-Yes, but you'll need to make some additonal changes (see "Why aren't my changes showing when I use CloudFlare or another proxy?" below).
+Yes, but you'll need to make some additional changes (see "Why aren't my changes showing when I use CloudFlare or another proxy?" below).
 
 = Why aren't my changes showing when I use CloudFlare or another proxy? =
 
-When you use CloudFlare or any other similar servive, you've got a proxy in front of the Varnish proxy. In general this isn't a bad thing. The problem arises when the DNS shenanigans send the purge request to your domainname. When you've got an additional proxy like CloudFlare, you don't want the request to go to the proxy, you want it to go to Varnish server.
+When you use CloudFlare or any other similar service, you've got a proxy in front of the Varnish proxy. In general this isn't a bad thing. The problem arises when the DNS shenanigans send the purge request to your domain name. When you've got an additional proxy like CloudFlare, you don't want the request to go to the proxy, you want it to go to Varnish server.
 
 To fix this, add the following to your wp-config.php file:
 
@@ -126,11 +124,13 @@ If your webhost set up Varnish for you, you may need to ask them for the specifi
 
 = What if I have multiple varnish IPs? =
 
-Right now it's not supported. I have a major issue with writing code I don't use, which means that since I'm only using one IP right now, I don't want to be on the ball for supporting multiple IPs. I don't even have a place to test is, which is just insane to attempt to code if you think about it. Yes, I could accept pull requests, but that means everyone's at some other person's discretion. So no, I won't be doing that at this time.
+Multiple IPs are not supported at this time.
+
+I have a major issue with writing code I don't use, which means that since I'm only using one IP right now, I don't want to be on the ball for supporting multiple IPs. I don't even have a place to test is, which is just insane to attempt to code if you think about it. Yes, I could accept pull requests, but that means everyone's at some other person's discretion. So no, I won't be doing that at this time.
 
 = Why don't my gzip'd pages flush? =
 
-Make sure your Varnish VCL is configured correctly to purge all the right pages. This is normally an issue with Varnish 2, which is not supported.
+Make sure your Varnish VCL is configured correctly to purge all the right pages. This is normally an issue with Varnish 2, which is not supported by this plugin.
 
 = Why isn't the whole cache purge working? =
 
@@ -149,7 +149,7 @@ If you want to grab the last purge requests, it's this:
 And this will show you if the WP button was used:
 `varnishlog -d -c -m RxURL:.*vhp_flush_all.*`
 
-In general, I leave the first command up and test the plugin. 
+In general, I leave the first command up and test the plugin.
 
 A full Varnish flush looks like this:
 `PURGE /.*`
@@ -191,10 +191,10 @@ If you're using `varnish_http_purge_events` then you have to make sure your even
 * Added wp-cli command: wp varnish purge (to purge varnish)
 * Adding some docblocks
 
-= 3.7.3 = 
+= 3.7.3 =
 * Add varnish_http_purge_schema filter for changing the default schema. The default remains http (even if you set your home and/or site URL to https) because of sanity, but in order to support some edge cases, they can filter if they want. (props Drumba)
 
-= 3.7.2 = 
+= 3.7.2 =
 * Revisions were being mishandled and purging all inappropriately. (props Cha0sgr)
 
 = 3.7.1 =

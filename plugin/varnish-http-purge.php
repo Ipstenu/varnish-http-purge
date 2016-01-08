@@ -3,7 +3,7 @@
 Plugin Name: Varnish HTTP Purge
 Plugin URI: http://wordpress.org/extend/plugins/varnish-http-purge/
 Description: Sends HTTP PURGE requests to URLs of changed posts/pages when they are modified.
-Version: 3.8-beta
+Version: 3.8
 Author: Mika Epstein
 Author URI: http://halfelf.org/
 License: http://www.apache.org/licenses/LICENSE-2.0
@@ -62,10 +62,10 @@ class VarnishPurger {
 
 		// make sure we have events and it's an array
 		if ( ! empty( $events ) ) {
-			
+
 			// Force it to be an array, in case someone's stupid
 			$events = (array) $events;
-			
+
 			// Add the action for each event
 			foreach ( $events as $event) {
 				add_action( $event, array($this, 'purgePost'), 10, 2 );

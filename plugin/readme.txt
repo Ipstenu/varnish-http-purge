@@ -190,6 +190,7 @@ If you're using `varnish_http_purge_events` then you have to make sure your even
 * Add a method to grab the response from purge request and pass to the 'after_purge_url' action for debugging. (props @shaula)
 * Added wp-cli command: wp varnish purge (to purge varnish)
 * Adding some docblocks
+* Fixing i18n
 
 = 3.7.3 =
 * Add varnish_http_purge_schema filter for changing the default schema. The default remains http (even if you set your home and/or site URL to https) because of sanity, but in order to support some edge cases, they can filter if they want. (props Drumba)

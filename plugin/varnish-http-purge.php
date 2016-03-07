@@ -163,7 +163,7 @@ class VarnishPurger {
 		} else {
 			$text = $intro.' '.$nobutton;
 		}
-		echo esc_html( "<p class='varnish-rightnow'>$text</p>\n" );
+		echo "<p class='varnish-rightnow'>$text</p>\n";
 	}
 
 	/**

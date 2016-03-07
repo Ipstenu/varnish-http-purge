@@ -2,8 +2,8 @@
 Contributors: techpriester, Ipstenu, DH-Shredder
 Tags: varnish, purge, cache
 Requires at least: 4.0
-Tested up to: 4.4
-Stable tag: 3.8
+Tested up to: 4.4.2
+Stable tag: 3.8.1
 
 Purge Varnish Cache when post content on your site is modified.
 
@@ -184,6 +184,9 @@ All of these VCLs work with this plugin.
 If you're using `varnish_http_purge_events` then you have to make sure your event spits out a post ID.
 
 == Changelog ==
+
+= 3.8.1 =
+* Fix PHPCS (WordPress Code Style) notices and warnings.
 
 = 3.8 =
 * Add varnish_http_purge_events filter to allow people to add their own events for purging. (props @norcross)

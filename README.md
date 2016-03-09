@@ -1,8 +1,17 @@
 Varnish HTTP Purge
 ==================
 
-**THIS IS NOT WHERE YOU SHOULD DOWNLOAD THIS PLUGIN FROM!**
+This is the development repository for the Varnish HTTP Purge plugin.
 
-Yes, I accept pull requests and stuff here, but if you're installing the plugin from this location directly, you're silly. This is where dev things live. 
+You should install the plugin from the [WordPress.org Repository](http://wordpress.org/plugins/varnish-http-purge/) however the master branch will mirror that. Development happens on various `REL` branches.
 
-Install the plugin from the [WordPress.org Repository](http://wordpress.org/plugins/varnish-http-purge/) please and thank you.
+## Current Versions
+
+* Live - 3.8
+* Development - 3.9
+
+## Helpful Links
+
+* [WP Readme](readme.txt)
+* [Changelog](changelog.txt)
+* [VCLs](https://github.com/Ipstenu/varnish-http-purge/wiki/Sample-VCLs)

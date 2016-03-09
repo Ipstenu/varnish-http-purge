@@ -111,7 +111,7 @@ class VarnishPurger {
 	 * @since 2.0
 	 */
 	function prettyPermalinksMessage() {
-		echo "<div id='message' class='error'><p>".__( 'Varnish HTTP Purge requires you to use custom permalinks. Please go to the <a href="options-permalink.php">Permalinks Options Page</a> to configure them.', 'varnish-http-purge' )."</p></div>";
+		echo "<div id='message' class='error'><p>" . printf( _( 'Varnish HTTP Purge requires you to use custom permalinks. Please go to the <a href="%s">Permalinks Options Page</a> to configure them.', 'varnish-http-purge' ), 'options-permalink.php' ) . "</p></div>";
 	}
 
 	/**

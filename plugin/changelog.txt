@@ -1,0 +1,68 @@
+= 3.6 =
+* Making purge be http only, since Varnish doesn't support https. This will prevent other issues for people using SSL with Varnish (though goodness knows why...)
+* Forcing backslash on home_url. Why WP doesn't, I have no idea, but this will help sites not running regex.
+
+= 3.5.1 =
+* Language fix
+* Using add_query_arg
+* Ignore revisions
+
+= 3.5 =
+* Isset wrap for URL path and query which may not be set in rare conditions (props <a href="https://wordpress.org/support/topic/undefined-index-notices-4">hsz</a>)
+* Added in flushing for feeds (requested by <a href="https://wordpress.org/support/topic/feed-not-purged">heypete</a>)
+
+= 3.4 =
+* Multisite support
+* Button in toolbar
+* Fix define message in debug mode
+* Better parsing for if you set the define in the DB or config.
+
+= 3.3.4 =
+* Rollback. Sorry.
+
+= 3.3.3 =
+* Per request of Jetpack team, added in a <code>wp_cache_flush()</code> call when manually purging. This should only impact server side PHP caches (APC, Memcached etc)
+
+= 3.3.2 =
+* Varnish IP was too persnickity in PHP 5.4 (added in an 'and if not null' check - props <a href="http://wordpress.org/support/topic/patch-a-little-patch-to-purge-on-comment-posting">colinleroy</a>)
+
+= 3.3.1 =
+* Language Pack fixing.
+
+= 3.3 =
+* Quick and dirty fix for a plugin that is causing the URLs to purge <em>ALL THE TIME</em>
+
+= 3.2 =
+* Correcting conflict with host's default config.
+
+= 3.1 =
+* Refactoring Cleanup (otherwise known as Copy/Pasta error in variable name). (props Shredder)
+
+= 3.0 =
+* Adds 'Purge Varnish' button
+* More selective purging, to account for different server setups
+* Tighened up what purges and when
+* Flushing categories and tags (per code from WP Super Cache, thanks!)
+* Clarify requirements (Varnish and Pretty Permalinks)
+
+= 2.3 =
+* Purge images on deletion
+* Fix for a VarnishIP when behind proxy servers not working on all hosts (props Berler)
+
+= 2.2.1 =
+* typo (hit . instead of / - Props John B. Manos)
+
+= 2.2 =
+* Added in workaround for Varnish purge reqs going AWOL when another proxy server is in place. (props to Shredder and Berler)
+* Cache flushes when you change themes
+
+= 2.1 =
+* Header Image
+
+= 2.0 =
+* Commit access handed to Ipstenu
+* Changed CURL to wp_remote_request (thank you <a href="http://wordpress.org/support/topic/incompatability-with-editorial-calendar-plugin?replies=1">Kenn Wilson</a>) so we don't have to do <a href="http://wordpress.org/support/topic/plugin-varnish-http-purge-incompatibility-with-woocommerce?replies=6">CURLOPT_RETURNTRANSFER</a> Remember kids, CURL is okay, but wp_remote_request is more better.
+
+= 1.2.0 =
+* Moved actual request execution to "shutdown" event
+* Removed GET request due to bad performance impact

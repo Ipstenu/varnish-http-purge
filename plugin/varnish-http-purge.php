@@ -41,7 +41,6 @@ class VarnishPurger {
 	 * @access public
 	 */
 	public function __construct() {
-		defined('varnish-http-purge') || define('varnish-http-purge', true);
 		defined('VHP_VARNISH_IP') || define('VHP_VARNISH_IP', false );
 		add_action( 'init', array( &$this, 'init' ) );
 		add_action( 'activity_box_end', array( $this, 'varnish_rightnow' ), 100 );
@@ -55,7 +54,6 @@ class VarnishPurger {
 	 */
 	public function init() {
 		global $blog_id;
-		load_plugin_textdomain( 'varnish-http-purge' );
 
 		// get my events
 		$events = $this->getRegisterEvents();

@@ -10,7 +10,6 @@ Install the plugin from the [WordPress.org Repository](http://wordpress.org/plug
 ## What is here?
 
 * A beta copy of the plugin, for testing
-* Language packs
 * VCLs
 
 ## Note about Varnish 4

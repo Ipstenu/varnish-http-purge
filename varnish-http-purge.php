@@ -252,9 +252,15 @@ class VarnishPurger {
 
 		// If we made varniship, let it sail
 		if ( isset($varniship) && $varniship != null ) {
-			$purgeme = $schema.$varniship.$path.$pregex;
+			$host = $varniship;
 		} else {
-			$purgeme = $schema.$p['host'].$path.$pregex;
+			$host = $p['host'];
+		}
+
+		$purgeme = $schema.$host.$path.$pregex;
+
+		if (!empty($p['query'])) {
+			$purgeme .= '?' . $p['query'];
 		}
 
 		// Cleanup CURL functions to be wp_remote_request and thus better

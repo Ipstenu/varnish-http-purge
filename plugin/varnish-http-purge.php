@@ -10,7 +10,7 @@ License: http://www.apache.org/licenses/LICENSE-2.0
 Text Domain: varnish-http-purge
 Network: true
 
-Copyright 2013-2015: Mika A. Epstein (email: ipstenu@ipstenu.org)
+Copyright 2013-2016: Mika A. Epstein (email: ipstenu@ipstenu.org)
 
 Original Author: Leon Weidauer ( http:/www.lnwdr.de/ )
 

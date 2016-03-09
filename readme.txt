@@ -185,6 +185,9 @@ If you're using `varnish_http_purge_events` then you have to make sure your even
 
 == Changelog ==
 
+= 3.9 =
+* Retain query params on purge
+
 = 3.8 =
 * Add varnish_http_purge_events filter to allow people to add their own events for purging. (props @norcross)
 * Add a method to grab the response from purge request and pass to the 'after_purge_url' action for debugging. (props @shaula)

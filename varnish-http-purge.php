@@ -231,6 +231,7 @@ class VarnishPurger {
 		} else {
 			$varniship = get_option('vhp_varnish_ip');
 		}
+		$varniship = apply_filters('vhp_varnish_ip', $varniship);
 
 		if (isset($p['path'] ) ) {
 			$path = $p['path'];

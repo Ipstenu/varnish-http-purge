@@ -187,6 +187,7 @@ If you're using `varnish_http_purge_events` then you have to make sure your even
 
 = 3.9 =
 * Retain query params on purge
+* Allow Varnish IP to be filtered. [Credit: floatingio](https://wordpress.org/support/topic/supply-varnish-ip-via-filter?replies=4&view=all#post-8300652)
 
 = 3.8 =
 * Add varnish_http_purge_events filter to allow people to add their own events for purging. (props @norcross)

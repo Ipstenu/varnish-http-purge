@@ -260,7 +260,7 @@ class VarnishPurger {
 
 		$purgeme = $schema.$host.$path.$pregex;
 
-		if (!empty($p['query'])) {
+		if (!empty($p['query']) && $p['query'] != 'vhp-regex') {
 			$purgeme .= '?' . $p['query'];
 		}
 

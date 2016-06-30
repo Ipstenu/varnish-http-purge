@@ -155,8 +155,7 @@ A full Varnish flush looks like this:
 `PURGE /.*`
 
 And a new-post (or edited post) would look like this:
-```
-PURGE /category/uncategorized/
+```PURGE /category/uncategorized/
 PURGE /author/ipstenu/
 PURGE /author/ipstenu/feed/
 PURGE /2015/08/test-post/
@@ -166,8 +165,7 @@ PURGE /feed/
 PURGE /feed/atom/
 PURGE /comments/feed/
 PURGE /2015/08/test-post/feed/
-PURGE /
-```
+PURGE /```
 
 It's just a matter of poking at things from then on.
 
@@ -183,12 +181,16 @@ All of these VCLs work with this plugin.
 
 If you're using `varnish_http_purge_events` then you have to make sure your event spits out a post ID.
 
+If you don't have a post ID and you still need this, add it to *both* `varnish_http_purge_events_full` and `varnish_http_purge_events` - but please use this with caution, otherwise you'll be purging everything all the time, and you're a terrible person.
+
 == Changelog ==
 
 = 3.9 =
 * Retain query params on purge
 * Do not use query part for regex purging [Credit: shaula](https://github.com/Ipstenu/varnish-http-purge/pull/18)
 * Allow Varnish IP to be filtered. [Credit: floatingio](https://wordpress.org/support/topic/supply-varnish-ip-via-filter)
+* Improve flushing for cases when there's no Post ID
+* Add filter so other plugins can add events to trigger purge when they have no post ID
 
 = 3.8 =
 * Add varnish_http_purge_events filter to allow people to add their own events for purging. (props @norcross)

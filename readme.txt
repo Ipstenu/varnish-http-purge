@@ -191,6 +191,7 @@ If you don't have a post ID and you still need this, add it to *both* `varnish_h
 * Allow Varnish IP to be filtered. [Credit: floatingio](https://wordpress.org/support/topic/supply-varnish-ip-via-filter)
 * Improve flushing for cases when there's no Post ID
 * Add filter so other plugins can add events to trigger purge when they have no post ID
+* Add compatibility with [Autoptimize](https://wordpress.org/plugins/autoptimize/) so it flushes Varnish when you flush their cache
 
 = 3.8 =
 * Add varnish_http_purge_events filter to allow people to add their own events for purging. (props @norcross)

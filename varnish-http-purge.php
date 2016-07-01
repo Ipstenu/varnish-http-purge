@@ -181,12 +181,13 @@ class VarnishPurger {
 
 		// Define registered purge events
 		$actions = array(
-			'switch_theme',			// After a theme is changed
-			'save_post',            // Save a post
-			'deleted_post',         // Delete a post
-			'trashed_post',         // Empty Trashed post
-			'edit_post',            // Edit a post - includes leaving comments
-			'delete_attachment',    // Delete an attachment - includes re-uploading
+			'switch_theme',						// After a theme is changed
+			'autoptimize_action_cachepurged,' 	// Compat with https://wordpress.org/plugins/autoptimize/
+			'save_post',     			       // Save a post
+			'deleted_post',  			       // Delete a post
+			'trashed_post',  			       // Empty Trashed post
+			'edit_post',  			          // Edit a post - includes leaving comments
+			'delete_attachment', 			   // Delete an attachment - includes re-uploading
 		);
 
 		// send back the actions array, filtered
@@ -205,7 +206,8 @@ class VarnishPurger {
 
 		// Define registered purge events
 		$actions = array(
-			'switch_theme',		// After a theme is changed
+			'switch_theme',						// After a theme is changed
+			'autoptimize_action_cachepurged,' 	// Compat with https://wordpress.org/plugins/autoptimize/
 		);
 
 		// send back the actions array, filtered

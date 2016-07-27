@@ -29,7 +29,8 @@ class WP_CLI_Varnish_Purge_Command extends WP_CLI_Command {
 	}
 	
     /**
-     * Forces a Varnish Purge
+     * Forces a full Varnish Purge of the entire site (provided
+     * regex is supported).
      * 
      * ## EXAMPLES
      * 

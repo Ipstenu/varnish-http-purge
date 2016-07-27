@@ -3,7 +3,7 @@
 Plugin Name: Varnish HTTP Purge
 Plugin URI: http://wordpress.org/extend/plugins/varnish-http-purge/
 Description: Sends HTTP PURGE requests to URLs of changed posts/pages when they are modified.
-Version: 3.8
+Version: 3.9
 Author: Mika Epstein
 Author URI: http://halfelf.org/
 License: http://www.apache.org/licenses/LICENSE-2.0
@@ -40,7 +40,7 @@ class VarnishPurger {
 	 * @since 2.0
 	 * @access public
 	 */
-	public function __construct() {
+	public function __construct( ) {
 		defined('VHP_VARNISH_IP') || define('VHP_VARNISH_IP', false );
 		add_action( 'init', array( &$this, 'init' ) );
 		add_action( 'activity_box_end', array( $this, 'varnish_rightnow' ), 100 );
@@ -57,18 +57,26 @@ class VarnishPurger {
 
 		// get my events
 		$events = $this->getRegisterEvents();
+		$noIDevents = $this->getNoIDEvents();
 
-		// make sure we have events and it's an array
-		if ( ! empty( $events ) ) {
+		// make sure we have events and they're in an array
+		if ( !empty( $events ) && !empty( $noIDevents ) ) {
 
 			// Force it to be an array, in case someone's stupid
 			$events = (array) $events;
+			$noIDevents = (array) $noIDevents;
 
 			// Add the action for each event
 			foreach ( $events as $event) {
-				add_action( $event, array($this, 'purgePost'), 10, 2 );
+				if ( in_array($event, $noIDevents ) ) {
+					// These events have no post ID and, thus, will perform a full purge
+					add_action( $event, array($this, 'purgeNoID') );
+				} else {
+					add_action( $event, array($this, 'purgePost'), 10, 2 );
+				}
 			}
 		}
+		
 		add_action( 'shutdown', array($this, 'executePurge') );
 
 		// Success: Admin notice when purging
@@ -81,6 +89,7 @@ class VarnishPurger {
 			add_action( 'admin_notices' , array( $this, 'prettyPermalinksMessage'));
 		}
 
+		// Checking user permissions for who can and cannot use the admin button
 		if (
 			// SingleSite - admins can always purge
 			( !is_multisite() && current_user_can('activate_plugins') ) ||
@@ -111,7 +120,7 @@ class VarnishPurger {
 	 * @since 2.0
 	 */
 	function prettyPermalinksMessage() {
-		echo "<div id='message' class='error'><p>".__( 'Varnish HTTP Purge requires you to use custom permalinks. Please go to the <a href="options-permalink.php">Permalinks Options Page</a> to configure them.', 'varnish-http-purge' )."</p></div>";
+		echo "<div id='message' class='error'><p>" . printf( _( 'Varnish HTTP Purge requires you to use custom permalinks. Please go to the <a href="%s">Permalinks Options Page</a> to configure them.', 'varnish-http-purge' ), 'options-permalink.php' ) . "</p></div>";
 	}
 
 	/**
@@ -172,17 +181,39 @@ class VarnishPurger {
 
 		// Define registered purge events
 		$actions = array(
-			'save_post',            // Save a post
-			'deleted_post',         // Delete a post
-			'trashed_post',         // Empty Trashed post
-			'edit_post',            // Edit a post - includes leaving comments
-			'delete_attachment',    // Delete an attachment - includes re-uploading
-			'switch_theme',         // Change theme
+			'switch_theme',						// After a theme is changed
+			'autoptimize_action_cachepurged,' 	// Compat with https://wordpress.org/plugins/autoptimize/
+			'save_post',     			       // Save a post
+			'deleted_post',  			       // Delete a post
+			'trashed_post',  			       // Empty Trashed post
+			'edit_post',  			          // Edit a post - includes leaving comments
+			'delete_attachment', 			   // Delete an attachment - includes re-uploading
 		);
 
 		// send back the actions array, filtered
 		// @param array $actions the actions that trigger the purge event
 		return apply_filters( 'varnish_http_purge_events', $actions );
+	}
+
+	/**
+	 * Events that have no post IDs
+	 * These are when a full purge is triggered
+	 *
+	 * @since 3.9
+	 * @access protected
+	 */
+	protected function getNoIDEvents() {
+
+		// Define registered purge events
+		$actions = array(
+			'switch_theme',						// After a theme is changed
+			'autoptimize_action_cachepurged,' 	// Compat with https://wordpress.org/plugins/autoptimize/
+		);
+
+		// send back the actions array, filtered
+		// @param array $actions the actions that trigger the purge event
+		// DEVELOPERS! USE THIS SPARINGLY! YOU'RE A GREAT BIG :poop: IF YOU USE IT FLAGRANTLY
+		return apply_filters( 'varnish_http_purge_events_full', $actions );
 	}
 
 	/**
@@ -192,7 +223,7 @@ class VarnishPurger {
 	 * @since 1.0
 	 * @access protected
 	 */
-	public function executePurge() {
+	public function executePurge( ) {
 		$purgeUrls = array_unique($this->purgeUrls);
 
 		if (empty($purgeUrls)) {
@@ -231,6 +262,7 @@ class VarnishPurger {
 		} else {
 			$varniship = get_option('vhp_varnish_ip');
 		}
+		$varniship = apply_filters('vhp_varnish_ip', $varniship);
 
 		if (isset($p['path'] ) ) {
 			$path = $p['path'];
@@ -252,9 +284,15 @@ class VarnishPurger {
 
 		// If we made varniship, let it sail
 		if ( isset($varniship) && $varniship != null ) {
-			$purgeme = $schema.$varniship.$path.$pregex;
+			$host = $varniship;
 		} else {
-			$purgeme = $schema.$p['host'].$path.$pregex;
+			$host = $p['host'];
+		}
+
+		$purgeme = $schema.$host.$path.$pregex;
+
+		if (!empty($p['query']) && $p['query'] != 'vhp-regex') {
+			$purgeme .= '?' . $p['query'];
 		}
 
 		// Cleanup CURL functions to be wp_remote_request and thus better
@@ -265,28 +303,48 @@ class VarnishPurger {
 	}
 
 	/**
+	 * Purge - No IDs
+	 * Flush the whole cache
+	 *
+	 * @since 3.9
+	 * @access private
+	 */
+	public function purgeNoID( $postId ) {
+		$listofurls = array();
+		
+		array_push($listofurls, home_url('/?vhp-regex' ) );
+	
+		// Now flush all the URLs we've collected provided the array isn't empty
+		if ( !empty($listofurls) ) {
+			foreach ($listofurls as $url) {
+				array_push($this->purgeUrls, $url ) ;
+			}
+		}
+	}
+
+	/**
 	 * Purge Post
 	 * Flush the post
 	 *
 	 * @since 1.0
-	 * @param array $url the url to be purged
+	 * @param array $postId the ID of the post to be purged
 	 * @access public
 	 */
-	public function purgePost($postId) {
-
-		// If this is a valid post we want to purge the post, the home page and any associated tags & cats
-		// If not, purge everything on the site.
+	public function purgePost( $postId ) {
+		
+		// If this is a valid post we want to purge the post, 
+		// the home page and any associated tags and categories
 
 		$validPostStatus = array("publish", "trash");
 		$thisPostStatus  = get_post_status($postId);
 
-		// If this is a revision, stop.
-		if( get_permalink($postId) !== true && !in_array($thisPostStatus, $validPostStatus) ) {
-			return;
-		} else {
-			// array to collect all our URLs
-			$listofurls = array();
+		// array to collect all our URLs
+		$listofurls = array();
 
+		if( get_permalink($postId) == true && in_array($thisPostStatus, $validPostStatus) ) {
+			// If this is a post with a permalink AND it's published or trashed, 
+			// we're going to add a ton of things to flush.
+			
 			// Category purge based on Donnacha's work in WP Super Cache
 			$categories = get_the_category($postId);
 			if ( $categories ) {
@@ -335,8 +393,13 @@ class VarnishPurger {
 			if ( get_option('show_on_front') == 'page' ) {
 				array_push($listofurls, get_permalink( get_option('page_for_posts') ) );
 			}
-
-			// Now flush all the URLs we've collected
+		} else {
+			// We're not sure how we got here, but bail instead of processing anything else.
+			return;
+		}
+		
+		// Now flush all the URLs we've collected provided the array isn't empty
+		if ( !empty($listofurls) ) {
 			foreach ($listofurls as $url) {
 				array_push($this->purgeUrls, $url ) ;
 			}

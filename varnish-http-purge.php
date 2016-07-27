@@ -303,18 +303,6 @@ class VarnishPurger {
 	}
 
 	/**
-	 * Flush Object Cache
-	 *
-	 * @since 3.9
-	 * @access private
-	 * https://groups.google.com/a/pantheon.io/forum/m/#!msg/power-users/vynRmHL6eT8/2WSrJOSCCQAJ
-	 */
-	//add_action( 'admin_post_pantheon_cache_delete_page',  'dc_flush_wp_object_cache' );
-	public function wp_flush_cache() {
-		wp_cache_flush();
-	}
-
-	/**
 	 * Purge - No IDs
 	 * Flush the whole cache
 	 *
@@ -344,8 +332,8 @@ class VarnishPurger {
 	 */
 	public function purgePost( $postId ) {
 		
-		// If this is a valid post we want to purge the post, the home page and any associated tags & cats
-		// If not, purge everything on the site.
+		// If this is a valid post we want to purge the post, 
+		// the home page and any associated tags and categories
 
 		$validPostStatus = array("publish", "trash");
 		$thisPostStatus  = get_post_status($postId);

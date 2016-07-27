@@ -7,8 +7,8 @@ You should install the plugin from the [WordPress.org Repository](http://wordpre
 
 ## Current Versions
 
-* Live - 3.8
-* Development - 3.9
+* Live - 3.9
+* Development - N/A
 
 ## Helpful Links
 

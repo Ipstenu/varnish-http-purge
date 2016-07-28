@@ -1,8 +1,8 @@
 === Varnish HTTP Purge ===
-Contributors: techpriester, Ipstenu, DH-Shredder
+Contributors: techpriester, Ipstenu, mikeschroder
 Tags: varnish, purge, cache
 Requires at least: 4.0
-Tested up to: 4.5
+Tested up to: 4.6
 Stable tag: 3.9
 
 Purge Varnish Cache when post content on your site is modified.

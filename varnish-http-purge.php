@@ -182,7 +182,7 @@ class VarnishPurger {
 		// Define registered purge events
 		$actions = array(
 			'switch_theme',						// After a theme is changed
-			'autoptimize_action_cachepurged,' 	// Compat with https://wordpress.org/plugins/autoptimize/
+			'autoptimize_action_cachepurged', 	// Compat with https://wordpress.org/plugins/autoptimize/
 			'save_post',     			       // Save a post
 			'deleted_post',  			       // Delete a post
 			'trashed_post',  			       // Empty Trashed post

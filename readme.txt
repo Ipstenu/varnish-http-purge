@@ -3,7 +3,7 @@ Contributors: techpriester, Ipstenu, mikeschroder
 Tags: varnish, purge, cache
 Requires at least: 4.0
 Tested up to: 4.5
-Stable tag: 3.9
+Stable tag: 3.9.1
 
 Purge Varnish Cache when post content on your site is modified.
 
@@ -184,6 +184,9 @@ If you're using `varnish_http_purge_events` then you have to make sure your even
 If you don't have a post ID and you still need this, add it to *both* `varnish_http_purge_events_full` and `varnish_http_purge_events` - but please use this with caution, otherwise you'll be purging everything all the time, and you're a terrible person.
 
 == Changelog ==
+
+= 3.9.1 =
+* Fixing i18n which wasn't working and threw a stupid error on sites without pretty permalinks. (Props DH customer Rasmus and employee Heckman!)
 
 = 3.9 =
 * Retain query params on purge

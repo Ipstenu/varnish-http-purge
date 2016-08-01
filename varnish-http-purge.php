@@ -3,7 +3,7 @@
 Plugin Name: Varnish HTTP Purge
 Plugin URI: http://wordpress.org/extend/plugins/varnish-http-purge/
 Description: Sends HTTP PURGE requests to URLs of changed posts/pages when they are modified.
-Version: 3.9
+Version: 3.9.1
 Author: Mika Epstein
 Author URI: http://halfelf.org/
 License: http://www.apache.org/licenses/LICENSE-2.0
@@ -120,7 +120,7 @@ class VarnishPurger {
 	 * @since 2.0
 	 */
 	function prettyPermalinksMessage() {
-		echo "<div id='message' class='error'><p>" . printf( _( 'Varnish HTTP Purge requires you to use custom permalinks. Please go to the <a href="%s">Permalinks Options Page</a> to configure them.', 'varnish-http-purge' ), 'options-permalink.php' ) . "</p></div>";
+		echo "<div id='message' class='error'><p>" . sprintf( __( 'Varnish HTTP Purge requires you to use custom permalinks. Please go to the <a href="%1$s">Permalinks Options Page</a> to configure them.', 'varnish-http-purge' ), admin_url( 'options-permalink.php' ) ) . "</p></div>";
 	}
 
 	/**

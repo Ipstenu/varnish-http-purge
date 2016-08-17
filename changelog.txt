@@ -1,3 +1,16 @@
+= 3.7.3 =
+* Add varnish_http_purge_schema filter for changing the default schema. The default remains http (even if you set your home and/or site URL to https) because of sanity, but in order to support some edge cases, they can filter if they want. (props Drumba)
+
+= 3.7.2 =
+* Revisions were being mishandled and purging all inappropriately. (props Cha0sgr)
+
+= 3.7.1 =
+* Archives weren't purging. (props Ingraye)
+
+= 3.7 =
+* Optimizing flushes.
+* Add filter to allow other people to hook in when 3rd party plugins are abjectly weird (props jnachtigall)
+
 = 3.6 =
 * Making purge be http only, since Varnish doesn't support https. This will prevent other issues for people using SSL with Varnish (though goodness knows why...)
 * Forcing backslash on home_url. Why WP doesn't, I have no idea, but this will help sites not running regex.

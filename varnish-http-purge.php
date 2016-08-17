@@ -3,7 +3,7 @@
 Plugin Name: Varnish HTTP Purge
 Plugin URI: http://wordpress.org/extend/plugins/varnish-http-purge/
 Description: Sends HTTP PURGE requests to URLs of changed posts/pages when they are modified.
-Version: 3.9.1
+Version: 3.9.2
 Author: Mika Epstein
 Author URI: http://halfelf.org/
 License: http://www.apache.org/licenses/LICENSE-2.0
@@ -110,7 +110,7 @@ class VarnishPurger {
 	 * @since 2.0
 	 */
 	function purgeMessage() {
-		echo "<div id='message' class='updated fade'><p><strong>".__('Varnish cache purged!', 'varnish-http-purge')."</strong></p></div>";
+		echo "<div id='message' class='notice notice-success fade is-dismissible'><p><strong>".__('Varnish cache purged!', 'varnish-http-purge')."</strong></p></div>";
 	}
 
 	/**
@@ -378,6 +378,13 @@ class VarnishPurger {
 			// Post URL
 			array_push($listofurls, get_permalink($postId) );
 
+			// Also clean URL for trashed post.
+			if ( $thisPostStatus == "trash" ) {
+				$trashpost = get_permalink($postId);
+				$trashpost = str_replace("__trashed", "", $trashpost);
+				array_push($listofurls, $trashpost, $trashpost.'feed/' );
+			}
+			
 			// Feeds
 			array_push($listofurls,
 				get_bloginfo_rss('rdf_url') ,

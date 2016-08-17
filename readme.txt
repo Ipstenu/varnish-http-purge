@@ -155,7 +155,9 @@ A full Varnish flush looks like this:
 `PURGE /.*`
 
 And a new-post (or edited post) would look like this:
-```PURGE /category/uncategorized/
+
+<pre>
+PURGE /category/uncategorized/
 PURGE /author/ipstenu/
 PURGE /author/ipstenu/feed/
 PURGE /2015/08/test-post/
@@ -165,7 +167,8 @@ PURGE /feed/
 PURGE /feed/atom/
 PURGE /comments/feed/
 PURGE /2015/08/test-post/feed/
-PURGE /```
+PURGE /
+</pre>
 
 It's just a matter of poking at things from then on.
 
@@ -185,6 +188,10 @@ If you don't have a post ID and you still need this, add it to *both* `varnish_h
 
 == Changelog ==
 
+= 3.9.2 =
+* Change purge notice so it can be dismissed.
+* Fix purging of deleted posts.
+
 = 3.9.1 =
 * Fixing i18n which wasn't working and threw a stupid error on sites without pretty permalinks. (Props DH customer Rasmus and employee Heckman!)
 
@@ -202,19 +209,6 @@ If you don't have a post ID and you still need this, add it to *both* `varnish_h
 * Added wp-cli command: wp varnish purge (to purge varnish)
 * Adding some docblocks
 * Fixing i18n
-
-= 3.7.3 =
-* Add varnish_http_purge_schema filter for changing the default schema. The default remains http (even if you set your home and/or site URL to https) because of sanity, but in order to support some edge cases, they can filter if they want. (props Drumba)
-
-= 3.7.2 =
-* Revisions were being mishandled and purging all inappropriately. (props Cha0sgr)
-
-= 3.7.1 =
-* Archives weren't purging. (props Ingraye)
-
-= 3.7 =
-* Optimizing flushes.
-* Add filter to allow other people to hook in when 3rd party plugins are abjectly weird (props jnachtigall)
 
 == Screenshots ==
 

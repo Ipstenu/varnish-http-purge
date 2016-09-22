@@ -24,6 +24,8 @@ if ( !defined( 'WP_CLI' ) ) return;
  */
 class WP_CLI_Varnish_Purge_Command extends WP_CLI_Command {
 
+	private $wildcard = false;
+
 	public function __construct() {
 		$this->varnish_purge = new VarnishPurger();
 	}
@@ -34,14 +36,44 @@ class WP_CLI_Varnish_Purge_Command extends WP_CLI_Command {
      * 
      * ## EXAMPLES
      * 
-     *     wp varnish purge
+     *		wp varnish purge
+     *
+     *		wp varnish purge http://example.com/wp-content/themes/twentyeleventy/style.css
+     *
+	 *		wp vanrish purge "/wp-content/themes/twentysixty/style.css"
+	 *
+     *		wp varnish purge http://example.com/wp-content/themes/ --wildcard
+     *
+     *		wp varnish purge "/wp-content/themes/" --wildcard
      *
      */
 	
-	function purge() {	
+	function purge( $args , $assoc_args ) {	
+
+		// Set the URL/path
+		list( $url ) = $args;
+
+		// If wildcard is set, or the URL argument is empty
+		// then treat this as a full purge
+		if ( isset( $assoc_args['wildcard'] ) || empty($url) ) {
+			$pregex = '/?vhp-regex';
+		} else {
+			$pregex = '';
+		}
+
 		wp_create_nonce('varnish-http-purge-cli');
 
-		$this->varnish_purge->purgeUrl( home_url() .'/?vhp-regex' );
+		// Make sure the URL is a URL:
+		if ( !empty($url) ) {
+			// If the URL isn't a URL, make it a URL
+			if ( empty( esc_url( $url ) ) ) {
+				$url = $this->varnish_purge->the_home_url() . $url;
+			}
+		} else {
+			$url = $this->varnish_purge->the_home_url();
+		}
+		
+		$this->varnish_purge->purgeUrl( $url.$pregex );
 
 		WP_CLI::success( 'The Varnish cache was purged.' );
 	}

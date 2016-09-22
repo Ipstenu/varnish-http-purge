@@ -3,9 +3,9 @@ Contributors: techpriester, Ipstenu, mikeschroder
 Tags: varnish, purge, cache
 Requires at least: 4.0
 Tested up to: 4.5
-Stable tag: 3.9.2
+Stable tag: 4.0
 
-Purge Varnish Cache when post content on your site is modified.
+Automatically purge Varnish Cache when content on your site is modified.
 
 == Description ==
 Varnish HTTP Purge sends a PURGE request to the URL of a page or post every time it it modified. This occurs when editing, publishing, commenting or deleting an item, and when changing themes.
@@ -20,10 +20,13 @@ Not all pages are purged every time, depending on your Varnish configuration. Wh
 
 In addition, your entire cache will be purged on the following actions:
 
-* <del>Changing permalinks</del>
 * Changing themes
 * Press the 'Purge Varnish Cache' button on the dashboard
 * Press the 'Purge Varnish' button on the toolbar
+
+Plugins can hook into the purge actions as well, to filter their own events to trigger a purge.
+
+And if you're into WP-CLI, you can use that too.
 
 Please note: On a multisite network using subfolders, only the <strong>network admins</strong> can purge the main site.
 
@@ -84,9 +87,7 @@ In order to mitigate the destructive nature of that power, only the network admi
 
 = Why is nothing caching when I use PageSpeed? =
 
-PageSpeed likes to put in Caching headers to say <em>not</em> to cache. To fix this, you need to put this in your .htaccess section for PageSpeed:
-
-`ModPagespeedModifyCachingHeaders off`
+PageSpeed likes to put in Caching headers to say <em>not</em> to cache. To fix this, you need to put this in your .htaccess section for PageSpeed: `ModPagespeedModifyCachingHeaders off`
 
 If you're using nginx, it's `pagespeed ModifyCachingHeaders off;`
 
@@ -180,13 +181,38 @@ This is a question beyond the support of plugin. I don't offer any Varnish Confi
 
 All of these VCLs work with this plugin.
 
+= Can I filter things to add special URLs? =
+
+Yes! 
+
+* `vhp_home_url` - Change the home URL (default is `home_url()`)
+* `vhp_purge_urls` - Add additional URLs to what will be purged
+* `varnish_http_purge_events` - Add a specific event to trigger a page purge
+* `varnish_http_purge_events_full` - Add a specific event to trigger a full site purge
+* `varnish_http_purge_schema` - Allows you to change the schema (default is http)
+
+I strongly urge you to use the last one with caution. If you trigger a full site purge too often, you'll obviate the usefulness of caching!
+
 = I added in an event to purge on and it's not working =
 
 If you're using `varnish_http_purge_events` then you have to make sure your event spits out a post ID.
 
 If you don't have a post ID and you still need this, add it to *both* `varnish_http_purge_events_full` and `varnish_http_purge_events` - but please use this with caution, otherwise you'll be purging everything all the time, and you're a terrible person.
 
+= Hey, don't you work at DreamHost? Is this Official or DreamHost only? =
+
+Yes I do, and yes and no. This plugin is installed by default for _all_ DreamPress installs on DreamHost, and I maintain it for DreamHost, but it was not originally an official DH plugin which means I will continue to support all users to the best of my ability.
+
 == Changelog ==
+
+== 4.0 ==
+* Allow filter for `home_url()`
+* Update readme with list of filters.
+* Added wp-cli commands to flush specific URLs and wildcards
+* Command line broken due to https://github.com/wp-cli/wp-cli/issues/3315
+
+= 3.9.3 =
+* Update Documentation and Readme
 
 = 3.9.2 =
 * Change purge notice so it can be dismissed.
@@ -202,13 +228,6 @@ If you don't have a post ID and you still need this, add it to *both* `varnish_h
 * Improve flushing for cases when there's no Post ID
 * Add filter so other plugins can add events to trigger purge when they have no post ID
 * Add compatibility with [Autoptimize](https://wordpress.org/plugins/autoptimize/) so it flushes Varnish when you flush their cache
-
-= 3.8 =
-* Add varnish_http_purge_events filter to allow people to add their own events for purging. (props @norcross)
-* Add a method to grab the response from purge request and pass to the 'after_purge_url' action for debugging. (props @shaula)
-* Added wp-cli command: wp varnish purge (to purge varnish)
-* Adding some docblocks
-* Fixing i18n
 
 == Screenshots ==
 

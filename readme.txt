@@ -2,7 +2,7 @@
 Contributors: techpriester, Ipstenu, mikeschroder
 Tags: varnish, purge, cache
 Requires at least: 4.0
-Tested up to: 4.5
+Tested up to: 4.6
 Stable tag: 4.0
 
 Automatically purge Varnish Cache when content on your site is modified.
@@ -52,6 +52,14 @@ When used on Multisite, the plugin is Network Activatable Only.
 Until the WordPress Language Pack system is deployable, I'm storing them <a href="https://github.com/Ipstenu/varnish-http-purge">on Github</a> for now.
 
 == Frequently Asked Questions ==
+
+= How can I tell everything's working? =
+
+This can be difficult, since it's a silent plugin. That is you turn it on and walk away. The easiest way to tell would be view a page as a non-logged-in user. I recommend a private browsing window. Then, as a logged in user in another window, edit an existing post (make a small change). Refresh the view in your private window. If the change is there, then everything's working!
+
+= Does every WordPress plugin and theme work with Varnish? =
+
+No. Some of them have behavior that causes Varnish not to cache. While debugging that is outside the scope of this plugin, there is an "Is Varnish Working?" tool (see WP Admin -> Tools -> Is Varnish Working?) that tries to detect most of the common issues and direct you to resolutions.
 
 = What version of Varnish is supported? =
 
@@ -206,6 +214,7 @@ Yes I do, and yes and no. This plugin is installed by default for _all_ DreamPre
 == Changelog ==
 
 == 4.0 ==
+* Added Varnish Status Page - Tools -> Is Varnish Working
 * Allow filter for `home_url()`
 * Update readme with list of filters.
 * Added wp-cli commands to flush specific URLs and wildcards

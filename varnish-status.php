@@ -133,9 +133,7 @@ class VarnishStatus {
 		$icon_awkward	= '<span class="dashicons dashicons-flag" style="color:#FF9933;">';
 		$icon_bad		= '<span class="dashicons dashicons-thumbs-down" style="color:#990000;"></span>';
 
-
 		$url = esc_url($this->varnish_purge->the_home_url());
-		$url = 'https://plugins.breakwpdh.com';	
 			
 		$args = array(
 			'headers' => array( 

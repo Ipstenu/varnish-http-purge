@@ -121,6 +121,8 @@ and
 
 `wp option update vhp_varnish_ip 123.45.67.890`
 
+The option is also setable on the Varnish Status page, under Tools.
+
 = How do I find my Varnish IP? =
 
 Your Varnish IP must be one of the IPs that Varnish is listening on. If you use multiple IPs, or if you've customized your ACLs, you'll need to pick on that doesn't conflict with your other settings. For example, if you have Varnish listening on a public and private IP, you'll want to pick the private. On the other hand, if you told Varnish to listen on 0.0.0.0 (i.e. "listen on every interface you can") you would need to check what IP you set your purge ACL to allow (commonly 127.0.0.1 aka localhost), and use that (i.e. 127.0.0.1).
@@ -214,7 +216,7 @@ Yes I do, and yes and no. This plugin is installed by default for _all_ DreamPre
 == Changelog ==
 
 == 4.0 ==
-* Added Varnish Status Page - Tools -> Is Varnish Working
+* Added Varnish Status Page - Tools -> Varnish Status
 * Allow filter for `home_url()`
 * Update readme with list of filters.
 * Added wp-cli commands to flush specific URLs and wildcards

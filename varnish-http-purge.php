@@ -437,10 +437,18 @@ class VarnishPurger {
 
 $purger = new VarnishPurger();
 
-// WP-CLI
+/**
+ * Purge Varnish via WP-CLI
+ *
+ * @since 3.8
+ */
 if ( defined('WP_CLI') && WP_CLI ) {
 	include( 'wp-cli.php' );
 }
 
-// Status Page
+/**
+ * Varnish Status Page
+ *
+ * @since 4.0
+ */
 include( 'varnish-status.php' );

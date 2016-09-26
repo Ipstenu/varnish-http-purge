@@ -26,18 +26,9 @@ In addition, your entire cache will be purged on the following actions:
 
 Plugins can hook into the purge actions as well, to filter their own events to trigger a purge.
 
-And if you're into WP-CLI, you can use that too.
+And if you're into WP-CLI, you can use that too: `wp varnish purge`
 
 Please note: On a multisite network using subfolders, only the <strong>network admins</strong> can purge the main site.
-
-= The future ... =
-
-We're going to sit down and look into how the plugin is structured to make it even faster and more organized. Please send coffee. Here's the wish list:
-
-* Only purge all automatically once an hour (manual button click will continue to work)
-* Refactor automated purge all to be kinder
-* Reorganize code for sanity
-* Get rid of the need to parse_url()
 
 == Installation ==
 No WordPress configuration needed.
@@ -48,9 +39,6 @@ When used on Multisite, the plugin is Network Activatable Only.
 * Pretty Permalinks enabled
 * Varnish 3.x or higher
 
-= Languages =
-Until the WordPress Language Pack system is deployable, I'm storing them <a href="https://github.com/Ipstenu/varnish-http-purge">on Github</a> for now.
-
 == Frequently Asked Questions ==
 
 = How can I tell everything's working? =
@@ -59,11 +47,15 @@ This can be difficult, since it's a silent plugin. That is you turn it on and wa
 
 = Does every WordPress plugin and theme work with Varnish? =
 
-No. Some of them have behavior that causes Varnish not to cache. While debugging that is outside the scope of this plugin, there is an "Is Varnish Working?" tool (see WP Admin -> Tools -> Is Varnish Working?) that tries to detect most of the common issues and direct you to resolutions.
+No. Some of them have behavior that causes Varnish not to cache. While debugging that is outside the scope of this plugin, there is an "Is Varnish Working?" tool (see WP Admin -> Tools -> Varnish Status) that tries to detect most of the common issues and direct you to resolutions.
+
+= How can I debug my site? =
+
+From your WordPress Dashboard, go to Tools -> Varnish Status. There a page will auto-scan your main plugin page and report back any issues found. This includes any known problematic plugins.
 
 = What version of Varnish is supported? =
 
-This was built and tested on Varnish 3.x, however it is reported to work on 2.x and 4.x. It is only supported on v3 at this time.
+This was built and tested on Varnish 3.x. While it is reported to work on 2.x and 4.x, it is only supported on v3 at this time.
 
 = Why doesn't every page flush when I make a new post? =
 
@@ -75,7 +67,7 @@ In the interests of design, we decided that the KISS principle was key. Since yo
 
 = Why doesn't my cache purge when I edit my theme? =
 
-Because the plugin only purges your <em>content</em> when you edit it. That means if you edit a page/post, or someone leaves a comment, it'll change. Otherwise, you have to purge the whole cache. The plugin will do this for you if you ''change'' your theme, but not when you edit your theme.
+Because the plugin only purges your <em>content</em> when you edit it. That means if you edit a page/post, or someone leaves a comment, it'll change. Otherwise, you have to purge the whole cache. The plugin will do this for you if you activate a new theme, but not when you edit your current theme's files.
 
 If you use Jetpack's CSS editor, it will purge the whole cache for your site on save.
 
@@ -121,7 +113,7 @@ and
 
 `wp option update vhp_varnish_ip 123.45.67.890`
 
-The option is also setable on the Varnish Status page, under Tools.
+The option can be set on the Varnish Status page, under Tools.
 
 = How do I find my Varnish IP? =
 

@@ -92,9 +92,9 @@ class VarnishStatus {
 	}
 
 	/**
-	 * Colour-Coded Post Statuses Callback
+	 * Varnish IP Callback
 	 *
-	 * @since 2.0
+	 * @since 4.0
 	 */
 	function varnish_ip_callback() {
 
@@ -150,9 +150,9 @@ class VarnishStatus {
 
 			<h1><?php _e( 'Is Varnish Working?', 'varnish-http-purge' ); ?></h1>
 			
-			<p>Obviously we can't predict everything but...</p>
+			<p><?php _e( 'While it\'s impossible to detect all possible conflicts, the Status Page will perform a check of the most common issues that prevent Varnish from caching properly.', 'varnish-http-purge' ); ?></p>
 			
-			<h2>Overview</h2>
+			<h2><?php _e( 'Overview', 'varnish-http-purge' ); ?></h2>
 			<table class="wp-list-table widefat fixed posts">
 			<?php
 				
@@ -162,25 +162,27 @@ class VarnishStatus {
 				if ( isset( $headers['x-cacheable'] ) && strpos( $headers['x-cacheable'] ,'YES') !== false ) {
 				?><tr>
 					<td width="40px"><?php echo $icon_good; ?></td>
-					<td>Varnish is running properly so caching is happening.</td>
+					<td><?php _e( 'Varnish is running properly so caching is happening.', 'varnish-http-purge' ); ?></td>
 				</tr><?php
 				} elseif (isset( $headers['x-cacheable'] ) && strpos( $headers['x-cacheable'] ,'NO') !== false ) {
 				?><tr>
 					<td width="40px"><?php echo $icon_bad; ?></td>
-					<td>Varnish is running but can't cache.</td>
+					<td><?php _e( 'Varnish is running but can\'t cache.', 'varnish-http-purge' ); ?></td>
 				</tr><?php
 				} else {
 				?><tr>
 					<td width="40px"><?php echo $icon_warning; ?></td>
-					<td>We can't find Varnish on this server.</td>
+					<td><?php _e( 'We can\'t find Varnish on this server.', 'varnish-http-purge' ); ?></td>
 				</tr><?php
 				}
+
+
 
 				// Cloudflare
 				if ( strpos( $headers['Server'] ,'cloudflare') !== false ) {
 				?><tr>
 					<td><?php echo $icon_warning; ?></td>
-					<td>Because CloudFlare is running, you <em>may</em> experience some cache oddities. Make sure you <a href="#configure">configure WordPress for Cloudflare</a>.</td>
+					<td><?php printf( __( 'Because CloudFlare is running, you may experience some cache oddities. Make sure you <a href="%s">configure WordPress for Cloudflare</a>?', 'varnish-http-purge'  ), '#configure' ); ?></td>
 				</tr><?php
 				}
 
@@ -189,7 +191,7 @@ class VarnishStatus {
 					if ( strpos( $headers['X-Powered-By'] ,'HHVM') !== false ) {
 					?><tr>
 						<td><?php echo $icon_good; ?></td>
-						<td>You are so awesome! You're on HHVM!</td>
+						<td><?php _e( 'You\'re running HHVM instead of PHP. Hip Hop!', 'varnish-http-purge' ); ?></td>
 					</tr><?php
 					}
 				}
@@ -200,7 +202,7 @@ class VarnishStatus {
 					if( strpos( $headers['Content-Encoding'] ,'gzip') !== false || ( isset( $headers['Vary']) && strpos( $headers['Vary'] ,'gzip') !== false ) ) {
 					?><tr>
 						<td><?php echo $icon_good; ?></td>
-						<td>Your site is compressing content and making the internet faster.</td>
+						<td><?php _e( 'Your site is compressing content and making the internet faster.', 'varnish-http-purge' ); ?></td>
 					</tr><?php						
 					}
 
@@ -208,7 +210,7 @@ class VarnishStatus {
 					if ( strpos( $headers['Content-Encoding'] ,'Fastly') !== false ) {
 					?><tr>
 						<td><?php echo $icon_good; ?></td>
-						<td>You're using <a href="https://fastly.com">Fastly</a> to speed up your site.</td>
+						<td><?php printf( __( 'You\'re using <a href="%s">Fastly</a> to speed up your site. Keep in mind, it may cache your CSS and images longer than Varnish does. Remember to flush both caches.', 'varnish-http-purge'  ), esc_url('https://fastly.com') ); ?></td>
 					</tr><?php
 					} 
 				}
@@ -221,31 +223,31 @@ class VarnishStatus {
 					if ( strpos( $headers['Set-Cookie'] , 'PHPSESSID') !== false ) {
 						?><tr>
 							<td><?php echo $icon_bad; ?></td>
-							<td>You're setting a PHPSESSID cookie. This makes Varnish not deliver cached pages.</td>
+							<td><?php _e( 'A plugin or theme is setting a PHPSESSID cookie on every pageload. This makes Varnish not deliver cached pages.', 'varnish-http-purge' ); ?></td>
 						</tr><?php
 					}
 					if ( strpos( $headers['Set-Cookie'], 'edd_wp_session' ) !== false ) {
 						?><tr>
 							<td><?php echo $icon_bad; ?></td>
-							<td><a href="https://wordpress.org/plugins/easy-digital-downloads/">Easy Digital Downloads</a> is being used with cookie sessions. This may cause your cache to misbehave. If you have issues, please set <code>define( 'EDD_USE_PHP_SESSIONS', true );</code> in your <code>wp-config.php</code> file.</td>
+							<td><?php printf( __( '<a href="%s">Easy Digital Downloads</a> is being used with cookie sessions. This may cause your cache to misbehave. If you have issues, please set <code>define( "EDD_USE_PHP_SESSIONS", true );</code> in your <code>wp-config.php</code> file.', 'varnish-http-purge'  ), esc_url('https://wordpress.org/plugins/easy-digital-downloads/') ); ?></td>
 						</tr><?php
 					}
 					if ( strpos( $headers['Set-Cookie'], 'edd_items_in_cart' ) !== false ) {
 						?><tr>
 							<td><?php echo $icon_warning; ?></td>
-							<td><a href="https://wordpress.org/plugins/easy-digital-downloads/">Easy Digital Downloads</a> is putting down a shopping cart cookie on every page load. Make sure Varnish is set up to ignore that when it's empty.</td>
+							<td><?php printf( __( '<a href="%s">Easy Digital Downloads</a> is putting down a shopping cart cookie on every page load. Make sure Varnish is set up to ignore that when it\'s empty.', 'varnish-http-purge'  ), esc_url('https://wordpress.org/plugins/easy-digital-downloads/') ); ?></td>
 						</tr><?php				
 					}
 					if ( strpos( $headers['Set-Cookie'], 'wfvt_' ) !== false ) {
 						?><tr>
 							<td><?php echo $icon_bad; ?></td>
-							<td>The plugin <a href="https://wordpress.org/plugins/wordfence">WordFence</a> is putting down cookies on every page load. Please disable that in your options (available from version 4.0.4 and up)</td>
+							<td><?php printf( __( '<a href="%s">Wordfence</a> is putting down cookies on every page load. Please disable that in your options (available from version 4.0.4 and up).', 'varnish-http-purge'  ), esc_url('https://wordpress.org/plugins/wordfence/') ); ?></td>
 						</tr><?php
 					}
 					if ( strpos( $headers['Set-Cookie'], 'invite-anyone' ) !== false ) {
 						?><tr>
 							<td><?php echo $icon_bad; ?></td>
-							<td><a href="https://wordpress.org/plugins/invite-anyone/">Invite Anyone</a>, a plugin for BuddyPress, is putting down a cookie on every page load. This will prevent Varnish from caching.</td>
+							<td><?php printf( __( '<a href="%s">Invite Anyone</a>, a plugin for BuddyPress, is putting down a cookie on every page load. This will prevent Varnish from caching.', 'varnish-http-purge'  ), esc_url('https://wordpress.org/plugins/invite-anyone/') ); ?></td>
 						</tr><?php
 					}
 				}
@@ -254,17 +256,17 @@ class VarnishStatus {
 				if( !isset($headers['Age']) ) {
 					?><tr>
 						<td><?php echo $icon_bad; ?></td>
-						<td>There's no "Age" header, which means we can't tell if the page is actually serving from cache.</td>
+						<td><?php _e( 'Your domain doesn\'t report an "Age" header, which means we can\'t tell if the page is actually serving from cache.', 'varnish-http-purge' ); ?></td>
 					</tr><?php
 				} elseif( $headers['Age'] <= 0 || $headers['Age'] == 0 ) {
 					if( !isset($headers['Cache-Control']) || strpos($headers['Cache-Control'], 'max-age') === FALSE ) {
 						?><tr>
 							<td><?php echo $icon_warning; ?></td>
-							<td>The "Age" header is set to less than 1, which means you checked right when Varnish cleared it's cache for that url or Varnish is not actually serving the content for that url from cache. Check again (refresh the page) but if it happens again, it could be one of the following reasons:
+							<td><?php _e( 'The "Age" header is set to less than 1, which means you checked right when Varnish cleared it\'s cache for that url or Varnish is not actually serving the content for that url from cache. Check again (refresh the page) but if it happens again, it could be one of the following reasons:', 'varnish-http-purge' ); ?>
 								<ul style=\"text-align: left;\">
-									<li>That url is excluded from the cache on purpose in the Varnish vcl file (in which case, yay! It's working.)</li>
-									<li>A theme or plugin is sending cache headers that are telling Varnish not to serve that content from cache. This means you'll have to fix the cache headers the application is sending to Varnish. A lot of the time those headers are Cache-Control and/or Expires.</li>
-									<li>A theme or plugin is setting a session cookie, which can prevent Varnish from serving content from cache. This means you'll have to update the application and make it not send a session cookie for anonymous traffic. </li>
+									<li><?php _e( 'That url is excluded from the cache on purpose in the Varnish vcl file (in which case, yay! It\'s working.)', 'varnish-http-purge' ); ?></li>
+									<li><?php _e( 'A theme or plugin is sending cache headers that are telling Varnish not to serve that content from cache. This means you\'ll have to fix the cache headers the application is sending to Varnish. A lot of the time those headers are Cache-Control and/or Expires.', 'varnish-http-purge' ); ?></li>
+									<li><?php _e( 'A theme or plugin is setting a session cookie, which can prevent Varnish from serving content from cache. You need to make it not send a session cookie for anonymous traffic. ', 'varnish-http-purge' ); ?></li>
 								</ul>
 							</td>
 						</tr><?php			
@@ -275,7 +277,7 @@ class VarnishStatus {
 				if ( isset( $headers['Cache-Control'] ) && strpos( $headers['Cache-Control'] ,'no-cache') !== false ) {
 					?><tr>
 						<td><?php echo $icon_bad; ?></td>
-						<td>Something is setting the header Cache-Control to 'no-cache' which means visitors will never get cached pages.</td>
+						<td><?php _e( 'Something is setting the header Cache-Control to "no-cache" which means visitors will never get cached pages.', 'varnish-http-purge' ); ?></td>
 					</tr><?php
 				}
 				
@@ -283,7 +285,7 @@ class VarnishStatus {
 				if ( isset( $headers['Cache-Control'] ) && strpos( $headers['Cache-Control'] ,'max-age=0') !== false ) {
 					?><tr>
 						<td><?php echo $icon_bad; ?></td>
-						<td>Something is setting the header Cache-Control to 'max-age=0' which means a page can be no older than 0 seconds before it needs to regenerate the cache.</td>
+						<td><?php _e( 'Something is setting the header Cache-Control to "max-age=0" which means a page can be no older than 0 seconds before it needs to regenerate the cache.', 'varnish-http-purge' ); ?></td>
 					</tr><?php
 				}
 				
@@ -291,7 +293,7 @@ class VarnishStatus {
 				if ( isset( $headers['Pragma'] ) && strpos( $headers['Pragma'] ,'no-cache') !== false ) {
 					?><tr>
 						<td><?php echo $icon_bad; ?></td>
-						<td>Something is setting the header Pragma to 'no-cache' which means visitors will never get cached pages.</td>
+						<td><?php _e( 'Something is setting the header Pragma to "no-cache" which means visitors will never get cached pages.', 'varnish-http-purge' ); ?></td>
 					</tr><?php
 				}
 				
@@ -299,7 +301,7 @@ class VarnishStatus {
 				if ( isset( $headers['X-Cache-Status'] ) && strpos( $headers['X-Cache-Status'] ,'MISS') !== false ) {
 					?><tr>
 						<td><?php echo $icon_bad; ?></td>
-						<td>X-Cache missed, which means it's not able to serve this page as cached.</td>
+						<td><?php _e( 'X-Cache missed, which means it was not able to serve this page as cached.', 'varnish-http-purge' ); ?></td>
 					</tr><?php
 				}
 				
@@ -310,12 +312,12 @@ class VarnishStatus {
 					if ( strpos( $headers['X-Cacheable'] , 'YES:Forced') !== false ) {
 						?><tr>
 							<td><?php echo $icon_good; ?></td>
-							<td>Mod Pagespeed is active and working properly with Varnish.</td>
+							<td><?php _e( 'Mod Pagespeed is active and working properly with Varnish.', 'varnish-http-purge' ); ?></td>
 						</tr><?php
 					} else {
 						?><tr>
 							<td><?php echo $icon_bad; ?></td>
-							<td>Mod Pagespeed is active but it looks like your caching headers may not be right. DreamPress doesn't support Pagespeed anymore, so this may be a false negative if other parts of your site are overwriting headers. Fix all other errors <em>first</em>, then come back to this. If you're still having errors, you'll need to look into using htaccess or nginx to override the Pagespeed headers.</td>
+							<td><?php _e( 'Mod Pagespeed is active but it looks like your caching headers may not be right. This may be a false negative if other parts of your site are overwriting headers. Fix all other errors listed, then come back to this. If you are still having errors, you will need to look into using htaccess or nginx to override the Pagespeed headers.', 'varnish-http-purge' ); ?></td>
 						</tr><?php
 					}
 				}

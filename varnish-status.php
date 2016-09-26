@@ -150,7 +150,7 @@ class VarnishStatus {
 
 			<h1><?php _e( 'Is Varnish Working?', 'varnish-http-purge' ); ?></h1>
 			
-			<p><?php _e( 'While it\'s impossible to detect all possible conflicts, the Status Page will perform a check of the most common issues that prevent Varnish from caching properly.', 'varnish-http-purge' ); ?></p>
+			<p><?php _e( 'While it would be impossible to detect all possible conflicts, this Status Page will perform a check of the most common issues that prevent Varnish from caching properly.', 'varnish-http-purge' ); ?></p>
 			
 			<h2><?php _e( 'Overview', 'varnish-http-purge' ); ?></h2>
 			<table class="wp-list-table widefat fixed posts">
@@ -162,17 +162,17 @@ class VarnishStatus {
 				if ( isset( $headers['x-cacheable'] ) && strpos( $headers['x-cacheable'] ,'YES') !== false ) {
 				?><tr>
 					<td width="40px"><?php echo $icon_good; ?></td>
-					<td><?php _e( 'Varnish is running properly so caching is happening.', 'varnish-http-purge' ); ?></td>
+					<td><?php _e( 'Varnish is running properly and caching is happening.', 'varnish-http-purge' ); ?></td>
 				</tr><?php
 				} elseif (isset( $headers['x-cacheable'] ) && strpos( $headers['x-cacheable'] ,'NO') !== false ) {
 				?><tr>
 					<td width="40px"><?php echo $icon_bad; ?></td>
-					<td><?php _e( 'Varnish is running but can\'t cache.', 'varnish-http-purge' ); ?></td>
+					<td><?php _e( 'Varnish is running but cannot cache.', 'varnish-http-purge' ); ?></td>
 				</tr><?php
 				} else {
 				?><tr>
 					<td width="40px"><?php echo $icon_warning; ?></td>
-					<td><?php _e( 'We can\'t find Varnish on this server.', 'varnish-http-purge' ); ?></td>
+					<td><?php _e( 'We did not find Varnish active for this domain.', 'varnish-http-purge' ); ?></td>
 				</tr><?php
 				}
 
@@ -191,7 +191,7 @@ class VarnishStatus {
 					if ( strpos( $headers['X-Powered-By'] ,'HHVM') !== false ) {
 					?><tr>
 						<td><?php echo $icon_good; ?></td>
-						<td><?php _e( 'You\'re running HHVM instead of PHP. Hip Hop!', 'varnish-http-purge' ); ?></td>
+						<td><?php _e( 'You are running HHVM instead of PHP. Hip Hop!', 'varnish-http-purge' ); ?></td>
 					</tr><?php
 					}
 				}
@@ -210,7 +210,7 @@ class VarnishStatus {
 					if ( strpos( $headers['Content-Encoding'] ,'Fastly') !== false ) {
 					?><tr>
 						<td><?php echo $icon_good; ?></td>
-						<td><?php printf( __( 'You\'re using <a href="%s">Fastly</a> to speed up your site. Keep in mind, it may cache your CSS and images longer than Varnish does. Remember to flush both caches.', 'varnish-http-purge'  ), esc_url('https://fastly.com') ); ?></td>
+						<td><?php printf( __( '<a href="%s">Fastly</a> is speeding up your site. Keep in mind, it may cache your CSS and images longer than Varnish does. Remember to flush both caches.', 'varnish-http-purge'  ), esc_url('https://fastly.com') ); ?></td>
 					</tr><?php
 					} 
 				}
@@ -256,16 +256,16 @@ class VarnishStatus {
 				if( !isset($headers['Age']) ) {
 					?><tr>
 						<td><?php echo $icon_bad; ?></td>
-						<td><?php _e( 'Your domain doesn\'t report an "Age" header, which means we can\'t tell if the page is actually serving from cache.', 'varnish-http-purge' ); ?></td>
+						<td><?php _e( 'Your domain does not report an "Age" header, which means we can\'t tell if the page is actually serving from cache.', 'varnish-http-purge' ); ?></td>
 					</tr><?php
 				} elseif( $headers['Age'] <= 0 || $headers['Age'] == 0 ) {
 					if( !isset($headers['Cache-Control']) || strpos($headers['Cache-Control'], 'max-age') === FALSE ) {
 						?><tr>
 							<td><?php echo $icon_warning; ?></td>
-							<td><?php _e( 'The "Age" header is set to less than 1, which means you checked right when Varnish cleared it\'s cache for that url or Varnish is not actually serving the content for that url from cache. Check again (refresh the page) but if it happens again, it could be one of the following reasons:', 'varnish-http-purge' ); ?>
+							<td><?php _e( 'The "Age" header is set to less than 1, which means you checked right when Varnish cleared the cache for that url or Varnish is not actually serving the content for that url from cache. Check again (refresh the page) but if it happens again, it could be one of the following reasons:', 'varnish-http-purge' ); ?>
 								<ul style=\"text-align: left;\">
-									<li><?php _e( 'That url is excluded from the cache on purpose in the Varnish vcl file (in which case, yay! It\'s working.)', 'varnish-http-purge' ); ?></li>
-									<li><?php _e( 'A theme or plugin is sending cache headers that are telling Varnish not to serve that content from cache. This means you\'ll have to fix the cache headers the application is sending to Varnish. A lot of the time those headers are Cache-Control and/or Expires.', 'varnish-http-purge' ); ?></li>
+									<li><?php _e( 'That url is excluded from the cache on purpose in the Varnish vcl file (in which case everything is working.)', 'varnish-http-purge' ); ?></li>
+									<li><?php _e( 'A theme or plugin is sending cache headers that are telling Varnish not to serve that content from cache. This means you will have to fix the cache headers the application is sending to Varnish. A lot of the time those headers are Cache-Control and/or Expires.', 'varnish-http-purge' ); ?></li>
 									<li><?php _e( 'A theme or plugin is setting a session cookie, which can prevent Varnish from serving content from cache. You need to make it not send a session cookie for anonymous traffic. ', 'varnish-http-purge' ); ?></li>
 								</ul>
 							</td>

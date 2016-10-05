@@ -399,6 +399,11 @@ class VarnishPurger {
 				array_push($listofurls, $trashpost, $trashpost.'feed/' );
 			}
 			
+			// Add in AMP permalink if Automattic's AMP is installed
+			if ( function_exists('amp_get_permalink') ) {
+				array_push( amp_get_permalink($postId) );
+			}
+			
 			// Feeds
 			array_push($listofurls,
 				get_bloginfo_rss('rdf_url') ,

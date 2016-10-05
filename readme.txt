@@ -212,7 +212,8 @@ Yes I do, and yes and no. This plugin is installed by default for _all_ DreamPre
 * Allow filter for `home_url()`
 * Update readme with list of filters.
 * Added wp-cli commands to flush specific URLs and wildcards
-* Requires wp-cli 0.25+ to work [3315](https://github.com/wp-cli/wp-cli/issues/3315)
+* Requires wp-cli 0.25+ to work [3315](https://github.com/wp-cli/wp-cli/issues/3315) for WP 4.6+
+* Add check for AMP ([Props JeremyClarke](https://wordpress.org/support/topic/varnish-http-purge-doesnt-update-amp-urls-on-post-update/))
 
 = 3.9.3 =
 * Update Documentation and Readme

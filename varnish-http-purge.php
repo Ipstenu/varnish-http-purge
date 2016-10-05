@@ -418,7 +418,10 @@ class VarnishPurger {
 			
 			array_push($listofurls, $this->the_home_url().'/' );
 			if ( get_option('show_on_front') == 'page' ) {
-				array_push($listofurls, get_permalink( get_option('page_for_posts') ) );
+				// Ensure we have a page_for_posts setting to avoid empty URL
+				if ( get_option('page_for_posts') ) {
+					array_push($listofurls, get_permalink( get_option('page_for_posts') ) );
+				}
 			}
 		} else {
 			// We're not sure how we got here, but bail instead of processing anything else.

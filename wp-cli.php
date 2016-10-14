@@ -49,7 +49,10 @@ class WP_CLI_Varnish_Purge_Command extends WP_CLI_Command {
      */
 	
 	function purge( $args , $assoc_args ) {	
-
+		
+		$wp_version = get_bloginfo( 'version' );
+		$cli_version = WP_CLI_VERSION;
+		
 		// Set the URL/path
 		list( $url ) = $args;
 
@@ -57,8 +60,9 @@ class WP_CLI_Varnish_Purge_Command extends WP_CLI_Command {
 		// then treat this as a full purge
 		if ( isset( $assoc_args['wildcard'] ) || empty($url) ) {
 			$pregex = '/?vhp-regex';
+			$wild = ".*";
 		} else {
-			$pregex = '';
+			$pregex = $wild = '';
 		}
 
 		wp_create_nonce('varnish-http-purge-cli');
@@ -72,7 +76,15 @@ class WP_CLI_Varnish_Purge_Command extends WP_CLI_Command {
 		} else {
 			$url = $this->varnish_purge->the_home_url();
 		}
-		
+
+		if ( $wp_version >= '4.6' && $cli_version <= '0.26.0' ) {
+			
+			WP_CLI::log( sprintf( 'This plugin does not work on WP 4.6 and up, unless WP-CLI is version 0.26 or greater. You\'re using %s.', $cli_version ) );
+			WP_CLI::log( 'To flush your cache, please run the following command:');
+			WP_CLI::log( sprintf( '$ curl -X PURGE "%s"' , $url.$wild ) );
+			WP_CLI::error( 'Varnish Cache must be purged manually.' );
+		}
+
 		$this->varnish_purge->purgeUrl( $url.$pregex );
 
 		WP_CLI::success( 'The Varnish cache was purged.' );

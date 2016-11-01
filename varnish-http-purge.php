@@ -250,10 +250,10 @@ class VarnishPurger {
 
 		if ( isset($p['query']) && ( $p['query'] == 'vhp-regex' ) ) {
 			$pregex = '.*';
-			$varnish_x_purgemethod = 'regex';
+			$varnish_x_purgemethod = 'BAN';
 		} else {
 			$pregex = '';
-			$varnish_x_purgemethod = 'default';
+			$varnish_x_purgemethod = 'PURGE';
 		}
 
 		// Build a varniship
@@ -297,7 +297,7 @@ class VarnishPurger {
 
 		// Cleanup CURL functions to be wp_remote_request and thus better
 		// http://wordpress.org/support/topic/incompatability-with-editorial-calendar-plugin
-		$response = wp_remote_request($purgeme, array('method' => 'PURGE', 'headers' => array( 'host' => $p['host'], 'X-Purge-Method' => $varnish_x_purgemethod ) ) );
+		$response = wp_remote_request($purgeme, array('method' => $varnish_x_purgemethod, 'headers' => array( 'host' => $p['host'], 'X-Purge-Method' => $varnish_x_purgemethod ) ) );
 
 		do_action('after_purge_url', $url, $purgeme, $response);
 	}

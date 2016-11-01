@@ -390,19 +390,22 @@ class VarnishPurger {
 			}
 
 			// Post URL
-			array_push($listofurls, get_permalink($postId) );
+			array_push( $listofurls, get_permalink($postId) );
 
 			// Also clean URL for trashed post.
 			if ( $thisPostStatus == "trash" ) {
 				$trashpost = get_permalink($postId);
 				$trashpost = str_replace("__trashed", "", $trashpost);
-				array_push($listofurls, $trashpost, $trashpost.'feed/' );
+				array_push( $listofurls, $trashpost, $trashpost.'feed/' );
 			}
 			
 			// Add in AMP permalink if Automattic's AMP is installed
 			if ( function_exists('amp_get_permalink') ) {
-				array_push( amp_get_permalink($postId) );
+				array_push( $listofurls, amp_get_permalink($postId) );
 			}
+			
+			// Regular AMP url for posts
+			array_push( $listofurls, get_permalink($postId).'amp/' );
 			
 			// Feeds
 			array_push($listofurls,
@@ -415,12 +418,11 @@ class VarnishPurger {
 			);
 
 			// Home Page and (if used) posts page
-			
-			array_push($listofurls, $this->the_home_url().'/' );
+			array_push( $listofurls, $this->the_home_url().'/' );
 			if ( get_option('show_on_front') == 'page' ) {
 				// Ensure we have a page_for_posts setting to avoid empty URL
 				if ( get_option('page_for_posts') ) {
-					array_push($listofurls, get_permalink( get_option('page_for_posts') ) );
+					array_push( $listofurls, get_permalink( get_option('page_for_posts') ) );
 				}
 			}
 		} else {

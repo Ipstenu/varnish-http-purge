@@ -99,21 +99,19 @@ Yes, but you'll need to make some additional changes (see "Why aren't my changes
 
 When you use CloudFlare or any other similar service, you've got a proxy in front of the Varnish proxy. In general this isn't a bad thing. The problem arises when the DNS shenanigans send the purge request to your domain name. When you've got an additional proxy like CloudFlare, you don't want the request to go to the proxy, you want it to go to Varnish server.
 
-To fix this, add the following to your wp-config.php file:
+On single-site, you can edit this via the Tools -> Varnish Status page. On Multisite, you'll need to add the following to your wp-config.php file:
 
 `define('VHP_VARNISH_IP','123.45.67.89');`
 
 Replace "123.45.67.89" with the IP of your <em>Varnish Server</em> (not CloudFlare, Varnish). <em>DO NOT</em> put in http in this define.
 
-You can also set the option `vhp_varnish_ip` in the database. This will NOT take precedence over the define, it's just there to let hosts who are using something like wp-cli do this for you in an automated fashion:
+If you want to use WP-CLI, you can set an option in the database. This will NOT take precedence over the define, it's just there to let hosts who are using something like wp-cli do this for you in an automated fashion:
 
 `wp option add vhp_varnish_ip 123.45.67.89`
 
 and
 
 `wp option update vhp_varnish_ip 123.45.67.890`
-
-The option can be set on the Varnish Status page, under Tools.
 
 = How do I find my Varnish IP? =
 
@@ -129,7 +127,7 @@ If your webhost set up Varnish for you, you may need to ask them for the specifi
 
 Multiple IPs are not supported at this time.
 
-I have a major issue with writing code I don't use, which means that since I'm only using one IP right now, I don't want to be on the ball for supporting multiple IPs. I don't even have a place to test is, which is just insane to attempt to code if you think about it. Yes, I could accept pull requests, but that means everyone's at some other person's discretion. So no, I won't be doing that at this time.
+I have a major issue with writing code I don't use, which means that since I'm only using one IP right now, I don't want to be on the ball for supporting multiple IPs. I don't even have a place to test it, which is just insane to attempt to code if you think about it. Yes, I could accept pull requests, but that means everyone's at some other person's discretion. So no, I won't be doing that at this time.
 
 = Why don't my gzip'd pages flush? =
 
@@ -208,7 +206,7 @@ Yes I do, and yes and no. This plugin is installed by default for _all_ DreamPre
 == Changelog ==
 
 == 4.0 ==
-* Added Varnish Status Page - Tools -> Varnish Status
+* Added Varnish Status Page - Tools -> Varnish Status (includes basic scanning etc)
 * Allow filter for `home_url()`
 * Update readme with list of filters.
 * Added wp-cli commands to flush specific URLs and wildcards

@@ -456,3 +456,9 @@ $purger = new VarnishPurger();
 if ( defined('WP_CLI') && WP_CLI ) {
 	include( 'wp-cli.php' );
 }
+
+/* Varnish Status Page
+ * 
+ * @since 4.0
+ */
+include_once( 'varnish-status.php' );

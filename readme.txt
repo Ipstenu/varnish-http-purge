@@ -2,7 +2,7 @@
 Contributors: techpriester, Ipstenu, mikeschroder
 Tags: varnish, purge, cache
 Requires at least: 4.0
-Tested up to: 4.6
+Tested up to: 4.7
 Stable tag: 4.0
 
 Automatically purge Varnish Cache when content on your site is modified.
@@ -215,6 +215,7 @@ Yes I do, and yes and no. This plugin is installed by default for _all_ DreamPre
 * Requires wp-cli 0.25+ to work [3315](https://github.com/wp-cli/wp-cli/issues/3315) for WP 4.6+
 * Update `purgePost()` to validate page_for_posts ([Props JeremyClarke](https://github.com/Ipstenu/varnish-http-purge/pull/20))
 * Add check for AMP ([Props JeremyClarke](https://wordpress.org/support/topic/varnish-http-purge-doesnt-update-amp-urls-on-post-update/))
+* Purge 'default' AMP URL as well
 
 = 3.9.3 =
 * Update Documentation and Readme

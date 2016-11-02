@@ -31,10 +31,6 @@ class VarnishStatus {
 	 * @since 4.0
 	 */
 	function __construct() {
-
-		// Calling Varnish Purger!
-		$this->varnish_purge = new VarnishPurger();
-
 		// Admin Init Hooks
 		add_action( 'admin_init', array( &$this, 'admin_init' ) );
 		// Admin Menu
@@ -133,7 +129,7 @@ class VarnishStatus {
 		$icon_awkward	= '<span class="dashicons dashicons-flag" style="color:#FF9933;">';
 		$icon_bad		= '<span class="dashicons dashicons-thumbs-down" style="color:#990000;"></span>';
 
-		$url = esc_url($this->varnish_purge->the_home_url());
+		$url = esc_url( VarnishPurger::the_home_url() );
 			
 		$args = array(
 			'headers' => array( 

@@ -86,7 +86,7 @@ class VarnishPurger {
 		add_action( 'shutdown', array($this, 'executePurge') );
 
 		// Success: Admin notice when purging
-		if ( isset($_GET['vhp_flush_all']) && check_admin_referer('varnish-http-purge') ) {
+		if ( isset($_GET['vhp_flush_all']) && check_admin_referer('vhp-flush-all') ) {
 			add_action( 'admin_notices' , array( $this, 'purgeMessage'));
 		}
 
@@ -146,7 +146,7 @@ class VarnishPurger {
 		$admin_bar->add_menu( array(
 			'id'	=> 'purge-varnish-cache-all',
 			'title' => __('Purge Varnish','varnish-http-purge'),
-			'href'  => wp_nonce_url(add_query_arg('vhp_flush_all', 1), 'varnish-http-purge'),
+			'href'  => wp_nonce_url( add_query_arg('vhp_flush_all', 1), 'vhp-flush-all'),
 			'meta'  => array(
 				'title' => __('Purge Varnish','varnish-http-purge'),
 			),
@@ -161,7 +161,7 @@ class VarnishPurger {
 	 */
 	function varnish_rightnow() {
 		global $blog_id;
-		$url = wp_nonce_url(add_query_arg('vhp_flush_all', 1), 'varnish-http-purge');
+		$url = wp_nonce_url(add_query_arg('vhp_flush_all', 1), 'vhp-flush-all');
 		$intro = sprintf( __('<a href="%1$s">Varnish HTTP Purge</a> automatically purges your posts when published or updated. Sometimes you need a manual flush.', 'varnish-http-purge' ), 'http://wordpress.org/plugins/varnish-http-purge/' );
 		$button =  __('Press the button below to force it to purge your entire cache.', 'varnish-http-purge' );
 		$button .= '</p><p><span class="button"><a href="'.$url.'"><strong>';
@@ -226,7 +226,8 @@ class VarnishPurger {
 
 		// send back the actions array, filtered
 		// @param array $actions the actions that trigger the purge event
-		// DEVELOPERS! USE THIS SPARINGLY! YOU'RE A GREAT BIG :poop: IF YOU USE IT FLAGRANTLY
+		// DEVELOPERS! USE THIS SPARINGLY! YOU'RE A GREAT BIG 💩 IF YOU USE IT FLAGRANTLY
+		// Remember to add your action to this AND varnish_http_purge_events due to shenanigans
 		return apply_filters( 'varnish_http_purge_events_full', $actions );
 	}
 
@@ -237,11 +238,11 @@ class VarnishPurger {
 	 * @since 1.0
 	 * @access protected
 	 */
-	public function executePurge( ) {
-		$purgeUrls = array_unique($this->purgeUrls);
+	public function executePurge() {
+		$purgeUrls = array_unique( $this->purgeUrls );
 
-		if (empty($purgeUrls)) {
-			if ( isset($_GET['vhp_flush_all']) && check_admin_referer('varnish-http-purge') ) {
+		if ( empty($purgeUrls) ) {
+			if ( isset($_GET['vhp_flush_all']) && check_admin_referer('vhp-flush-all') ) {
 				$this->purgeUrl( $this->the_home_url() .'/?vhp-regex' );
 			}
 		} else {
@@ -455,10 +456,3 @@ $purger = new VarnishPurger();
 if ( defined('WP_CLI') && WP_CLI ) {
 	include( 'wp-cli.php' );
 }
-
-/**
- * Varnish Status Page
- *
- * @since 4.0
- */
-include( 'varnish-status.php' );

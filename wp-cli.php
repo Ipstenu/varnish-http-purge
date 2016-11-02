@@ -65,7 +65,7 @@ class WP_CLI_Varnish_Purge_Command extends WP_CLI_Command {
 			$pregex = $wild = '';
 		}
 
-		wp_create_nonce('varnish-http-purge-cli');
+		wp_create_nonce('vhp-flush-cli');
 
 		// Make sure the URL is a URL:
 		if ( !empty($url) ) {

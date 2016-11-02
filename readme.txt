@@ -41,6 +41,10 @@ When used on Multisite, the plugin is Network Activatable Only.
 
 == Frequently Asked Questions ==
 
+**Please report all issues in the [support forums](https://wordpress.org/support/plugin/varnish-http-purge)**
+
+If you have code patches, [pull requests are welcome](https://github.com/Ipstenu/varnish-http-purge).
+
 = How can I tell everything's working? =
 
 This can be difficult, since it's a silent plugin. That is you turn it on and walk away. The easiest way to tell would be view a page as a non-logged-in user. I recommend a private browsing window. Then, as a logged in user in another window, edit an existing post (make a small change). Refresh the view in your private window. If the change is there, then everything's working!

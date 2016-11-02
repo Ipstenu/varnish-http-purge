@@ -28,7 +28,7 @@ Plugins can hook into the purge actions as well, to filter their own events to t
 
 And if you're into WP-CLI, you can use that too: `wp varnish purge`
 
-Please note: On a multisite network using subfolders, only the <strong>network admins</strong> can purge the main site.
+Please note: On a multisite network using subfolders, only <strong>network admins</strong> can purge the main site.
 
 == Installation ==
 No WordPress configuration needed.
@@ -214,25 +214,11 @@ Yes I do, and yes and no. This plugin is installed by default for _all_ DreamPre
 * Update `purgePost()` to validate page_for_posts ([Props JeremyClarke](https://github.com/Ipstenu/varnish-http-purge/pull/20))
 * Add check for AMP ([Props JeremyClarke](https://wordpress.org/support/topic/varnish-http-purge-doesnt-update-amp-urls-on-post-update/))
 * Purge 'default' AMP URL as well
-
-= 3.9.3 =
-* Update Documentation and Readme
-
-= 3.9.2 =
-* Change purge notice so it can be dismissed.
-* Fix purging of deleted posts.
-
-= 3.9.1 =
-* Fixing i18n which wasn't working and threw a stupid error on sites without pretty permalinks. (Props DH customer Rasmus and employee Heckman!)
-
-= 3.9 =
-* Retain query params on purge
-* Do not use query part for regex purging [Credit: shaula](https://github.com/Ipstenu/varnish-http-purge/pull/18)
-* Allow Varnish IP to be filtered. [Credit: floatingio](https://wordpress.org/support/topic/supply-varnish-ip-via-filter)
-* Improve flushing for cases when there's no Post ID
-* Add filter so other plugins can add events to trigger purge when they have no post ID
-* Add compatibility with [Autoptimize](https://wordpress.org/plugins/autoptimize/) so it flushes Varnish when you flush their cache
+* Cleanup on Uninstall
 
 == Screenshots ==
 
-1. What the button looks like
+1. Purge button on Right Now (Dashboard Admin)
+2. Purge button on Toolbar
+3. Scanner results
+4. Change Varnish IP address

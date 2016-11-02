@@ -1,3 +1,21 @@
+= 3.9.3 =
+* Update Documentation and Readme
+
+= 3.9.2 =
+* Change purge notice so it can be dismissed.
+* Fix purging of deleted posts.
+
+= 3.9.1 =
+* Fixing i18n which wasn't working and threw a stupid error on sites without pretty permalinks. (Props DH customer Rasmus and employee Heckman!)
+
+= 3.9 =
+* Retain query params on purge
+* Do not use query part for regex purging [Credit: shaula](https://github.com/Ipstenu/varnish-http-purge/pull/18)
+* Allow Varnish IP to be filtered. [Credit: floatingio](https://wordpress.org/support/topic/supply-varnish-ip-via-filter)
+* Improve flushing for cases when there's no Post ID
+* Add filter so other plugins can add events to trigger purge when they have no post ID
+* Add compatibility with [Autoptimize](https://wordpress.org/plugins/autoptimize/) so it flushes Varnish when you flush their cache
+
 = 3.8 =
 * Add varnish_http_purge_events filter to allow people to add their own events for purging. (props @norcross)
 * Add a method to grab the response from purge request and pass to the 'after_purge_url' action for debugging. (props @shaula)

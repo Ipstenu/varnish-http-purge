@@ -132,7 +132,7 @@ class VarnishPurger {
 	 *
 	 * @since 4.0
 	 */
-	public function the_home_url(){
+	static public function the_home_url(){
 		$home_url = apply_filters( 'vhp_home_url', home_url() );
 		return $home_url;
 	}

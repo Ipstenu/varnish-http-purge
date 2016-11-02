@@ -1,5 +1,5 @@
 === Varnish HTTP Purge ===
-Contributors: techpriester, Ipstenu, mikeschroder
+Contributors: Ipstenu, mikeschroder, techpriester
 Tags: varnish, purge, cache
 Requires at least: 4.0
 Tested up to: 4.7

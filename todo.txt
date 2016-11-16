@@ -1,0 +1,8 @@
+= The future ... =
+
+We're going to sit down and look into how the plugin is structured to make it even faster and more organized. Please send coffee. Here's the wish list:
+
+* Only purge all automatically once an hour (manual button click will continue to work)
+* Refactor automated purge all to be kinder
+* Reorganize code for sanity
+* Get rid of the need to parse_url()

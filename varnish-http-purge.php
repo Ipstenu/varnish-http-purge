@@ -97,7 +97,7 @@ class VarnishPurger {
 			// Multisite - Network Admin can always purge
 			current_user_can('manage_network') ||
 			// Multisite - Site admins can purge UNLESS it's a subfolder install and we're on site #1
-			( is_multisite() && !current_user_can('manage_network') && ( SUBDOMAIN_INSTALL || ( !SUBDOMAIN_INSTALL && ( BLOG_ID_CURRENT_SITE != $blog_id ) ) ) )
+			( is_multisite() && current_user_can('activate_plugins') && ( SUBDOMAIN_INSTALL || ( !SUBDOMAIN_INSTALL && ( BLOG_ID_CURRENT_SITE != $blog_id ) ) ) )
 			) {
 				add_action( 'admin_bar_menu', array( $this, 'varnish_rightnow_adminbar' ), 100 );
 		}
@@ -422,13 +422,8 @@ class VarnishPurger {
 			array_push( $listofurls, $this->the_home_url().'/' );
 			if ( get_option('show_on_front') == 'page' ) {
 				// Ensure we have a page_for_posts setting to avoid empty URL
-<<<<<<< HEAD
-				if (get_option('page_for_posts')) {
-					array_push($listofurls, get_permalink( get_option('page_for_posts') ) );
-=======
 				if ( get_option('page_for_posts') ) {
 					array_push( $listofurls, get_permalink( get_option('page_for_posts') ) );
->>>>>>> REL_4.0
 				}
 			}
 		} else {

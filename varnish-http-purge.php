@@ -422,13 +422,8 @@ class VarnishPurger {
 			array_push( $listofurls, $this->the_home_url().'/' );
 			if ( get_option('show_on_front') == 'page' ) {
 				// Ensure we have a page_for_posts setting to avoid empty URL
-<<<<<<< HEAD
-				if (get_option('page_for_posts')) {
-					array_push($listofurls, get_permalink( get_option('page_for_posts') ) );
-=======
 				if ( get_option('page_for_posts') ) {
 					array_push( $listofurls, get_permalink( get_option('page_for_posts') ) );
->>>>>>> REL_4.0
 				}
 			}
 		} else {
@@ -461,12 +456,9 @@ $purger = new VarnishPurger();
 if ( defined('WP_CLI') && WP_CLI ) {
 	include( 'wp-cli.php' );
 }
-<<<<<<< HEAD
-=======
 
 /* Varnish Status Page
  * 
  * @since 4.0
  */
 include_once( 'varnish-status.php' );
->>>>>>> REL_4.0

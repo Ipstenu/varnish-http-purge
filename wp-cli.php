@@ -58,22 +58,18 @@ class WP_CLI_Varnish_Purge_Command extends WP_CLI_Command {
 
 		// If wildcard is set, or the URL argument is empty
 		// then treat this as a full purge
+		$pregex = $wild = '';
 		if ( isset( $assoc_args['wildcard'] ) || empty($url) ) {
 			$pregex = '/?vhp-regex';
 			$wild = ".*";
-		} else {
-			$pregex = $wild = '';
 		}
 
 		wp_create_nonce('vhp-flush-cli');
 
 		// Make sure the URL is a URL:
+		$url = esc_url( $url );
 		if ( !empty($url) ) {
-			// If the URL isn't a URL, make it a URL
-			$url = esc_url( $url );
-			if ( empty( $url ) ) {
-				$url = $this->varnish_purge->the_home_url() . $url;
-			}
+			$url = $this->varnish_purge->the_home_url() . $url;
 		} else {
 			$url = $this->varnish_purge->the_home_url();
 		}

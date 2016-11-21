@@ -3,7 +3,7 @@
 Plugin Name: Varnish HTTP Purge
 Plugin URI: https://halfelf.org/plugins/varnish-http-purge/
 Description: Automatically purge Varnish Cache when content on your site is modified.
-Version: 4.0.2
+Version: 4.0.1
 Author: Mika Epstein
 Author URI: https://halfelf.org/
 License: http://www.apache.org/licenses/LICENSE-2.0
@@ -98,9 +98,10 @@ class VarnishPurger {
 			current_user_can('manage_network') ||
 			// Multisite - Site admins can purge UNLESS it's a subfolder install and we're on site #1
 			( is_multisite() && current_user_can('activate_plugins') && ( SUBDOMAIN_INSTALL || ( !SUBDOMAIN_INSTALL && ( BLOG_ID_CURRENT_SITE != $blog_id ) ) ) )
-		) {
-			add_action( 'admin_bar_menu', array( $this, 'varnish_rightnow_adminbar' ), 100 );
+			) {
+				add_action( 'admin_bar_menu', array( $this, 'varnish_rightnow_adminbar' ), 100 );
 		}
+
 	}
 
 	/**
@@ -260,14 +261,14 @@ class VarnishPurger {
 	 * @access protected
 	 */
 	public function purgeUrl($url) {
-
 		$p = parse_url($url);
 
-		$pregex = '';
-		$varnish_x_purgemethod = 'default';
 		if ( isset($p['query']) && ( $p['query'] == 'vhp-regex' ) ) {
 			$pregex = '.*';
 			$varnish_x_purgemethod = 'regex';
+		} else {
+			$pregex = '';
+			$varnish_x_purgemethod = 'default';
 		}
 
 		// Build a varniship
@@ -278,9 +279,10 @@ class VarnishPurger {
 		}
 		$varniship = apply_filters('vhp_varnish_ip', $varniship);
 
-		$path = '';
 		if (isset($p['path'] ) ) {
 			$path = $p['path'];
+		} else {
+			$path = '';
 		}
 
 		/**

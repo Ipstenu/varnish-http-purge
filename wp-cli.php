@@ -40,7 +40,7 @@ class WP_CLI_Varnish_Purge_Command extends WP_CLI_Command {
      *
      *		wp varnish purge http://example.com/wp-content/themes/twentyeleventy/style.css
      *
-	 *		wp vanrish purge "/wp-content/themes/twentysixty/style.css"
+	 *		wp varnish purge "/wp-content/themes/twentysixty/style.css"
 	 *
      *		wp varnish purge http://example.com/wp-content/themes/ --wildcard
      *
@@ -54,7 +54,7 @@ class WP_CLI_Varnish_Purge_Command extends WP_CLI_Command {
 		$cli_version = WP_CLI_VERSION;
 		
 		// Set the URL/path
-		list( $url ) = $args;
+		if ( !empty($args) ) { list( $url ) = $args; }
 
 		// If wildcard is set, or the URL argument is empty
 		// then treat this as a full purge
@@ -67,9 +67,8 @@ class WP_CLI_Varnish_Purge_Command extends WP_CLI_Command {
 		wp_create_nonce('vhp-flush-cli');
 
 		// Make sure the URL is a URL:
-		$url = esc_url( $url );
 		if ( !empty($url) ) {
-			$url = $this->varnish_purge->the_home_url() . $url;
+			$url = $this->varnish_purge->the_home_url() . esc_url( $url );
 		} else {
 			$url = $this->varnish_purge->the_home_url();
 		}

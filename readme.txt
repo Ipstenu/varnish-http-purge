@@ -211,6 +211,10 @@ Yes I do, and yes and no. This plugin is installed by default for _all_ DreamPre
 
 = 4.0.2 =
 * Support for WP-CLI commands and PHP > 5.5 (though please upgrade, props @robertpeake)
+* Better information regarding Cloudflare
+* Better failure on domains for scanner
+* Better IP detection
+* Break apart settings for faster saving
 
 = 4.0.1 =
 * Fix typo (on -> one)

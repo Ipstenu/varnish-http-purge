@@ -466,6 +466,17 @@ class VarnishStatus {
 		$output = esc_url( VarnishPurger::the_home_url() );
 		$set_type = 'error';	
 
+		if ( !empty($input) ) {
+			$parsed_input = parse_url($input);
+			if ( empty($parsed_input['scheme']) ) {
+				$schema_input = 'http://';
+				if ( is_ssl() ) {
+					$schema_input = 'https://';
+				}
+				$input = $schema_input . ltrim($input, '/');
+			}
+		}
+
 		if ( empty($input) ) {
 			$set_message = 'You must enter a URL from your own domain to scan.';
 		} elseif ( !filter_var( $input, FILTER_VALIDATE_URL) ) {

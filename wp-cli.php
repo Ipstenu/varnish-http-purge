@@ -70,7 +70,8 @@ class WP_CLI_Varnish_Purge_Command extends WP_CLI_Command {
 		// Make sure the URL is a URL:
 		if ( !empty($url) ) {
 			// If the URL isn't a URL, make it a URL
-			if ( empty( esc_url( $url ) ) ) {
+			$url = esc_url( $url );
+			if ( empty( $url ) ) {
 				$url = $this->varnish_purge->the_home_url() . $url;
 			}
 		} else {

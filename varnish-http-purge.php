@@ -3,16 +3,16 @@
 Plugin Name: Varnish HTTP Purge
 Plugin URI: https://halfelf.org/plugins/varnish-http-purge/
 Description: Automatically purge Varnish Cache when content on your site is modified.
-Version: 4.0.1
+Version: 4.0.2
 Author: Mika Epstein
 Author URI: https://halfelf.org/
 License: http://www.apache.org/licenses/LICENSE-2.0
 Text Domain: varnish-http-purge
 Network: true
 
-Copyright 2013-2016: Mika A. Epstein (email: ipstenu@halfelf.org)
+	Copyright 2013-2016: Mika A. Epstein (email: ipstenu@halfelf.org)
 
-Original Author: Leon Weidauer ( http:/www.lnwdr.de/ )
+	Original Author: Leon Weidauer ( http:/www.lnwdr.de/ )
 
 	This file is part of Varnish HTTP Purge, a plugin for WordPress.
 

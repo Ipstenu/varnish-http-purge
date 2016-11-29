@@ -174,6 +174,8 @@ class VarnishStatus {
 		} elseif ( isset( $headers['HTTP_X_FORWARDED_FOR'] ) && filter_var( $headers['HTTP_X_FORWARDED_FOR'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 )
 		) {
 			$remote_ip = $headers['HTTP_X_FORWARDED_FOR'];
+		} elseif ( strpos( $headers['Server'] ,'cloudflare') !== false ) {
+			$remote_ip = 'cloudflare';
 		} else {
 			$remote_ip = false;
 		}
@@ -223,7 +225,7 @@ class VarnishStatus {
 					if ( $remote_ip == false && !empty( $varniship) ) {
 					?>
 						<td width="40px"><?php echo $icon_bad; ?></td>
-						<td><?php printf( __( 'You have a Varnish IP set but you don\'t appear to be using a proxy like Cloudflare or Sucuri. Please <a href="%s">erase your Varnish IP</a>', 'varnish-http-purge'  ), '#configure' ); ?></td>
+						<td><?php printf( __( 'You have a Varnish IP set but you don\'t appear to be using a proxy like Cloudflare or Sucuri. Or at least we don\'t detect a proxy IP like we expected. You may need to <a href="%s">erase your Varnish IP</a> if you have issues with caches not flushing.', 'varnish-http-purge'  ), '#configure' ); ?></td>
 					<?php
 					} elseif ( $remote_ip !== false && $remote_ip !== $varniship ) {
 					?>
@@ -242,7 +244,7 @@ class VarnishStatus {
 				if ( strpos( $headers['Server'] ,'cloudflare') !== false ) {
 				?><tr>
 					<td><?php echo $icon_warning; ?></td>
-					<td><?php printf( __( 'Because CloudFlare is running, you may experience some cache oddities. Make sure you <a href="%s">configure WordPress for Cloudflare</a>?', 'varnish-http-purge'  ), '#configure' ); ?></td>
+					<td><?php printf( __( 'Because CloudFlare is running, you may experience some cache oddities. Make sure you <a href="%s">configure WordPress for Cloudflare</a>.', 'varnish-http-purge'  ), '#configure' ); ?></td>
 				</tr><?php
 				}
 	

@@ -239,7 +239,7 @@ class VarnishStatus {
 				?></tr><?php
 
 				// Cloudflare
-				if ( strpos( $headers['Server'] ,'cloudflare') !== false ) {
+				if ( isset( $headers['Server'] ) && strpos( $headers['Server'] ,'cloudflare') !== false ) {
 				?><tr>
 					<td><?php echo $icon_warning; ?></td>
 					<td><?php printf( __( 'Because CloudFlare is running, you may experience some cache oddities. Make sure you <a href="%s">configure WordPress for Cloudflare</a>?', 'varnish-http-purge'  ), '#configure' ); ?></td>

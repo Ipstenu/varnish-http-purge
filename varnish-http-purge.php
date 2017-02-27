@@ -3,7 +3,7 @@
 Plugin Name: Varnish HTTP Purge
 Plugin URI: https://halfelf.org/plugins/varnish-http-purge/
 Description: Automatically purge Varnish Cache when content on your site is modified.
-Version: 4.0.2
+Version: 4.0.3
 Author: Mika Epstein
 Author URI: https://halfelf.org/
 License: http://www.apache.org/licenses/LICENSE-2.0
@@ -145,10 +145,10 @@ class VarnishPurger {
 	function varnish_rightnow_adminbar($admin_bar){
 		$admin_bar->add_menu( array(
 			'id'	=> 'purge-varnish-cache-all',
-			'title' => __('Purge Varnish','varnish-http-purge'),
+			'title' => __('Empty Cache','varnish-http-purge'),
 			'href'  => wp_nonce_url( add_query_arg('vhp_flush_all', 1), 'vhp-flush-all'),
 			'meta'  => array(
-				'title' => __('Purge Varnish','varnish-http-purge'),
+				'title' => __('Empty Cache','varnish-http-purge'),
 			),
 		));
 	}
@@ -163,9 +163,9 @@ class VarnishPurger {
 		global $blog_id;
 		$url = wp_nonce_url(add_query_arg('vhp_flush_all', 1), 'vhp-flush-all');
 		$intro = sprintf( __('<a href="%1$s">Varnish HTTP Purge</a> automatically purges your posts when published or updated. Sometimes you need a manual flush.', 'varnish-http-purge' ), 'http://wordpress.org/plugins/varnish-http-purge/' );
-		$button =  __('Press the button below to force it to purge your entire cache.', 'varnish-http-purge' );
+		$button =  __('Press the button below to force it to empty your entire Varnish cache.', 'varnish-http-purge' );
 		$button .= '</p><p><span class="button"><a href="'.$url.'"><strong>';
-		$button .= __('Purge Varnish', 'varnish-http-purge' );
+		$button .= __('Empty Cache', 'varnish-http-purge' );
 		$button .= '</strong></a></span>';
 		$nobutton =  __('You do not have permission to purge the cache for the whole site. Please contact your administrator.', 'varnish-http-purge' );
 

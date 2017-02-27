@@ -210,9 +210,8 @@ Yes I do, and yes and no. This plugin is installed by default for _all_ DreamPre
 == Changelog ==
 
 = 4.0.3 =
-* Better Cloudflare checks
-* Minor text changes
-* Rename flush button
+* Better explanation when Cloudflare gets in the way of DNS
+* Rename flush button for people who don't speak Varnish
 
 = 4.0.2 =
 * Support for WP-CLI commands and PHP > 5.5 (though please upgrade, props @robertpeake)

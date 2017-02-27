@@ -88,7 +88,7 @@ class VarnishStatus {
 	 */
 	function options_callback_ip() {
 	    ?>
-	    <p><a name="#configure"></a><?php _e('The majority of users will never need to so much as look down here. However there are cases when a custom Varnish IP Address will need to be set, in order to tell the plugin to flush cache in a specific location. If you\'re using a CDN like Cloudflare or a Firewall Proxy like Sucuri, you will want to set this.', 'varnish-http-purge'); ?></p>
+	    <p><a name="#configure"></a><?php _e('The majority of users will never need to so much as look down here. However there are cases when a custom Varnish IP Address will need to be set, in order to tell the plugin to empty the cache in a specific location. If you\'re using a CDN like Cloudflare or a Firewall Proxy like Sucuri, you will want to set this.', 'varnish-http-purge'); ?></p>
 	    <p><?php _e('Your Varnish IP is just the IP address of the server where Varnish is installed. Your Varnish IP must be one of the IPs that Varnish is listening on. If you use multiple IPs, or if you\'ve customized your ACLs, you\'ll need to pick one that doesn\'t conflict with your other settings. For example, if you have Varnish listening on a public and private IP, pick the private. On the other hand, if you told Varnish to listen on 0.0.0.0 (i.e. "listen on every interface you can") you would need to check what IP you set your purge ACL to allow (commonly 127.0.0.1 aka localhost), and use that (i.e. 127.0.0.1).', 'varnish-http-purge'); ?></p>
 	    <p><?php _e('If your webhost set up Varnish for you, you may need to ask them for the specifics if they don\'t have it documented. I\'ve listed the ones I know about here, however you should still check with them if you\'re not sure.', 'varnish-http-purge'); ?></p>
 
@@ -225,7 +225,7 @@ class VarnishStatus {
 					if ( $remote_ip == false && !empty( $varniship) ) {
 					?>
 						<td width="40px"><?php echo $icon_bad; ?></td>
-						<td><?php printf( __( 'You have a Varnish IP set but you don\'t appear to be using a proxy like Cloudflare or Sucuri. Or at least we don\'t detect a proxy IP like we expected. You may need to <a href="%s">erase your Varnish IP</a> if you have issues with caches not flushing.', 'varnish-http-purge'  ), '#configure' ); ?></td>
+						<td><?php printf( __( 'You have a Varnish IP set but you don\'t appear to be using a proxy like Cloudflare or Sucuri. Or at least we don\'t detect a proxy IP like we expected. You may need to <a href="%s">erase your Varnish IP</a> if you have issues with caches not emptying.', 'varnish-http-purge'  ), '#configure' ); ?></td>
 					<?php
 					} elseif ( $remote_ip !== false && $remote_ip !== $varniship ) {
 					?>
@@ -272,7 +272,7 @@ class VarnishStatus {
 					if ( strpos( $headers['Content-Encoding'] ,'Fastly') !== false ) {
 					?><tr>
 						<td><?php echo $icon_good; ?></td>
-						<td><?php printf( __( '<a href="%s">Fastly</a> is speeding up your site. Keep in mind, it may cache your CSS and images longer than Varnish does. Remember to flush both caches.', 'varnish-http-purge'  ), esc_url('https://fastly.com') ); ?></td>
+						<td><?php printf( __( '<a href="%s">Fastly</a> is speeding up your site. Keep in mind, it may cache your CSS and images longer than Varnish does. Remember to empty all caches.', 'varnish-http-purge'  ), esc_url('https://fastly.com') ); ?></td>
 					</tr><?php
 					} 
 				}

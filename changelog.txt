@@ -1,3 +1,31 @@
+= 4.0.3 =
+* Better explanation when Cloudflare gets in the way of DNS
+* Rename flush button for people who don't speak Varnish
+
+= 4.0.2 =
+* Support for WP-CLI commands and PHP > 5.5 (though please upgrade, props @robertpeake)
+* Better information regarding Cloudflare
+* Better failure on domains for scanner
+* Better IP detection
+* Break apart settings for faster saving
+
+= 4.0.1 =
+* Fix typo (on -> one)
+* Correct permissions on Multisite (props @phh - resolves #27 #28)
+* Correct weird merge error (props @phh - resolves #25 #26)
+* Fix formatting in Changelog
+
+= 4.0 =
+* Added Varnish Status Page - Tools -> Varnish Status (includes basic scanning etc)
+* Allow filter for `home_url()`
+* Update readme with list of filters.
+* Added wp-cli commands to flush specific URLs and wildcards
+* Requires wp-cli 0.25+ to work [3315](https://github.com/wp-cli/wp-cli/issues/3315) for WP 4.6+
+* Update `purgePost()` to validate page_for_posts ([Props JeremyClarke](https://github.com/Ipstenu/varnish-http-purge/pull/20))
+* Add check for AMP ([Props JeremyClarke](https://wordpress.org/support/topic/varnish-http-purge-doesnt-update-amp-urls-on-post-update/))
+* Purge 'default' AMP URL as well
+* Cleanup on Uninstall
+
 = 3.9.3 =
 * Update Documentation and Readme
 

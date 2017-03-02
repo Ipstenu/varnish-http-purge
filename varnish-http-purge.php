@@ -3,14 +3,14 @@
 Plugin Name: Varnish HTTP Purge
 Plugin URI: https://halfelf.org/plugins/varnish-http-purge/
 Description: Automatically purge Varnish Cache when content on your site is modified.
-Version: 4.0.3
+Version: 4.1-beta
 Author: Mika Epstein
 Author URI: https://halfelf.org/
 License: http://www.apache.org/licenses/LICENSE-2.0
 Text Domain: varnish-http-purge
 Network: true
 
-	Copyright 2013-2016: Mika A. Epstein (email: ipstenu@halfelf.org)
+	Copyright 2013-2017: Mika A. Epstein (email: ipstenu@halfelf.org)
 
 	Original Author: Leon Weidauer ( http:/www.lnwdr.de/ )
 
@@ -357,6 +357,7 @@ class VarnishPurger {
 		$listofurls = array();
 
 		if( get_permalink($postId) == true && in_array($thisPostStatus, $validPostStatus) ) {
+
 			// If this is a post with a permalink AND it's published or trashed, 
 			// we're going to add a ton of things to flush.
 			
@@ -364,14 +365,20 @@ class VarnishPurger {
 			$categories = get_the_category($postId);
 			if ( $categories ) {
 				foreach ($categories as $cat) {
-					array_push($listofurls, get_category_link( $cat->term_id ) );
+					array_push($listofurls, 
+						get_category_link( $cat->term_id ),
+						get_rest_url().'wp/v2/categories/'.$cat->term_id.'/'
+					);
 				}
 			}
 			// Tag purge based on Donnacha's work in WP Super Cache
 			$tags = get_the_tags($postId);
 			if ( $tags ) {
 				foreach ($tags as $tag) {
-					array_push($listofurls, get_tag_link( $tag->term_id ) );
+					array_push($listofurls, 
+						get_tag_link( $tag->term_id ),
+						get_rest_url().'wp/v2/tags/'.$tag->term_id.'/'
+					);
 				}
 			}
 
@@ -417,6 +424,16 @@ class VarnishPurger {
 				get_bloginfo_rss('comments_rss2_url'),
 				get_post_comments_feed_link($postId)
 			);
+
+			// JSON API
+			array_push($listofurls,
+				get_rest_url(), // base URL
+			
+				'http://demo.wp-api.org/wp-json/wp/v2/posts/'.$postId
+				
+				/wp/v2/categories/
+				
+				http://demo.wp-api.org/wp-json/wp/v2/pages/
 
 			// Home Page and (if used) posts page
 			array_push( $listofurls, $this->the_home_url().'/' );

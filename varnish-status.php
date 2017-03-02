@@ -89,8 +89,9 @@ class VarnishStatus {
 	function options_callback_ip() {
 	    ?>
 	    <p><a name="#configure"></a><?php _e('The majority of users will never need to so much as look down here. However there are cases when a custom Varnish IP Address will need to be set, in order to tell the plugin to empty the cache in a specific location. If you\'re using a CDN like Cloudflare or a Firewall Proxy like Sucuri, you will want to set this.', 'varnish-http-purge'); ?></p>
-	    <p><?php _e('Your Varnish IP is just the IP address of the server where Varnish is installed. Your Varnish IP must be one of the IPs that Varnish is listening on. If you use multiple IPs, or if you\'ve customized your ACLs, you\'ll need to pick one that doesn\'t conflict with your other settings. For example, if you have Varnish listening on a public and private IP, pick the private. On the other hand, if you told Varnish to listen on 0.0.0.0 (i.e. "listen on every interface you can") you would need to check what IP you set your purge ACL to allow (commonly 127.0.0.1 aka localhost), and use that (i.e. 127.0.0.1).', 'varnish-http-purge'); ?></p>
-	    <p><?php _e('If your webhost set up Varnish for you, you may need to ask them for the specifics if they don\'t have it documented. I\'ve listed the ones I know about here, however you should still check with them if you\'re not sure.', 'varnish-http-purge'); ?></p>
+	    <p><?php _e('Your Varnish IP the IP address of the server where Varnish is installed. Your Varnish IP must be one of the IPs that Varnish is listening. If you use multiple IPs, or if you\'ve customized your ACLs, you\'ll need to pick one that doesn\'t conflict with your other settings. For example, if you have Varnish listening on a public and private IP, pick the private. On the other hand, if you told Varnish to listen on 0.0.0.0 (i.e. "listen on every interface you can") you would need to check what IP you set your purge ACL to allow (commonly 127.0.0.1 aka localhost), and use that (i.e. 127.0.0.1).', 'varnish-http-purge'); ?></p>
+	    <p><?php _e('If your webhost set up Varnish for you, as is the case with DreamPress or WP Engine, you may need to ask them for the specifics if they don\'t have it documented. I\'ve listed the ones I know about here, however you should still check with them if you\'re not sure.', 'varnish-http-purge'); ?></p>
+	    <p><strong><?php _e('If you aren\'t sure what to do, contact your webhost or server admin before making any changes.', 'varnish-http-purge'); ?></strong></p>
 
 		<ul>
 		    <li><?php _e('DreamHost - Go into the Panel and click on the DNS settings for the domain. The entry for <em>resolve-to.domain</em> (if set) will your varnish server. If it\'s not set, then you don\'t need to worry about this at all. Example:', 'varnish-http-purge'); ?> <code>resolve-to.www A 208.97.157.172</code></li>
@@ -224,18 +225,18 @@ class VarnishStatus {
 				?><tr><?php
 					if ( $remote_ip == false && !empty( $varniship) ) {
 					?>
-						<td width="40px"><?php echo $icon_bad; ?></td>
-						<td><?php printf( __( 'You have a Varnish IP set but you don\'t appear to be using a proxy like Cloudflare or Sucuri. Or at least we don\'t detect a proxy IP like we expected. You may need to <a href="%s">erase your Varnish IP</a> if you have issues with caches not emptying.', 'varnish-http-purge'  ), '#configure' ); ?></td>
+						<td width="40px"><?php echo $icon_warning; ?></td>
+						<td><?php printf( __( 'You have a Varnish IP set but a proxy like Cloudflare or Sucuri has not been detected. This is usually fine, but if you have issues with your cache not emptying when you make a post, you may need to <a href="%s">erase your Varnish IP</a>. Please check with your webhost or server admin before doing so.', 'varnish-http-purge'  ), '#configure' ); ?></td>
 					<?php
 					} elseif ( $remote_ip !== false && $remote_ip !== $varniship ) {
 					?>
-						<td width="40px"><?php echo $icon_bad; ?></td>
-						<td><?php printf( __( 'You\'re using a Custom Varnish IP that doesn\'t appear to match your server IP address. Please make sure you\'ve <a href="%s">properly configured it</a> according to your webhost\'s specifications.', 'varnish-http-purge'  ), '#configure' ); ?></td>
+						<td width="40px"><?php echo $icon_warning; ?></td>
+						<td><?php printf( __( 'You\'re using a Custom Varnish IP that doesn\'t appear to match your server IP address. If you\'re using multiple Varnish servers, this is fine. Please make sure you\'ve <a href="%s">properly configured it</a> according to your webhost\'s specifications.', 'varnish-http-purge'  ), '#configure' ); ?></td>
 					<?php
 					} else {
 					?>
 						<td width="40px"><?php echo $icon_good; ?></td>
-						<td><?php printf( __( 'Your sever IP setup looks just fine. If you are using a proxy (like Sucuri or Cloudflare or Fastly) please double check that configuration and make sure to add a <a href="%s">custom Varnish IP</a> .', 'varnish-http-purge'  ), '#configure' ); ?></td>
+						<td><?php printf( __( 'Your sever IP setup looks good. If you are using a proxy (like Sucuri or Cloudflare or Fastly) please double check that configuration and make sure to add a <a href="%s">custom Varnish IP</a> if necessary.', 'varnish-http-purge'  ), '#configure' ); ?></td>
 					<?php
 					}
 				?></tr><?php
@@ -281,32 +282,47 @@ class VarnishStatus {
 				
 				// SET COOKIE
 				if ( isset( $headers['Set-Cookie'] ) ) {
-				
-					if ( strpos( $headers['Set-Cookie'] , 'PHPSESSID') !== false ) {
+					
+					// If cookies are an array, scan the whole thing. Otherwise, we can use strpos.
+					if ( is_array( $headers['Set-Cookie'] ) ) {						
+						$cookie_phpsessid = in_array( 'PHPSESSID', $headers['Set-Cookie'], true );
+						$cookie_edd_wp_session = in_array( 'edd_wp_session', $headers['Set-Cookie'], true );
+						$cookie_edd_items_in_cart = in_array( 'edd_items_in_cart', $headers['Set-Cookie'], true );
+						$cookie_wfvt = in_array( 'wfvt_', $headers['Set-Cookie'], true );
+						$cookie_invite_anyone = in_array( 'invite-anyone', $headers['Set-Cookie'], true );
+					} else {
+						$cookie_phpsessid = strpos( $headers['Set-Cookie'] , 'PHPSESSID');
+						$cookie_edd_wp_session = strpos( $headers['Set-Cookie'], 'edd_wp_session' );
+						$cookie_edd_items_in_cart = strpos( $headers['Set-Cookie'], 'edd_items_in_cart' );
+						$cookie_wfvt = strpos( $headers['Set-Cookie'], 'wfvt_' );
+						$cookie_invite_anyone = strpos( $headers['Set-Cookie'], 'invite-anyone' );
+					}
+
+					if ( $cookie_phpsessid !== false ) {
 						?><tr>
 							<td><?php echo $icon_bad; ?></td>
 							<td><?php _e( 'A plugin or theme is setting a PHPSESSID cookie on every pageload. This makes Varnish not deliver cached pages.', 'varnish-http-purge' ); ?></td>
 						</tr><?php
 					}
-					if ( strpos( $headers['Set-Cookie'], 'edd_wp_session' ) !== false ) {
+					if ( $cookie_edd_wp_session !== false ) {
 						?><tr>
 							<td><?php echo $icon_bad; ?></td>
 							<td><?php printf( __( '<a href="%s">Easy Digital Downloads</a> is being used with cookie sessions. This may cause your cache to misbehave. If you have issues, please set <code>define( "EDD_USE_PHP_SESSIONS", true );</code> in your <code>wp-config.php</code> file.', 'varnish-http-purge'  ), esc_url('https://wordpress.org/plugins/easy-digital-downloads/') ); ?></td>
 						</tr><?php
 					}
-					if ( strpos( $headers['Set-Cookie'], 'edd_items_in_cart' ) !== false ) {
+					if ( $cookie_edd_items_in_cart !== false ) {
 						?><tr>
 							<td><?php echo $icon_warning; ?></td>
 							<td><?php printf( __( '<a href="%s">Easy Digital Downloads</a> is putting down a shopping cart cookie on every page load. Make sure Varnish is set up to ignore that when it\'s empty.', 'varnish-http-purge'  ), esc_url('https://wordpress.org/plugins/easy-digital-downloads/') ); ?></td>
 						</tr><?php				
 					}
-					if ( strpos( $headers['Set-Cookie'], 'wfvt_' ) !== false ) {
+					if ( $cookie_wfvt !== false ) {
 						?><tr>
 							<td><?php echo $icon_bad; ?></td>
 							<td><?php printf( __( '<a href="%s">Wordfence</a> is putting down cookies on every page load. Please disable that in your options (available from version 4.0.4 and up).', 'varnish-http-purge'  ), esc_url('https://wordpress.org/plugins/wordfence/') ); ?></td>
 						</tr><?php
 					}
-					if ( strpos( $headers['Set-Cookie'], 'invite-anyone' ) !== false ) {
+					if ( $cookie_invite_anyone !== false ) {
 						?><tr>
 							<td><?php echo $icon_bad; ?></td>
 							<td><?php printf( __( '<a href="%s">Invite Anyone</a>, a plugin for BuddyPress, is putting down a cookie on every page load. This will prevent Varnish from caching.', 'varnish-http-purge'  ), esc_url('https://wordpress.org/plugins/invite-anyone/') ); ?></td>

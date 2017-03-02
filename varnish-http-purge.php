@@ -162,7 +162,7 @@ class VarnishPurger {
 	function varnish_rightnow() {
 		global $blog_id;
 		$url = wp_nonce_url(add_query_arg('vhp_flush_all', 1), 'vhp-flush-all');
-		$intro = sprintf( __('<a href="%1$s">Varnish HTTP Purge</a> automatically purges your posts when published or updated. Sometimes you need a manual flush.', 'varnish-http-purge' ), 'http://wordpress.org/plugins/varnish-http-purge/' );
+		$intro = sprintf( __('<a href="%1$s">Varnish HTTP Purge</a> automatically deletes your cached posts when published or updated. When making major site changes, such as with a new theme, plugins, or widgets, you may need to manually empty the cache.', 'varnish-http-purge' ), 'http://wordpress.org/plugins/varnish-http-purge/' );
 		$button =  __('Press the button below to force it to empty your entire Varnish cache.', 'varnish-http-purge' );
 		$button .= '</p><p><span class="button"><a href="'.$url.'"><strong>';
 		$button .= __('Empty Cache', 'varnish-http-purge' );
@@ -262,13 +262,12 @@ class VarnishPurger {
 	 */
 	public function purgeUrl($url) {
 		$p = parse_url($url);
+		$pregex = '';
+		$varnish_x_purgemethod = 'default';
 
 		if ( isset($p['query']) && ( $p['query'] == 'vhp-regex' ) ) {
 			$pregex = '.*';
 			$varnish_x_purgemethod = 'regex';
-		} else {
-			$pregex = '';
-			$varnish_x_purgemethod = 'default';
 		}
 
 		// Build a varniship
@@ -279,7 +278,7 @@ class VarnishPurger {
 		}
 		$varniship = apply_filters('vhp_varnish_ip', $varniship);
 
-		if (isset($p['path'] ) ) {
+		if ( isset($p['path'] ) ) {
 			$path = $p['path'];
 		} else {
 			$path = '';
@@ -294,7 +293,6 @@ class VarnishPurger {
 		 * @since 3.7.3
 		 *
 		 */
-
 		$schema = apply_filters( 'varnish_http_purge_schema', 'http://' );
 
 		// If we made varniship, let it sail
@@ -352,6 +350,7 @@ class VarnishPurger {
 
 		$validPostStatus = array("publish", "trash");
 		$thisPostStatus  = get_post_status($postId);
+		$rest_api_route  = 'wp/v2';
 
 		// array to collect all our URLs
 		$listofurls = array();
@@ -367,7 +366,7 @@ class VarnishPurger {
 				foreach ($categories as $cat) {
 					array_push($listofurls, 
 						get_category_link( $cat->term_id ),
-						get_rest_url().'wp/v2/categories/'.$cat->term_id.'/'
+						get_rest_url().$rest_api_route.'/categories/'.$cat->term_id.'/'
 					);
 				}
 			}
@@ -377,7 +376,7 @@ class VarnishPurger {
 				foreach ($tags as $tag) {
 					array_push($listofurls, 
 						get_tag_link( $tag->term_id ),
-						get_rest_url().'wp/v2/tags/'.$tag->term_id.'/'
+						get_rest_url().$rest_api_route.'/tags/'.$tag->term_id.'/'
 					);
 				}
 			}
@@ -425,18 +424,15 @@ class VarnishPurger {
 				get_post_comments_feed_link($postId)
 			);
 
-			// JSON API
-			array_push($listofurls,
-				get_rest_url(), // base URL
-			
-				'http://demo.wp-api.org/wp-json/wp/v2/posts/'.$postId
-				
-				/wp/v2/categories/
-				
-				http://demo.wp-api.org/wp-json/wp/v2/pages/
+			// JSON API Permalink for the post
+			$post_type_object = get_post_type_object( $postID );			
+			array_push($listofurls, get_rest_url().$rest_api_route.'/'.$post_type_object->rest_base.'/'.$postId.'/' );
 
 			// Home Page and (if used) posts page
-			array_push( $listofurls, $this->the_home_url().'/' );
+			array_push( $listofurls, 
+				$this->the_home_url().'/', // Home URL
+				get_rest_url()             // JSON URL
+				);
 			if ( get_option('show_on_front') == 'page' ) {
 				// Ensure we have a page_for_posts setting to avoid empty URL
 				if ( get_option('page_for_posts') ) {

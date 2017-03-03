@@ -231,7 +231,7 @@ class VarnishStatus {
 					} elseif ( $remote_ip !== false && $remote_ip !== $varniship ) {
 					?>
 						<td width="40px"><?php echo $icon_warning; ?></td>
-						<td><?php printf( __( 'You\'re using a Custom Varnish IP that doesn\'t appear to match your server IP address. If you\'re using multiple Varnish servers, this is fine. Please make sure you\'ve <a href="%s">properly configured it</a> according to your webhost\'s specifications.', 'varnish-http-purge'  ), '#configure' ); ?></td>
+						<td><?php printf( __( 'You\'re using a Custom Varnish IP that doesn\'t appear to match your server IP address. If you\'re using multiple Varnish servers or IPv6, this is fine. Please make sure you\'ve <a href="%s">properly configured it</a> according to your webhost\'s specifications.', 'varnish-http-purge'  ), '#configure' ); ?></td>
 					<?php
 					} else {
 					?>

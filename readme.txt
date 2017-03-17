@@ -229,6 +229,7 @@ This plugin is installed by default for _all_ DreamPress installs on DreamHost, 
 * Filter for purge headers (props @ocean90)
 * Disallow people from editing the Varnish IP on Multisite
 * Drop support for pre 4.7 because of JSON / REST API
+* Support flushing cache for private pages
 
 == Screenshots ==
 

@@ -384,9 +384,14 @@ class VarnishPurger {
 		
 		// If this is a valid post we want to purge the post, 
 		// the home page and any associated tags and categories
-		$validPostStatus = array( "publish", "trash" );
-		$thisPostStatus  = get_post_status( $postId );
-		
+		$valid_post_status = array( 'publish', 'private', 'trash' );
+		$this_post_status  = get_post_status( $postId );
+
+		// Not all post types are created equal
+		$invalid_post_type = array( 'nav_menu_item', 'revision' );
+		$noarchive_post_type = array( 'post', 'page' );
+		$this_post_type = get_post_type( $postId );
+				
 		// Determine the route for the rest API
 		// This will need to be revisted if WP updates the version.
 		// Future me: Consider an array? 4.7-4.7.3 use v2, and then adapt from there?
@@ -395,10 +400,40 @@ class VarnishPurger {
 		// array to collect all our URLs
 		$listofurls = array();
 
-		// If this is a post with a permalink AND it's published or trashed, 
-		// we're going to add a ton of things to flush.
-		if( get_permalink( $postId ) == true && in_array( $thisPostStatus, $validPostStatus ) ) {	
-					
+		// Verify we have a permalink and that we're a valid post status and a not an invalid post type
+		if( get_permalink( $postId ) == true && in_array( $this_post_status, $valid_post_status ) && !in_array( $this_post_type, $invalid_post_type ) ) {
+
+			// Post URL
+			array_push( $listofurls, get_permalink( $postId ) );
+
+			// JSON API Permalink for the post based on type
+			// We only want to do this if the rest_base exists
+			// But we apparently have to force it for posts and pages (seriously?)
+			$post_type_object = get_post_type_object( $postId );	
+			if ( isset( $post_type_object->rest_base ) ) {
+				$rest_permalink = get_rest_url().$rest_api_route.'/'.$post_type_object->rest_base.'/'.$postId.'/';
+			} elseif ( $this_post_type == 'post' ) {
+				$rest_permalink = get_rest_url().$rest_api_route.'/posts/'.$postId.'/';
+			} elseif ( $this_post_type == 'page' ) {
+				$rest_permalink = get_rest_url().$rest_api_route.'/pages/'.$postId.'/';
+			}
+			array_push( $listofurls, $rest_permalink );
+
+			// Add in AMP permalink if Automattic's AMP is installed
+			if ( function_exists( 'amp_get_permalink' ) ) {
+				array_push( $listofurls, amp_get_permalink( $postId ) );
+			}
+			
+			// Regular AMP url for posts
+			array_push( $listofurls, get_permalink( $postId ).'amp/' );
+
+			// Also clean URL for trashed post.
+			if ( $this_post_status == 'trash' ) {
+				$trashpost = get_permalink( $postId );
+				$trashpost = str_replace( '__trashed', '', $trashpost );
+				array_push( $listofurls, $trashpost, $trashpost.'feed/' );
+			}
+
 			// Category purge based on Donnacha's work in WP Super Cache
 			$categories = get_the_category( $postId) ;
 			if ( $categories ) {
@@ -419,7 +454,7 @@ class VarnishPurger {
 					);
 				}
 			}
-
+			
 			// Author URL
 			$author_id = get_post_field( 'post_author', $postId );
 			array_push( $listofurls,
@@ -429,31 +464,13 @@ class VarnishPurger {
 			);
 
 			// Archives and their feeds
-			if ( get_post_type_archive_link( get_post_type( $postId ) ) == true ) {
+			if ( $this_post_type && !in_array( $this_post_type, $noarchive_post_type ) ) {
 				array_push( $listofurls,
 					get_post_type_archive_link( get_post_type( $postId ) ),
 					get_post_type_archive_feed_link( get_post_type( $postId ) )
 					// Need to add in JSON?
 				);
 			}
-
-			// Post URL
-			array_push( $listofurls, get_permalink($postId) );
-
-			// Also clean URL for trashed post.
-			if ( $thisPostStatus == "trash" ) {
-				$trashpost = get_permalink( $postId );
-				$trashpost = str_replace( "__trashed", "", $trashpost );
-				array_push( $listofurls, $trashpost, $trashpost.'feed/' );
-			}
-			
-			// Add in AMP permalink if Automattic's AMP is installed
-			if ( function_exists( 'amp_get_permalink' ) ) {
-				array_push( $listofurls, amp_get_permalink( $postId ) );
-			}
-			
-			// Regular AMP url for posts
-			array_push( $listofurls, get_permalink( $postId ).'amp/' );
 			
 			// Feeds
 			array_push( $listofurls,
@@ -465,19 +482,10 @@ class VarnishPurger {
 				get_post_comments_feed_link( $postId )
 			);
 
-			// JSON API Permalink for the post based on type
-			// We only want to do this if the rest_base exists
-			$post_type_object = get_post_type_object( $postID );	
-			if ( isset( $post_type_object->rest_base ) && $post_type_object->rest_base !== false ) {
-				array_push( $listofurls, 
-					get_rest_url().$rest_api_route.'/'.$post_type_object->rest_base.'/'.$postId.'/' 
-				);
-			}
-
-			// Home Page and (if used) posts page
+			// Home Pages and (if used) posts page
 			array_push( $listofurls, 
-				$this->the_home_url().'/', // Home URL
-				get_rest_url()             // JSON URL
+				get_rest_url(),
+				$this->the_home_url().'/'
 				);
 			if ( get_option('show_on_front') == 'page' ) {
 				// Ensure we have a page_for_posts setting to avoid empty URL
@@ -485,14 +493,17 @@ class VarnishPurger {
 					array_push( $listofurls, get_permalink( get_option('page_for_posts') ) );
 				}
 			}
+			
 		} else {
 			// We're not sure how we got here, but bail instead of processing anything else.
 			return;
 		}
 		
 		// Now flush all the URLs we've collected provided the array isn't empty
+		// And make sure each URL only gets purged once, eh?
 		if ( !empty( $listofurls ) ) {
-			foreach ( $listofurls as $url ) {
+			$purgeurls = array_unique( $listofurls, SORT_REGULAR );
+			foreach ( $purgeurls as $url ) {
 				array_push( $this->purgeUrls, $url ) ;
 			}
 		}

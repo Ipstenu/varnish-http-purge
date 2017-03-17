@@ -345,12 +345,14 @@ class VarnishPurger {
 	 */
 	public function purgePost( $postId ) {
 		
+		global $wp_version;
+		
 		// If this is a valid post we want to purge the post, 
 		// the home page and any associated tags and categories
 
 		$validPostStatus = array("publish", "trash");
-		$thisPostStatus  = get_post_status($postId);
-		$rest_api_route  = 'wp/v2';
+		$thisPostStatus  = get_post_status($postId);	
+		$rest_api_route  = 'wp/v2'; // This may need to be revisted if WP updates the version. Gleep.
 
 		// array to collect all our URLs
 		$listofurls = array();
@@ -382,9 +384,11 @@ class VarnishPurger {
 			}
 
 			// Author URL
+			$author_id = get_post_field( 'post_author', $postId );
 			array_push($listofurls,
-				get_author_posts_url( get_post_field( 'post_author', $postId ) ),
-				get_author_feed_link( get_post_field( 'post_author', $postId ) )
+				get_author_posts_url( $author_id ),
+				get_author_feed_link( $author_id ),
+				get_rest_url().$rest_api_route.'/users/'.$author_id.'/'
 			);
 
 			// Archives and their feeds

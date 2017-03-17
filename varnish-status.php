@@ -115,7 +115,7 @@ class VarnishStatus {
 		<input type="text" id="vhp_varnish_ip" name="vhp_varnish_ip" value="<?php echo $varniship; ?>" size="25" <?php if ( $disabled == true ) { echo 'disabled'; } ?>/>
 		<label for="vhp_varnish_ip">
 			<?php
-			} elseif ( $disabled == true ) { 
+			if ( $disabled == true ) { 
 				_e('The Varnish IP has been defined in your wp-config, so it is not editable here.', 'varnish-http-purge');
 			} else {
 				_e('Example:', 'varnish-http-purge'); ?> <code>123.45.67.89</code><?php

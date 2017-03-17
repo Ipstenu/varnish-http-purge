@@ -1,7 +1,7 @@
 === Varnish HTTP Purge ===
 Contributors: Ipstenu, mikeschroder, techpriester
 Tags: varnish, purge, cache
-Requires at least: 4.0
+Requires at least: 4.7
 Tested up to: 4.8
 Stable tag: 4.1
 
@@ -228,6 +228,7 @@ This plugin is installed by default for _all_ DreamPress installs on DreamHost, 
 * Fix for Varnish Status Page on MAMP (props @jeremyclarke)
 * Filter for purge headers (props @ocean90)
 * Disallow people from editing the Varnish IP on Multisite
+* Drop support for pre 4.7 because of JSON / REST API
 
 == Screenshots ==
 

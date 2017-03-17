@@ -2,7 +2,7 @@
 /*
 Plugin Name: Varnish HTTP Purge
 Plugin URI: https://halfelf.org/plugins/varnish-http-purge/
-Description: Automatically purge Varnish Cache when content on your site is modified.
+Description: Automatically empty pages cached by Varnish when content on your site is modified.
 Version: 4.1-beta
 Author: Mika Epstein
 Author URI: https://halfelf.org/
@@ -43,7 +43,30 @@ class VarnishPurger {
 	public function __construct( ) {
 		defined('VHP_VARNISH_IP') || define('VHP_VARNISH_IP', false );
 		add_action( 'init', array( &$this, 'init' ) );
+		add_action( 'admin_init', array( &$this, 'admin_init' ) );
 		add_action( 'activity_box_end', array( $this, 'varnish_rightnow' ), 100 );
+	}
+
+	/**
+	 * Admin Init
+	 *
+	 * @since 4.1
+	 * @access public
+	 */
+	public function admin_init() {
+
+		// Failure: Pre WP 4.7		
+		if ( version_compare( get_bloginfo( 'version' ), '4.7', '<=' ) ) {
+			deactivate_plugins( plugin_basename( __FILE__ ) );
+			add_action( 'admin_notices' , array( $this, 'require_wp_version_notice'));
+			return;
+		}
+
+		// Warning: No Pretty Permalinks!
+		if ( '' == get_option( 'permalink_structure' ) && current_user_can('manage_options') ) {
+			add_action( 'admin_notices' , array( $this, 'require_pretty_permalinks_notice'));
+			return;
+		}
 	}
 
 	/**
@@ -54,12 +77,6 @@ class VarnishPurger {
 	 */
 	public function init() {
 		global $blog_id;
-
-		// Warning: No Pretty Permalinks!
-		if ( '' == get_option( 'permalink_structure' ) && current_user_can('manage_options') ) {
-			add_action( 'admin_notices' , array( $this, 'prettyPermalinksMessage'));
-			return;
-		}
 
 		// get my events
 		$events = $this->getRegisterEvents();
@@ -111,17 +128,27 @@ class VarnishPurger {
 	 * @since 2.0
 	 */
 	function purgeMessage() {
-		echo "<div id='message' class='notice notice-success fade is-dismissible'><p><strong>".__('Varnish cache purged!', 'varnish-http-purge')."</strong></p></div>";
+		echo "<div id='message' class='notice notice-success fade is-dismissible'><p><strong>".__('Varnish cache emptied!', 'varnish-http-purge')."</strong></p></div>";
 	}
 
 	/**
-	 * Permalinks Message
-	 * Explains you need Pretty Permalinks on to use this plugin
+	 * Require: Pretty Permalinks Message
+	 * Explains you need Pretty Permalinks enabled to use this plugin
 	 *
 	 * @since 2.0
 	 */
-	function prettyPermalinksMessage() {
+	function require_pretty_permalinks_notice() {
 		echo "<div id='message' class='error'><p>" . sprintf( __( 'Varnish HTTP Purge requires you to use custom permalinks. Please go to the <a href="%1$s">Permalinks Options Page</a> to configure them.', 'varnish-http-purge' ), admin_url( 'options-permalink.php' ) ) . "</p></div>";
+	}
+
+	/**
+	 * Require: WP Version Message
+	 * Explains you need WordPress 4.7+ to use this plugin
+	 *
+	 * @since 4.1
+	 */
+	function require_wp_version_notice() {
+		echo "<div id='message' class='error'><p>" . sprintf( __( 'Varnish HTTP Purge requires WordPress 4.7 or greater. Please <a href="%1$s">upgrade WordPress</a>.', 'varnish-http-purge' ), admin_url( 'update-core.php' ) ) . "</p></div>";
 	}
 
 	/**
@@ -167,7 +194,7 @@ class VarnishPurger {
 		$button .= '</p><p><span class="button"><a href="'.$url.'"><strong>';
 		$button .= __( 'Empty Cache', 'varnish-http-purge' );
 		$button .= '</strong></a></span>';
-		$nobutton =  __( 'You do not have permission to purge the cache for the whole site. Please contact your administrator.', 'varnish-http-purge' );
+		$nobutton =  __( 'You do not have permission to empty the Varnish cache for the whole site. Please contact your administrator.', 'varnish-http-purge' );
 
 		if (
 			// SingleSite - admins can always purge
@@ -293,7 +320,6 @@ class VarnishPurger {
 		 * varnish_http_purge_schema()
 		 *
 		 * @since 3.7.3
-		 *
 		 */
 		$schema = apply_filters( 'varnish_http_purge_schema', 'http://' );
 
@@ -313,7 +339,7 @@ class VarnishPurger {
 		/**
 		 * Filters the HTTP headers to send with a PURGE request.
 		 *
-		 * @since 4.0.3
+		 * @since 4.1
 		 */
 		$headers = apply_filters( 'varnish_http_purge_headers', array( 'host' => $p['host'], 'X-Purge-Method' => $x_purge_method ) );
 		
@@ -329,7 +355,7 @@ class VarnishPurger {
 	 * Flush the whole cache
 	 *
 	 * @since 3.9
-	 * @access private
+	 * @access public
 	 */
 	public function purgeNoID( $postId ) {
 		$listofurls = array();

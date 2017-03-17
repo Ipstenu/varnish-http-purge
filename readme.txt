@@ -227,6 +227,7 @@ This plugin is installed by default for _all_ DreamPress installs on DreamHost, 
 * JSON / REST API Support
 * Fix for Varnish Status Page on MAMP (props @jeremyclarke)
 * Filter for purge headers (props @ocean90)
+* Disallow people from editing the Varnish IP on Multisite
 
 == Screenshots ==
 

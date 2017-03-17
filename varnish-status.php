@@ -43,9 +43,8 @@ class VarnishStatus {
 	 * @since 4.0
 	 */
 	function admin_init() {
-		// Register Settings
-		$this->register_settings_url();
-		$this->register_settings_ip();
+		$this->register_settings_url();		
+		if ( !is_multisite() ) $this->register_settings_ip();
 	}
 
 	/**
@@ -64,7 +63,6 @@ class VarnishStatus {
 	 */
 	function register_settings_url() {
 		register_setting( 'varnish-http-purge-url', 'vhp_varnish_url', array( &$this, 'varnish_url_sanitize' ) );
-
 		add_settings_section( 'varnish-url-settings-section', __('Check Varnish Status', 'varnish-http-purge'), array( &$this, 'options_callback_url'), 'varnish-url-settings' );
 		add_settings_field( 'varnish_url', __('Check A URL On Your Site:', 'varnish-http-purge'), array( &$this, 'varnish_url_callback'), 'varnish-url-settings', 'varnish-url-settings-section' );
 	}
@@ -76,7 +74,6 @@ class VarnishStatus {
 	 */
 	function register_settings_ip() {
 		register_setting( 'varnish-http-purge-ip', 'vhp_varnish_ip', array( &$this, 'varnish_ip_sanitize' ) );
-		
 		add_settings_section( 'varnish-ip-settings-section', __('Configure Custom Varnish IP', 'varnish-http-purge'), array( &$this, 'options_callback_ip'), 'varnish-ip-settings' );		
 		add_settings_field( 'varnish_ip', __('Set Varnish IP', 'varnish-http-purge'), array( &$this, 'varnish_ip_callback'), 'varnish-ip-settings', 'varnish-ip-settings-section' );
 	}
@@ -96,7 +93,6 @@ class VarnishStatus {
 		<ul>
 		    <li><?php _e('DreamHost - Go into the Panel and click on the DNS settings for the domain. The entry for <em>resolve-to.domain</em> (if set) will your varnish server. If it\'s not set, then you don\'t need to worry about this at all. Example:', 'varnish-http-purge'); ?> <code>resolve-to.www A 208.97.157.172</code></li>
 		</ul>
-
 	    <?php
 	}
 
@@ -115,18 +111,19 @@ class VarnishStatus {
 		} else {
 			$varniship = get_option('vhp_varnish_ip');
 		}
+				
 		?>
 		<input type="text" id="vhp_varnish_ip" name="vhp_varnish_ip" value="<?php echo $varniship; ?>" size="25" <?php if ( $disabled == true ) { echo 'disabled'; } ?>/>
 		<label for="vhp_varnish_ip">
 			<?php
-			if ( $disabled == true ) { 
+			} elseif ( $disabled == true ) { 
 				_e('The Varnish IP has been defined in your wp-config, so it is not editable here.', 'varnish-http-purge');
 			} else {
 				_e('Example:', 'varnish-http-purge'); ?> <code>123.45.67.89</code><?php
 			}
 			?>
 		</label>
-	<?php
+		<?php
 	}
 
 	/**

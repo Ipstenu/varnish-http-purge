@@ -41,7 +41,7 @@ class VarnishPurger {
 	 * @access public
 	 */
 	public function __construct( ) {
-		defined('VHP_VARNISH_IP') || define('VHP_VARNISH_IP', false );
+		defined( 'VHP_VARNISH_IP' ) || define( 'VHP_VARNISH_IP' , false );
 		add_action( 'init', array( &$this, 'init' ) );
 		add_action( 'admin_init', array( &$this, 'admin_init' ) );
 		add_action( 'activity_box_end', array( $this, 'varnish_rightnow' ), 100 );
@@ -63,8 +63,8 @@ class VarnishPurger {
 		}
 
 		// Warning: No Pretty Permalinks!
-		if ( '' == get_option( 'permalink_structure' ) && current_user_can('manage_options') ) {
-			add_action( 'admin_notices' , array( $this, 'require_pretty_permalinks_notice'));
+		if ( '' == get_option( 'permalink_structure' ) && current_user_can( 'manage_options' ) ) {
+			add_action( 'admin_notices' , array( $this, 'require_pretty_permalinks_notice' ) );
 			return;
 		}
 	}
@@ -93,28 +93,28 @@ class VarnishPurger {
 			foreach ( $events as $event) {
 				if ( in_array($event, $noIDevents ) ) {
 					// These events have no post ID and, thus, will perform a full purge
-					add_action( $event, array($this, 'purgeNoID') );
+					add_action( $event, array( $this, 'purgeNoID' ) );
 				} else {
-					add_action( $event, array($this, 'purgePost'), 10, 2 );
+					add_action( $event, array( $this, 'purgePost' ), 10, 2 );
 				}
 			}
 		}
 		
-		add_action( 'shutdown', array($this, 'executePurge') );
+		add_action( 'shutdown', array( $this, 'executePurge' ) );
 
 		// Success: Admin notice when purging
-		if ( isset($_GET['vhp_flush_all']) && check_admin_referer('vhp-flush-all') ) {
+		if ( isset( $_GET['vhp_flush_all'] ) && check_admin_referer( 'vhp-flush-all' ) ) {
 			add_action( 'admin_notices' , array( $this, 'purgeMessage'));
 		}
 
 		// Checking user permissions for who can and cannot use the admin button
 		if (
 			// SingleSite - admins can always purge
-			( !is_multisite() && current_user_can('activate_plugins') ) ||
+			( !is_multisite() && current_user_can( 'activate_plugins' ) ) ||
 			// Multisite - Network Admin can always purge
-			current_user_can('manage_network') ||
+			current_user_can( 'manage_network' ) ||
 			// Multisite - Site admins can purge UNLESS it's a subfolder install and we're on site #1
-			( is_multisite() && current_user_can('activate_plugins') && ( SUBDOMAIN_INSTALL || ( !SUBDOMAIN_INSTALL && ( BLOG_ID_CURRENT_SITE != $blog_id ) ) ) )
+			( is_multisite() && current_user_can( 'activate_plugins' ) && ( SUBDOMAIN_INSTALL || ( !SUBDOMAIN_INSTALL && ( BLOG_ID_CURRENT_SITE != $blog_id ) ) ) )
 			) {
 				add_action( 'admin_bar_menu', array( $this, 'varnish_rightnow_adminbar' ), 100 );
 		}
@@ -169,13 +169,13 @@ class VarnishPurger {
 	 *
 	 * @since 2.0
 	 */
-	function varnish_rightnow_adminbar($admin_bar){
+	function varnish_rightnow_adminbar( $admin_bar ){
 		$admin_bar->add_menu( array(
 			'id'	=> 'purge-varnish-cache-all',
-			'title' => __('Empty Cache','varnish-http-purge'),
+			'title' => __( 'Empty Cache', 'varnish-http-purge' ),
 			'href'  => wp_nonce_url( add_query_arg('vhp_flush_all', 1), 'vhp-flush-all'),
 			'meta'  => array(
-				'title' => __('Empty Cache','varnish-http-purge'),
+				'title' => __( 'Empty Cache', 'varnish-http-purge' ),
 			),
 		));
 	}
@@ -188,7 +188,7 @@ class VarnishPurger {
 	 */
 	function varnish_rightnow() {
 		global $blog_id;
-		$url = wp_nonce_url(add_query_arg('vhp_flush_all', 1), 'vhp-flush-all');
+		$url = wp_nonce_url( add_query_arg( 'vhp_flush_all', 1 ), 'vhp-flush-all' );
 		$intro = sprintf( __( '<a href="%1$s">Varnish HTTP Purge</a> automatically deletes your cached posts when published or updated. When making major site changes, such as with a new theme, plugins, or widgets, you may need to manually empty the cache.', 'varnish-http-purge' ), 'http://wordpress.org/plugins/varnish-http-purge/' );
 		$button =  __( 'Press the button below to force it to empty your entire Varnish cache.', 'varnish-http-purge' );
 		$button .= '</p><p><span class="button"><a href="'.$url.'"><strong>';
@@ -270,11 +270,11 @@ class VarnishPurger {
 
 		if ( empty( $purgeUrls ) ) {
 			if ( isset( $_GET['vhp_flush_all'] ) && check_admin_referer( 'vhp-flush-all' ) ) {
-				$this->purgeUrl( $this->the_home_url() .'/?vhp-regex' );
+				$this->purgeUrl( $this->the_home_url() . '/?vhp-regex' );
 			}
 		} else {
 			foreach( $purgeUrls as $url ) {
-				$this->purgeUrl($url);
+				$this->purgeUrl( $url );
 			}
 		}
 	}
@@ -287,8 +287,8 @@ class VarnishPurger {
 	 * @param array $url the url to be purged
 	 * @access protected
 	 */
-	public function purgeUrl($url) {
-		$p = parse_url($url);
+	public function purgeUrl( $url ) {
+		$p = parse_url( $url );
 
 		// Determine if we're using regex to flush all pages or not
 		$pregex = '';
@@ -309,7 +309,7 @@ class VarnishPurger {
 
 		// Determine the path
 		$path = '';
-		if ( isset($p['path'] ) ) {
+		if ( isset( $p['path'] ) ) {
 			$path = $p['path'];
 		}
 
@@ -332,7 +332,7 @@ class VarnishPurger {
 
 		$purgeme = $schema.$host.$path.$pregex;
 
-		if ( !empty($p['query']) && $p['query'] != 'vhp-regex' ) {
+		if ( !empty( $p['query'] ) && $p['query'] != 'vhp-regex' ) {
 			$purgeme .= '?' . $p['query'];
 		}
 
@@ -360,7 +360,7 @@ class VarnishPurger {
 	public function purgeNoID( $postId ) {
 		$listofurls = array();
 
-		array_push( $listofurls, $this->the_home_url().'/?vhp-regex' );
+		array_push( $listofurls, $this->the_home_url() . '/?vhp-regex' );
 	
 		// Now flush all the URLs we've collected provided the array isn't empty
 		if ( !empty( $listofurls ) ) {
@@ -380,7 +380,9 @@ class VarnishPurger {
 	 */
 	public function purgePost( $postId ) {
 		
-		global $wp_version;
+		// Future Me: You may need this if you figure out how to use an array
+		// further down with versions of WP and their json versions.
+		// global $wp_version;
 		
 		// If this is a valid post we want to purge the post, 
 		// the home page and any associated tags and categories
@@ -411,11 +413,11 @@ class VarnishPurger {
 			// But we apparently have to force it for posts and pages (seriously?)
 			$post_type_object = get_post_type_object( $postId );	
 			if ( isset( $post_type_object->rest_base ) ) {
-				$rest_permalink = get_rest_url().$rest_api_route.'/'.$post_type_object->rest_base.'/'.$postId.'/';
+				$rest_permalink = get_rest_url() . $rest_api_route . '/' . $post_type_object->rest_base . '/' . $postId . '/';
 			} elseif ( $this_post_type == 'post' ) {
-				$rest_permalink = get_rest_url().$rest_api_route.'/posts/'.$postId.'/';
+				$rest_permalink = get_rest_url() . $rest_api_route . '/posts/' . $postId . '/';
 			} elseif ( $this_post_type == 'page' ) {
-				$rest_permalink = get_rest_url().$rest_api_route.'/pages/'.$postId.'/';
+				$rest_permalink = get_rest_url() . $rest_api_route . '/pages/' . $postId . '/';
 			}
 			array_push( $listofurls, $rest_permalink );
 
@@ -425,13 +427,13 @@ class VarnishPurger {
 			}
 			
 			// Regular AMP url for posts
-			array_push( $listofurls, get_permalink( $postId ).'amp/' );
+			array_push( $listofurls, get_permalink( $postId ) . 'amp/' );
 
 			// Also clean URL for trashed post.
 			if ( $this_post_status == 'trash' ) {
 				$trashpost = get_permalink( $postId );
 				$trashpost = str_replace( '__trashed', '', $trashpost );
-				array_push( $listofurls, $trashpost, $trashpost.'feed/' );
+				array_push( $listofurls, $trashpost, $trashpost . 'feed/' );
 			}
 
 			// Category purge based on Donnacha's work in WP Super Cache
@@ -440,7 +442,7 @@ class VarnishPurger {
 				foreach ( $categories as $cat ) {
 					array_push( $listofurls, 
 						get_category_link( $cat->term_id ),
-						get_rest_url().$rest_api_route.'/categories/'.$cat->term_id.'/'
+						get_rest_url() . $rest_api_route . '/categories/' . $cat->term_id . '/'
 					);
 				}
 			}
@@ -450,7 +452,7 @@ class VarnishPurger {
 				foreach ( $tags as $tag ) {
 					array_push( $listofurls, 
 						get_tag_link( $tag->term_id ),
-						get_rest_url().$rest_api_route.'/tags/'.$tag->term_id.'/'
+						get_rest_url() . $rest_api_route . '/tags/' . $tag->term_id . '/'
 					);
 				}
 			}
@@ -460,7 +462,7 @@ class VarnishPurger {
 			array_push( $listofurls,
 				get_author_posts_url( $author_id ),
 				get_author_feed_link( $author_id ),
-				get_rest_url().$rest_api_route.'/users/'.$author_id.'/'
+				get_rest_url() . $rest_api_route . '/users/' . $author_id . '/'
 			);
 
 			// Archives and their feeds
@@ -485,12 +487,12 @@ class VarnishPurger {
 			// Home Pages and (if used) posts page
 			array_push( $listofurls, 
 				get_rest_url(),
-				$this->the_home_url().'/'
+				$this->the_home_url() . '/'
 				);
-			if ( get_option('show_on_front') == 'page' ) {
+			if ( get_option( 'show_on_front' ) == 'page' ) {
 				// Ensure we have a page_for_posts setting to avoid empty URL
 				if ( get_option('page_for_posts') ) {
-					array_push( $listofurls, get_permalink( get_option('page_for_posts') ) );
+					array_push( $listofurls, get_permalink( get_option( 'page_for_posts' ) ) );
 				}
 			}
 			

@@ -306,6 +306,7 @@ class VarnishPurger {
 			$varniship = get_option( 'vhp_varnish_ip' );
 		}
 		$varniship = apply_filters( 'vhp_varnish_ip' , $varniship );
+                $varniships = explode(',', $varniship);
 
 		// Determine the path
 		$path = '';
@@ -322,32 +323,34 @@ class VarnishPurger {
 		 * @since 3.7.3
 		 */
 		$schema = apply_filters( 'varnish_http_purge_schema', 'http://' );
+                foreach ($varniships as $host) {
 
-		// If we made varniship, let it sail
-		if ( isset( $varniship ) && $varniship != null ) {
-			$host = $varniship;
-		} else {
-			$host = $p['host'];
-		}
+		        // If we made varniship, let it sail
+		        // if ( isset( $varniship ) && $varniship != null ) {
+		        // 	$host = $varniship;
+		        // } else {
+		        // 	$host = $p['host'];
+		        // }
 
-		$purgeme = $schema.$host.$path.$pregex;
+		        $purgeme = $schema.$host.$path.$pregex;
 
-		if ( !empty( $p['query'] ) && $p['query'] != 'vhp-regex' ) {
-			$purgeme .= '?' . $p['query'];
-		}
+		        if ( !empty( $p['query'] ) && $p['query'] != 'vhp-regex' ) {
+		        	$purgeme .= '?' . $p['query'];
+		        }
 
-		/**
-		 * Filters the HTTP headers to send with a PURGE request.
-		 *
-		 * @since 4.1
-		 */
-		$headers = apply_filters( 'varnish_http_purge_headers', array( 'host' => $p['host'], 'X-Purge-Method' => $x_purge_method ) );
-		
-		// Cleanup CURL functions to be wp_remote_request and thus better
-		// http://wordpress.org/support/topic/incompatability-with-editorial-calendar-plugin
-		$response = wp_remote_request( $purgeme, array( 'method' => 'PURGE', 'headers' => $headers ) );
+		        /**
+		         * Filters the HTTP headers to send with a PURGE request.
+		         *
+		         * @since 4.1
+		         */
+		        $headers = apply_filters( 'varnish_http_purge_headers', array( 'host' => $p['host'], 'X-Purge-Method' => $x_purge_method ) );
+		        
+		        // Cleanup CURL functions to be wp_remote_request and thus better
+		        // http://wordpress.org/support/topic/incompatability-with-editorial-calendar-plugin
+		        $response = wp_remote_request( $purgeme, array( 'method' => 'PURGE', 'headers' => $headers ) );
 
-		do_action( 'after_purge_url', $url, $purgeme, $response, $headers );
+		        do_action( 'after_purge_url', $url, $purgeme, $response, $headers );
+                }
 	}
 
 	/**

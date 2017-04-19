@@ -3,7 +3,7 @@
 Plugin Name: Varnish HTTP Purge
 Plugin URI: https://halfelf.org/plugins/varnish-http-purge/
 Description: Automatically empty pages cached by Varnish when content on your site is modified.
-Version: 4.1-beta
+Version: 4.1.1
 Author: Mika Epstein
 Author URI: https://halfelf.org/
 License: http://www.apache.org/licenses/LICENSE-2.0

@@ -232,7 +232,7 @@ class VarnishStatus {
 					} else {
 					?>
 						<td width="40px"><?php echo $icon_good; ?></td>
-						<td><?php printf( __( 'Your sever IP setup looks good. If you are using a proxy (like Sucuri or Cloudflare or Fastly) please double check that configuration and make sure to add a <a href="%s">custom Varnish IP</a> if necessary.', 'varnish-http-purge'  ), '#configure' ); ?></td>
+						<td><?php printf( __( 'Your server IP setup looks good. If you are using a proxy (like Sucuri or Cloudflare or Fastly) please double check that configuration and make sure to add a <a href="%s">custom Varnish IP</a> if necessary.', 'varnish-http-purge'  ), '#configure' ); ?></td>
 					<?php
 					}
 				?></tr><?php

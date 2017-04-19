@@ -3,7 +3,7 @@ Contributors: Ipstenu, mikeschroder, techpriester
 Tags: varnish, purge, cache
 Requires at least: 4.7
 Tested up to: 4.8
-Stable tag: 4.1
+Stable tag: 4.1.1
 
 Automatically empty a Varnish Cache when content on your site is modified.
 
@@ -30,11 +30,6 @@ Plugins can hook into the purge actions as well, to filter their own events to t
 And if you're into WP-CLI, you can use that too: `wp varnish purge`
 
 Please note: On a multisite network using subfolders, only <strong>network admins</strong> can purge the main site. This is a security decision.
-
-== Installation ==
-No WordPress configuration needed.
-
-When used on Multisite, the plugin is only able to be activated Network Wide.
 
 = Requirements =
 

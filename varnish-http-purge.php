@@ -412,6 +412,7 @@ class VarnishPurger {
 			// We only want to do this if the rest_base exists
 			// But we apparently have to force it for posts and pages (seriously?)
 			$post_type_object = get_post_type_object( $postId );	
+			$rest_permalink = false;
 			if ( isset( $post_type_object->rest_base ) ) {
 				$rest_permalink = get_rest_url() . $rest_api_route . '/' . $post_type_object->rest_base . '/' . $postId . '/';
 			} elseif ( $this_post_type == 'post' ) {
@@ -419,7 +420,8 @@ class VarnishPurger {
 			} elseif ( $this_post_type == 'page' ) {
 				$rest_permalink = get_rest_url() . $rest_api_route . '/pages/' . $postId . '/';
 			}
-			array_push( $listofurls, $rest_permalink );
+			
+			if ( $rest_permalink !== false ) array_push( $listofurls, $rest_permalink );
 
 			// Add in AMP permalink if Automattic's AMP is installed
 			if ( function_exists( 'amp_get_permalink' ) ) {

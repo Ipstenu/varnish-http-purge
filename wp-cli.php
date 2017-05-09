@@ -68,7 +68,13 @@ class WP_CLI_Varnish_Purge_Command extends WP_CLI_Command {
 
 		// Make sure the URL is a URL:
 		if ( !empty($url) ) {
-			$url = $this->varnish_purge->the_home_url() . esc_url( $url );
+			// If the URL is a URL and not a string, flush the URL on it's own.
+			// Otherwise add in the home URL:
+			if ( substr( $url, 0, 4) == 'http' ) {
+				$url = esc_url( $url )
+			} else {
+				$url = $this->varnish_purge->the_home_url() . esc_url( $url );
+			}
 		} else {
 			$url = $this->varnish_purge->the_home_url();
 		}
@@ -82,6 +88,10 @@ class WP_CLI_Varnish_Purge_Command extends WP_CLI_Command {
 		}
 
 		$this->varnish_purge->purgeUrl( $url.$pregex );
+		
+		if ( WP_DEBUG == true ) {
+			WP_CLI::log( sprintf( 'Flushing URL: %s with params: %s.', $url, $pregex ) );
+		}
 
 		WP_CLI::success( 'The Varnish cache was purged.' );
 	}

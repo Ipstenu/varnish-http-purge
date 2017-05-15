@@ -66,15 +66,12 @@ class WP_CLI_Varnish_Purge_Command extends WP_CLI_Command {
 
 		wp_create_nonce('vhp-flush-cli');
 
-		// Make sure the URL is a URL:
-		if ( !empty($url) ) {
-			// If the URL is a URL and not a string, flush the URL on it's own.
-			// Otherwise add in the home URL:
-			if ( substr( $url, 0, 4) == 'http' ) {
-				$url = esc_url( $url )
-			} else {
-				$url = $this->varnish_purge->the_home_url() . esc_url( $url );
-			}
+		// If the URL is not empty, sanitize. Else use home URL.
+		if ( !empty( $url ) ) {
+			$url = esc_url( $url );
+			
+			// If it's a regex, let's make sure we don't have //
+			if ( isset( $assoc_args['wildcard'] ) ) $url = rtrim( $url, '/' );
 		} else {
 			$url = $this->varnish_purge->the_home_url();
 		}

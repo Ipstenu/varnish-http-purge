@@ -217,6 +217,12 @@ This plugin is installed by default for _all_ DreamPress installs on DreamHost, 
 
 == Changelog ==
 
+= 4.1.1 =
+
+* JSON - fixed overzealous json assumptions from causing errors
+* WP-CLI - fixed prepending of domain on domain when using purge on a domain (props @ocean90)
+* Typos. We hate them.
+
 = 4.1 =
 
 * JSON / REST API Support

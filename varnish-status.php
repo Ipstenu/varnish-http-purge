@@ -132,7 +132,11 @@ class VarnishStatus {
 	 */
 	function options_callback_url() {
 
-		?><p><?php _e( 'While it would be impossible to detect all possible conflicts, this Status Page will perform a check of the most common issues that prevent Varnish from caching your site properly.', 'varnish-http-purge' ); ?></p><?php
+		?><p><?php _e( 'While it is impossible to detect all possible conflicts, this Status Page will perform a check of the most common issues that prevent Varnish from caching your site properly.', 'varnish-http-purge' ); ?></p>
+		
+		<p><?php _e( 'This feature is provided to help you in debugging any conflicts. If filing an issue with your webhost, it can be useful to include the output in your ticket.', 'varnish-http-purge' ); ?></p>
+		
+		<?php
 
 		$icon_awesome	= '<span class="dashicons dashicons-heart" style="color:#008000;"></span>';
 		$icon_good 		= '<span class="dashicons dashicons-thumbs-up" style="color:#008000;"></span>';

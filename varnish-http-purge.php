@@ -3,7 +3,7 @@
 Plugin Name: Varnish HTTP Purge
 Plugin URI: https://halfelf.org/plugins/varnish-http-purge/
 Description: Automatically empty pages cached by Varnish when content on your site is modified.
-Version: 4.1.1
+Version: 4.2.0
 Author: Mika Epstein
 Author URI: https://halfelf.org/
 License: http://www.apache.org/licenses/LICENSE-2.0
@@ -44,7 +44,6 @@ class VarnishPurger {
 		defined( 'VHP_VARNISH_IP' ) || define( 'VHP_VARNISH_IP' , false );
 		add_action( 'init', array( &$this, 'init' ) );
 		add_action( 'admin_init', array( &$this, 'admin_init' ) );
-		add_action( 'activity_box_end', array( $this, 'varnish_rightnow' ), 100 );
 	}
 
 	/**
@@ -54,6 +53,9 @@ class VarnishPurger {
 	 * @access public
 	 */
 	public function admin_init() {
+		
+		// Add to 'right now'
+		add_action( 'activity_box_end', array( $this, 'varnish_rightnow' ), 100 );
 
 		// Failure: Pre WP 4.7		
 		if ( version_compare( get_bloginfo( 'version' ), '4.7', '<=' ) ) {
@@ -371,6 +373,22 @@ class VarnishPurger {
 	}
 
 	/**
+	 * Generate URLs
+	 *
+	 * Generates a list of URLs that should be purged, based on the post ID
+	 * passed through. Useful for when you're trying to get a post to flush
+	 * another post.
+	 * 
+	 * @access public
+	 * @param mixed $postId
+	 * @return array()
+	 */
+	public function generate_urls ( $postId ) {
+		$this->purgePost( $postId );
+		return $this->purgeUrls;
+	}
+
+	/**
 	 * Purge Post
 	 * Flush the post
 	 *
@@ -442,6 +460,8 @@ class VarnishPurger {
 			$categories = get_the_category( $postId) ;
 			if ( $categories ) {
 				foreach ( $categories as $cat ) {
+					$category_base = get_option( 'category_base');
+					if ( $category_base == '' ) $category_base = '/category/';
 					array_push( $listofurls, 
 						get_category_link( $cat->term_id ),
 						get_rest_url() . $rest_api_route . '/categories/' . $cat->term_id . '/'
@@ -451,11 +471,26 @@ class VarnishPurger {
 			// Tag purge based on Donnacha's work in WP Super Cache
 			$tags = get_the_tags( $postId );
 			if ( $tags ) {
+				$tag_base = get_option( 'tag_base' );
+				if ( $tag_base == '' ) $tag_base = '/tag/';
 				foreach ( $tags as $tag ) {
 					array_push( $listofurls, 
 						get_tag_link( $tag->term_id ),
-						get_rest_url() . $rest_api_route . '/tags/' . $tag->term_id . '/'
+						get_rest_url() . $rest_api_route . $tag_base . $tag->term_id . '/'
 					);
+				}
+			}
+			// Custom Taxonomies
+			$taxonomies = get_post_taxonomies( $postId );
+			if ( $taxonomies ) {	
+				foreach ( $taxonomies as $taxonomy ) {
+					$terms = wp_get_post_terms( $postId, $taxonomy );
+					foreach ( $terms as $term ) {
+						array_push( $listofurls, 
+							get_term_link( $term ),
+							get_rest_url() . $rest_api_route . '/' . $term->taxonomy . '/' . $term->slug . '/'
+						);
+					}
 				}
 			}
 			

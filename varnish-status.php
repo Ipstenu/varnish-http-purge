@@ -90,7 +90,7 @@ class VarnishStatus {
 	    <p><strong><?php _e('If you aren\'t sure what to do, contact your webhost or server admin before making any changes.', 'varnish-http-purge'); ?></strong></p>
 
 		<ul>
-		    <li><?php _e('DreamHost - Go into the Panel and click on the DNS settings for the domain. The entry for <em>resolve-to.domain</em> (if set) will your varnish server. If it\'s not set, then you don\'t need to worry about this at all. Example:', 'varnish-http-purge'); ?> <code>resolve-to.www A 208.97.157.172</code></li>
+		    <li><?php _e('DreamHost - Go into the Panel and click on the DNS settings for the domain. The entry for <em>resolve-to.domain</em> (if set) will be your varnish server. If it\'s not set, then you don\'t need to worry about this at all. Example:', 'varnish-http-purge'); ?> <code>resolve-to.www A 208.97.157.172</code></li>
 		</ul>
 	    <?php
 	}

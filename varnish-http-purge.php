@@ -291,6 +291,9 @@ class VarnishPurger {
 	 */
 	public function purgeUrl( $url ) {
 		$p = parse_url( $url );
+		
+		// Bail early if there's no host since some plugins are weird
+		if ( !isset( $p['host'] ) ) return;
 
 		// Determine if we're using regex to flush all pages or not
 		$pregex = '';

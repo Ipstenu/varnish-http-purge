@@ -167,6 +167,7 @@ This plugin is installed by default for _all_ DreamPress installs on DreamHost, 
 * Added in support for custom taxonomies
 * New function to generate the URLs, so it can be called by external plugins
 * Move right now box to be called later, preventing double calls
+* Extra check for if it's a URL, because some plugins are weird (props @danielkun)
 
 = 4.1.1 =
 

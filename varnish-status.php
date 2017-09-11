@@ -52,7 +52,7 @@ class VarnishStatus {
 	 * @since 4.0
 	 */
 	function admin_menu() {
-		add_management_page( __('Is Varnish Working?', 'varnish-http-purge'), __('Varnish Status', 'varnish-http-purge'), 'manage_options', 'varnish-status', array( &$this, 'settings_page' ) );
+		add_management_page( __( 'Is Varnish Working?', 'varnish-http-purge' ), __( 'Varnish Status', 'varnish-http-purge' ), 'manage_options', 'varnish-status', array( &$this, 'settings_page' ) );
 	}
 
 	/**
@@ -62,8 +62,8 @@ class VarnishStatus {
 	 */
 	function register_settings_url() {
 		register_setting( 'varnish-http-purge-url', 'vhp_varnish_url', array( &$this, 'varnish_url_sanitize' ) );
-		add_settings_section( 'varnish-url-settings-section', __('Check Varnish Status', 'varnish-http-purge'), array( &$this, 'options_callback_url'), 'varnish-url-settings' );
-		add_settings_field( 'varnish_url', __('Check A URL On Your Site:', 'varnish-http-purge'), array( &$this, 'varnish_url_callback'), 'varnish-url-settings', 'varnish-url-settings-section' );
+		add_settings_section( 'varnish-url-settings-section', __( 'Check Varnish Status', 'varnish-http-purge' ), array( &$this, 'options_callback_url'), 'varnish-url-settings' );
+		add_settings_field( 'varnish_url', __( 'Check A URL On Your Site:', 'varnish-http-purge' ), array( &$this, 'varnish_url_callback' ), 'varnish-url-settings', 'varnish-url-settings-section' );
 	}
 
 	/**
@@ -84,13 +84,13 @@ class VarnishStatus {
 	 */
 	function options_callback_ip() {
 	    ?>
-	    <p><a name="#configure"></a><?php _e('The majority of users will never need to so much as look down here. However there are cases when a custom Varnish IP Address will need to be set, in order to tell the plugin to empty the cache in a specific location. If you\'re using a CDN like Cloudflare or a Firewall Proxy like Sucuri, you will want to set this.', 'varnish-http-purge'); ?></p>
-	    <p><?php _e('Your Varnish IP the IP address of the server where Varnish is installed. Your Varnish IP must be one of the IPs that Varnish is listening. If you use multiple IPs, or if you\'ve customized your ACLs, you\'ll need to pick one that doesn\'t conflict with your other settings. For example, if you have Varnish listening on a public and private IP, pick the private. On the other hand, if you told Varnish to listen on 0.0.0.0 (i.e. "listen on every interface you can") you would need to check what IP you set your purge ACL to allow (commonly 127.0.0.1 aka localhost), and use that (i.e. 127.0.0.1).', 'varnish-http-purge'); ?></p>
-	    <p><?php _e('If your webhost set up Varnish for you, as is the case with DreamPress or WP Engine, you may need to ask them for the specifics if they don\'t have it documented. I\'ve listed the ones I know about here, however you should still check with them if you\'re not sure.', 'varnish-http-purge'); ?></p>
-	    <p><strong><?php _e('If you aren\'t sure what to do, contact your webhost or server admin before making any changes.', 'varnish-http-purge'); ?></strong></p>
+	    <p><a name="#configure"></a><?php _e( 'The majority of users will never need to so much as look down here. However there are cases when a custom Varnish IP Address will need to be set, in order to tell the plugin to empty the cache in a specific location. If you\'re using a CDN like Cloudflare or a Firewall Proxy like Sucuri, you will want to set this.', 'varnish-http-purge' ); ?></p>
+	    <p><?php _e( 'Your Varnish IP the IP address of the server where Varnish is installed. Your Varnish IP must be one of the IPs that Varnish is listening. If you use multiple IPs, or if you\'ve customized your ACLs, you\'ll need to pick one that doesn\'t conflict with your other settings. For example, if you have Varnish listening on a public and private IP, pick the private. On the other hand, if you told Varnish to listen on 0.0.0.0 (i.e. "listen on every interface you can") you would need to check what IP you set your purge ACL to allow (commonly 127.0.0.1 aka localhost), and use that (i.e. 127.0.0.1).', 'varnish-http-purge' ); ?></p>
+	    <p><?php _e( 'If your webhost set up Varnish for you, as is the case with DreamPress or WP Engine, you may need to ask them for the specifics if they don\'t have it documented. I\'ve listed the ones I know about here, however you should still check with them if you\'re not sure.', 'varnish-http-purge' ); ?></p>
+	    <p><strong><?php _e( 'If you aren\'t sure what to do, contact your webhost or server admin before making any changes.', 'varnish-http-purge' ); ?></strong></p>
 
 		<ul>
-		    <li><?php _e('DreamHost - Go into the Panel and click on the DNS settings for the domain. The entry for <em>resolve-to.domain</em> (if set) will be your varnish server. If it\'s not set, then you don\'t need to worry about this at all. Example:', 'varnish-http-purge'); ?> <code>resolve-to.www A 208.97.157.172</code></li>
+		    <li><?php _e( 'DreamHost - Go into the Panel and click on the DNS settings for the domain. The entry for <em>resolve-to.domain</em> (if set) will be your varnish server. If it\'s not set, then you don\'t need to worry about this at all. Example:', 'varnish-http-purge' ); ?> <code>resolve-to.www A 208.97.157.172</code></li>
 		</ul>
 	    <?php
 	}
@@ -108,7 +108,7 @@ class VarnishStatus {
 			$disabled = true;
 			$varniship = VHP_VARNISH_IP;
 		} else {
-			$varniship = get_option('vhp_varnish_ip');
+			$varniship = get_option( 'vhp_varnish_ip' );
 		}
 				
 		?>
@@ -116,9 +116,9 @@ class VarnishStatus {
 		<label for="vhp_varnish_ip">
 			<?php
 			if ( $disabled == true ) { 
-				_e('The Varnish IP has been defined in your wp-config, so it is not editable here.', 'varnish-http-purge');
+				_e( 'The Varnish IP has been defined in your wp-config, so it is not editable here.', 'varnish-http-purge' );
 			} else {
-				_e('Example:', 'varnish-http-purge'); ?> <code>123.45.67.89</code><?php
+				_e( 'Example:', 'varnish-http-purge' ); ?> <code>123.45.67.89</code><?php
 			}
 			?>
 		</label>
@@ -161,12 +161,12 @@ class VarnishStatus {
 		// Basic checks that should stop a scan
 		if( is_wp_error($response) ) {
 			$preflight = false;
-			$failure_to_launch = __('This request cannot be performed: ', 'varnish-http-purge');
+			$failure_to_launch = __( 'This request cannot be performed: ', 'varnish-http-purge' );
 			$failure_to_launch .= $response->get_error_message();
 		}
 		if( wp_remote_retrieve_response_code($response) == '404' ) {
 			$preflight = false;
-			$failure_to_launch = __('This URL is a 404. Please check your typing and try again.', 'varnish-http-purge');
+			$failure_to_launch = __( 'This URL is a 404. Please check your typing and try again.', 'varnish-http-purge' );
 		}
 
 		// Get the IP address so we can check things later
@@ -251,10 +251,10 @@ class VarnishStatus {
 	
 				// HHVM
 				if ( isset( $headers['X-Powered-By'] ) ) {
-					if ( strpos( $headers['X-Powered-By'] ,'HHVM') !== false ) {
+					if ( strpos( $headers['X-Powered-By'], 'HHVM' ) !== false ) {
 					?><tr>
 						<td><?php echo $icon_good; ?></td>
-						<td><?php _e( 'You are running HHVM instead of PHP. Hip Hop!', 'varnish-http-purge' ); ?></td>
+						<td><?php _e( 'You are running HHVM instead of PHP. While that works fine, you should consider PHP 7.', 'varnish-http-purge' ); ?></td>
 					</tr><?php
 					}
 				}
@@ -262,7 +262,7 @@ class VarnishStatus {
 				// GZIP
 				if ( isset( $headers['Content-Encoding'] ) ) {
 					// Regular gZIP
-					if( strpos( $headers['Content-Encoding'] ,'gzip') !== false || ( isset( $headers['Vary']) && strpos( $headers['Vary'] ,'gzip') !== false ) ) {
+					if( strpos( $headers['Content-Encoding'] ,'gzip') !== false || ( isset( $headers['Vary'] ) && strpos( $headers['Vary'] ,'gzip' ) !== false ) ) {
 					?><tr>
 						<td><?php echo $icon_good; ?></td>
 						<td><?php _e( 'Your site is compressing content and making the internet faster.', 'varnish-http-purge' ); ?></td>
@@ -273,7 +273,7 @@ class VarnishStatus {
 					if ( strpos( $headers['Content-Encoding'] ,'Fastly') !== false ) {
 					?><tr>
 						<td><?php echo $icon_good; ?></td>
-						<td><?php printf( __( '<a href="%s">Fastly</a> is speeding up your site. Keep in mind, it may cache your CSS and images longer than Varnish does. Remember to empty all caches.', 'varnish-http-purge'  ), esc_url('https://fastly.com') ); ?></td>
+						<td><?php printf( __( '<a href="%s">Fastly</a> is speeding up your site. Keep in mind, it may cache your CSS and images longer than Varnish does. Remember to empty all caches.', 'varnish-http-purge' ), esc_url( 'https://fastly.com' ) ); ?></td>
 					</tr><?php
 					} 
 				}

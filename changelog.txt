@@ -1,3 +1,18 @@
+= 4.1.1 =
+
+* JSON - fixed overzealous json assumptions from causing errors
+* WP-CLI - fixed prepending of domain on domain when using purge on a domain (props @ocean90)
+* Typos. We hate them.
+
+= 4.1 =
+
+* JSON / REST API Support
+* Fix for Varnish Status Page on MAMP (props @jeremyclarke)
+* Filter for purge headers (props @ocean90)
+* Disallow people from editing the Varnish IP on Multisite
+* Drop support for pre 4.7 because of JSON / REST API
+* Support flushing cache for private pages
+
 = 4.0.3 =
 * Better explanation when Cloudflare gets in the way of DNS
 * Rename flush button for people who don't speak Varnish

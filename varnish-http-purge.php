@@ -3,7 +3,7 @@
 Plugin Name: Varnish HTTP Purge
 Plugin URI: https://halfelf.org/plugins/varnish-http-purge/
 Description: Automatically empty pages cached by Varnish when content on your site is modified.
-Version: 4.2.0
+Version: 4.3.0
 Author: Mika Epstein
 Author URI: https://halfelf.org/
 License: http://www.apache.org/licenses/LICENSE-2.0
@@ -105,22 +105,14 @@ class VarnishPurger {
 		add_action( 'shutdown', array( $this, 'executePurge' ) );
 
 		// Success: Admin notice when purging
-		if ( isset( $_GET['vhp_flush_all'] ) && check_admin_referer( 'vhp-flush-all' ) ) {
-			add_action( 'admin_notices' , array( $this, 'purgeMessage'));
+		if ( 
+			( isset( $_GET['vhp_flush_all'] ) && check_admin_referer( 'vhp-flush-all' ) ) || 
+			( isset( $_GET['vhp_flush_do'] ) && check_admin_referer( 'vhp-flush-do' ) ) ) {
+				add_action( 'admin_notices' , array( $this, 'purgeMessage') );
 		}
-
-		// Checking user permissions for who can and cannot use the admin button
-		if (
-			// SingleSite - admins can always purge
-			( !is_multisite() && current_user_can( 'activate_plugins' ) ) ||
-			// Multisite - Network Admin can always purge
-			current_user_can( 'manage_network' ) ||
-			// Multisite - Site admins can purge UNLESS it's a subfolder install and we're on site #1
-			( is_multisite() && current_user_can( 'activate_plugins' ) && ( SUBDOMAIN_INSTALL || ( !SUBDOMAIN_INSTALL && ( BLOG_ID_CURRENT_SITE != $blog_id ) ) ) )
-			) {
-				add_action( 'admin_bar_menu', array( $this, 'varnish_rightnow_adminbar' ), 100 );
-		}
-
+		
+		// Add Admin Bar
+		add_action( 'admin_bar_menu', array( $this, 'varnish_rightnow_adminbar' ), 100 );
 	}
 
 	/**
@@ -171,15 +163,56 @@ class VarnishPurger {
 	 *
 	 * @since 2.0
 	 */
-	function varnish_rightnow_adminbar( $admin_bar ){
-		$admin_bar->add_menu( array(
-			'id'	=> 'purge-varnish-cache-all',
-			'title' => __( 'Empty Cache', 'varnish-http-purge' ),
-			'href'  => wp_nonce_url( add_query_arg('vhp_flush_all', 1), 'vhp-flush-all'),
-			'meta'  => array(
-				'title' => __( 'Empty Cache', 'varnish-http-purge' ),
+	function varnish_rightnow_adminbar( $admin_bar ) {
+		global $wp;
+
+		// Main Array
+		$args = array(
+			array(
+				'id'    => 'purge-varnish-cache',
+				'title' => __( 'Varnish', 'varnish-http-purge' ),
 			),
-		));
+		);
+
+		// Checking user permissions for who can and cannot use the all flush
+		if (
+			// SingleSite - admins can always purge
+			( !is_multisite() && current_user_can( 'activate_plugins' ) ) ||
+			// Multisite - Network Admin can always purge
+			current_user_can( 'manage_network' ) ||
+			// Multisite - Site admins can purge UNLESS it's a subfolder install and we're on site #1
+			( is_multisite() && current_user_can( 'activate_plugins' ) && ( SUBDOMAIN_INSTALL || ( !SUBDOMAIN_INSTALL && ( BLOG_ID_CURRENT_SITE != $blog_id ) ) ) )
+			) {
+			$args[] = array(
+				'parent' => 'purge-varnish-cache',
+				'id'     => 'purge-varnish-cache-all',
+				'title'  => __( 'Empty Cache (All)', 'varnish-http-purge' ),
+				'href'   => wp_nonce_url( add_query_arg( 'vhp_flush_do', 'all' ), 'vhp-flush-do' ),
+				'meta'   => array(
+					'title' => __( 'Empty Cache (All)', 'varnish-http-purge' ),
+				),
+			);
+		}
+
+		// If we're on a front end page and the current user can edit published posts, then they can do this:
+		if ( ! is_admin() && get_post() !== false && current_user_can( 'edit_published_posts' ) ) {
+			
+			$page_url = esc_url( home_url( $wp->request ) );
+					
+			$args[] = array(
+				'parent' => 'purge-varnish-cache',
+				'id'     => 'purge-varnish-cache-this',
+				'title'  => __( 'Empty Cache (This Page)', 'varnish-http-purge' ),
+				'href'   => wp_nonce_url( add_query_arg( 'vhp_flush_do', $page_url . '/'  ), 'vhp-flush-do' ),
+				'meta'   => array(
+					'title' => __( 'Empty Cache (This Page)', 'varnish-http-purge' ),
+				),
+			);
+		}
+
+		foreach ( $args as $arg ) {
+			$admin_bar->add_node( $arg );
+		}
 	}
 
 	/**
@@ -190,7 +223,7 @@ class VarnishPurger {
 	 */
 	function varnish_rightnow() {
 		global $blog_id;
-		$url = wp_nonce_url( add_query_arg( 'vhp_flush_all', 1 ), 'vhp-flush-all' );
+		$url = wp_nonce_url( add_query_arg( 'vhp_flush_do', 'all' ), 'vhp-flush-do' );
 		$intro = sprintf( __( '<a href="%1$s">Varnish HTTP Purge</a> automatically deletes your cached posts when published or updated. When making major site changes, such as with a new theme, plugins, or widgets, you may need to manually empty the cache.', 'varnish-http-purge' ), 'http://wordpress.org/plugins/varnish-http-purge/' );
 		$button =  __( 'Press the button below to force it to empty your entire Varnish cache.', 'varnish-http-purge' );
 		$button .= '</p><p><span class="button"><a href="'.$url.'"><strong>';
@@ -273,6 +306,14 @@ class VarnishPurger {
 		if ( empty( $purgeUrls ) ) {
 			if ( isset( $_GET['vhp_flush_all'] ) && check_admin_referer( 'vhp-flush-all' ) ) {
 				$this->purgeUrl( $this->the_home_url() . '/?vhp-regex' );
+			} elseif ( isset( $_GET['vhp_flush_do'] ) && check_admin_referer( 'vhp-flush-do' ) ) {
+				if ( $_GET['vhp_flush_do'] == 'all' ) {
+					$this->purgeUrl( $this->the_home_url() . '/?vhp-regex' );
+				} else {
+					$p = parse_url( $_GET['vhp_flush_do'] );
+					if ( !isset( $p['host'] ) ) return;
+					$this->purgeUrl( $_GET['vhp_flush_do'] );
+				}
 			}
 		} else {
 			foreach( $purgeUrls as $url ) {

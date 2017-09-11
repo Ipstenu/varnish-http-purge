@@ -3,7 +3,7 @@ Contributors: Ipstenu, mikeschroder, techpriester
 Tags: varnish, purge, cache
 Requires at least: 4.7
 Tested up to: 4.9
-Stable tag: 4.2.0
+Stable tag: 4.3.0
 Requires PHP: 5.6
 
 Automatically empty a Varnish Cache when content on your site is modified.
@@ -74,7 +74,7 @@ There are many other plugins out there which will allow you to granularly select
 
 If you activate a new theme, or use the customizer to edit your theme, it will delete your cache.
 
-If you edit theme (or plugin) files directly, WordPress cannot easily detect those changes and therefor the plugin cannot delete the cache. In that situation, you will need to empty the cache manually.
+If you edit theme (or plugin) files directly, WordPress cannot easily detect those changes, therefor the plugin cannot delete the cache. In that situation, you will need to empty the cache manually.
 
 = How do I manually delete the whole cache? =
 
@@ -84,7 +84,7 @@ There's also an "Empty Cache" button on the admin toolbar.
 
 = I don't see a button! =
 
-That means your user doesn't have the appropriate permissions. Only administrators can empty the entire cache. In the case of a subfolder multisite network, only the <em>network</em> admins can empty the cache for the primary site.
+That means your account doesn't have the appropriate permissions. Only administrators can empty the entire cache. In the case of a subfolder multisite network, only the <em>network</em> admins can empty the cache for the primary site.
 
 = Why is nothing caching when I use PageSpeed? =
 
@@ -163,27 +163,17 @@ This plugin is installed by default for _all_ DreamPress installs on DreamHost, 
 
 == Changelog ==
 
+= 4.3.0 =
+* 26 September 2017
+* Add Varnish Flush for "this" page on front end
+
 = 4.2.0 =
+* 30 August 2017
 * More flexible support for custom cat/tag bases
 * Added in support for custom taxonomies
 * New function to generate the URLs, so it can be called by external plugins
 * Move right now box to be called later, preventing double calls
 * Extra check for if it's a URL, because some plugins are weird (props @danielkun)
-
-= 4.1.1 =
-
-* JSON - fixed overzealous json assumptions from causing errors
-* WP-CLI - fixed prepending of domain on domain when using purge on a domain (props @ocean90)
-* Typos. We hate them.
-
-= 4.1 =
-
-* JSON / REST API Support
-* Fix for Varnish Status Page on MAMP (props @jeremyclarke)
-* Filter for purge headers (props @ocean90)
-* Disallow people from editing the Varnish IP on Multisite
-* Drop support for pre 4.7 because of JSON / REST API
-* Support flushing cache for private pages
 
 == Screenshots ==
 

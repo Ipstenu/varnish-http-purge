@@ -80,11 +80,11 @@ class WP_CLI_Varnish_Purge_Command extends WP_CLI_Command {
 			
 			WP_CLI::log( sprintf( 'This plugin does not work on WP 4.6 and up, unless WP-CLI is version 0.25.0 or greater. You\'re using WP-CLI %s and WordPress %s.', $cli_version, $wp_version ) );
 			WP_CLI::log( 'To flush your cache, please run the following command:');
-			WP_CLI::log( sprintf( '$ curl -X PURGE "%s"' , $url.$wild ) );
+			WP_CLI::log( sprintf( '$ curl -X PURGE "%s"' , $url . $wild ) );
 			WP_CLI::error( 'Varnish Cache must be purged manually.' );
 		}
 
-		$this->varnish_purge->purgeUrl( $url.$pregex );
+		$this->varnish_purge->purgeUrl( $url . $pregex );
 		
 		if ( WP_DEBUG == true ) {
 			WP_CLI::log( sprintf( 'Flushing URL: %s with params: %s.', $url, $pregex ) );

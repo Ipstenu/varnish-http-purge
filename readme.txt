@@ -6,11 +6,11 @@ Tested up to: 4.9
 Stable tag: 4.3.0
 Requires PHP: 5.6
 
-Automatically empty a Varnish Cache when content on your site is modified.
+Automatically empty Varnish Cache when content on your site is modified.
 
 == Description ==
 
-Varnish HTTP Purge sends a request to delete the cached data of a page or post every time it it modified. This happens when updating, publishing, commenting on, or deleting an post, and when changing themes.
+Varnish HTTP Purge sends a request to delete (aka flush) the cached data of a page or post every time it it modified. This happens when updating, publishing, commenting on, or deleting an post, and when changing themes.
 
 <a href="https://www.varnish-cache.org/">Varnish</a> is a web application accelerator also known as a caching HTTP reverse proxy. You install it in front of any server that speaks HTTP and configure it to cache the contents. This plugin <em>does not</em> install Varnish for you, nor will it configure Varnish for WordPress.
 
@@ -20,7 +20,7 @@ Not all page caches are deleted every time, depending on your Varnish configurat
 * The post/page edited
 * Any categories, tags, and/or custom taxonomies associated with the page
 * Related feeds
-* Associated json API pages
+* Associated JSON API pages
 
 In addition, your <em>entire</em> cache will be deleted on the following actions:
 
@@ -50,7 +50,7 @@ From your WordPress Dashboard, go to Tools -> Varnish Status. There a page will 
 
 = Does every WordPress plugin and theme work with Varnish? =
 
-No. Some of them have behavior that causes Varnish not to cache. While I can't debug that for you, there is an "Is Varnish Working?" tool (see WP Admin -> Tools -> Varnish Status) that tries to detect most of the common issues and direct you to resolutions.
+No. Some of them have behaviour that causes Varnish not to cache. While I can't debug that for you, there is an "Is Varnish Working?" tool (see WP Admin -> Tools -> Varnish Status) that tries to detect most of the common issues and direct you to resolutions.
 
 = How can I debug my site? =
 
@@ -74,7 +74,7 @@ There are many other plugins out there which will allow you to granularly select
 
 If you activate a new theme, or use the customizer to edit your theme, it will delete your cache.
 
-If you edit theme (or plugin) files directly, WordPress cannot easily detect those changes, therefor the plugin cannot delete the cache. In that situation, you will need to empty the cache manually.
+If you edit theme (or plugin) files directly, WordPress cannot easily detect those changes, therefor the plugin will not delete the cache. In that situation, you will need to empty the cache manually.
 
 = How do I manually delete the whole cache? =
 
@@ -91,10 +91,6 @@ That means your account doesn't have the appropriate permissions. Only administr
 PageSpeed likes to put in Caching headers to say <em>not</em> to cache. To fix this, you need to put this in your `.htaccess` section for PageSpeed: `ModPagespeedModifyCachingHeaders off`
 
 If you're using nginx, it's `pagespeed ModifyCachingHeaders off;`
-
-= Can I use this with a proxy service like CloudFlare? =
-
-Yes, but you'll need to make some additional changes (see "Why aren't my changes showing when I use CloudFlare or another proxy?" below).
 
 = Why aren't my changes showing when I use CloudFlare or another proxy? =
 
@@ -128,10 +124,6 @@ If your webhost set up Varnish, you may need to ask them for the specifics if th
 
 Multiple IPs are not supported at this time.
 
-= Why don't my gzip'd pages get deleted? =
-
-Make sure your Varnish VCL is configured correctly to purge all the right pages. This is normally an issue with Varnish 2, which is not supported by this plugin.
-
 = Why isn't the whole cache deletion working? =
 
 The plugin sends a PURGE command of <code>/.*</code> and `X-Purge-Method` in the header with a value of regex. If your Varnish server doesn't doesn't understand the wildcard, you can configure it to check for the header.
@@ -148,7 +140,7 @@ This is a question beyond the support of plugin. I don't offer any Varnish Confi
 
 * <a href="https://github.com/dreamhost/varnish-vcl-collection">DreamHost's Varnish VCL Collection</a>
 
-All of these VCLs work with this plugin.
+All of those VCLs work with this plugin.
 
 = Can I filter things to add special URLs? =
 

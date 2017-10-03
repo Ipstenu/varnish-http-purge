@@ -1,6 +1,7 @@
 <?php
-	
 /**
+	Copyright 2015-2017 Mika Epstein (email: ipstenu@halfelf.org)
+	
 	This file is part of Varnish HTTP Purge, a plugin for WordPress.
 
 	Varnish HTTP Purge is free software: you can redistribute it and/or modify
@@ -9,10 +10,9 @@
 	Varnish HTTP Purge is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-	
 */
 
-if (!defined('ABSPATH')) {
+if ( !defined( 'ABSPATH' ) ) {
     die();
 }
 

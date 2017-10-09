@@ -158,6 +158,7 @@ This plugin is installed by default for _all_ DreamPress installs on DreamHost, 
 = 4.3.0 =
 * 26 September 2017
 * Add Varnish Flush for "this" page on front end
+* Do not flush non-public taxonomies
 
 = 4.2.0 =
 * 30 August 2017

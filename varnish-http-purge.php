@@ -522,15 +522,19 @@ class VarnishPurger {
 				}
 			}
 			// Custom Taxonomies
+			// Only show if the taxonomy is public
 			$taxonomies = get_post_taxonomies( $postId );
 			if ( $taxonomies ) {	
 				foreach ( $taxonomies as $taxonomy ) {
-					$terms = wp_get_post_terms( $postId, $taxonomy );
-					foreach ( $terms as $term ) {
-						array_push( $listofurls, 
-							get_term_link( $term ),
-							get_rest_url() . $rest_api_route . '/' . $term->taxonomy . '/' . $term->slug . '/'
-						);
+					$features = get_taxonomy( $taxonomy );	
+					if ( $features['public'] ) {
+						$terms = wp_get_post_terms( $postId, $taxonomy );
+						foreach ( $terms as $term ) {
+							array_push( $listofurls, 
+								get_term_link( $term ),
+								get_rest_url() . $rest_api_route . '/' . $term->taxonomy . '/' . $term->slug . '/'
+							);
+						}	
 					}
 				}
 			}

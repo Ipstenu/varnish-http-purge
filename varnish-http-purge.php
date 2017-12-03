@@ -53,11 +53,11 @@ class VarnishPurger {
 	 * @access public
 	 */
 	public function admin_init() {
-		
+
 		// Add to 'right now'
 		add_action( 'activity_box_end', array( $this, 'varnish_rightnow' ), 100 );
 
-		// Failure: Pre WP 4.7		
+		// Failure: Pre WP 4.7
 		if ( version_compare( get_bloginfo( 'version' ), '4.7', '<=' ) ) {
 			deactivate_plugins( plugin_basename( __FILE__ ) );
 			add_action( 'admin_notices' , array( $this, 'require_wp_version_notice'));
@@ -101,16 +101,16 @@ class VarnishPurger {
 				}
 			}
 		}
-		
+
 		add_action( 'shutdown', array( $this, 'executePurge' ) );
 
 		// Success: Admin notice when purging
-		if ( 
-			( isset( $_GET['vhp_flush_all'] ) && check_admin_referer( 'vhp-flush-all' ) ) || 
+		if (
+			( isset( $_GET['vhp_flush_all'] ) && check_admin_referer( 'vhp-flush-all' ) ) ||
 			( isset( $_GET['vhp_flush_do'] ) && check_admin_referer( 'vhp-flush-do' ) ) ) {
 				add_action( 'admin_notices' , array( $this, 'purgeMessage') );
 		}
-		
+
 		// Add Admin Bar
 		add_action( 'admin_bar_menu', array( $this, 'varnish_rightnow_adminbar' ), 100 );
 	}
@@ -196,9 +196,9 @@ class VarnishPurger {
 
 		// If we're on a front end page and the current user can edit published posts, then they can do this:
 		if ( ! is_admin() && get_post() !== false && current_user_can( 'edit_published_posts' ) ) {
-			
+
 			$page_url = esc_url( home_url( $wp->request ) );
-					
+
 			$args[] = array(
 				'parent' => 'purge-varnish-cache',
 				'id'     => 'purge-varnish-cache-this',
@@ -332,7 +332,7 @@ class VarnishPurger {
 	 */
 	public function purgeUrl( $url ) {
 		$p = parse_url( $url );
-		
+
 		// Bail early if there's no host since some plugins are weird
 		if ( !isset( $p['host'] ) ) return;
 
@@ -382,12 +382,17 @@ class VarnishPurger {
 			$purgeme .= '?' . $p['query'];
 		}
 
+		$host_heder = $p['host'];
+		if ( isset( $p['port'] ) ) {
+			$host_heder = $host_heder . ':' . $p['port'];
+		}
+
 		/**
 		 * Filters the HTTP headers to send with a PURGE request.
 		 *
 		 * @since 4.1
 		 */
-		$headers  = apply_filters( 'varnish_http_purge_headers', array( 'host' => $p['host'], 'X-Purge-Method' => $x_purge_method ) );
+		$headers  = apply_filters( 'varnish_http_purge_headers', array( 'host' => $host_heder, 'X-Purge-Method' => $x_purge_method ) );
 		$response = wp_remote_request( $purgeme, array( 'method' => 'PURGE', 'headers' => $headers ) );
 
 		do_action( 'after_purge_url', $url, $purgeme, $response, $headers );
@@ -404,7 +409,7 @@ class VarnishPurger {
 		$listofurls = array();
 
 		array_push( $listofurls, $this->the_home_url() . '/?vhp-regex' );
-	
+
 		// Now flush all the URLs we've collected provided the array isn't empty
 		if ( !empty( $listofurls ) ) {
 			foreach ( $listofurls as $url ) {
@@ -419,7 +424,7 @@ class VarnishPurger {
 	 * Generates a list of URLs that should be purged, based on the post ID
 	 * passed through. Useful for when you're trying to get a post to flush
 	 * another post.
-	 * 
+	 *
 	 * @access public
 	 * @param mixed $postId
 	 * @return array()
@@ -438,12 +443,12 @@ class VarnishPurger {
 	 * @access public
 	 */
 	public function purgePost( $postId ) {
-		
+
 		// Future Me: You may need this if you figure out how to use an array
 		// further down with versions of WP and their json versions.
 		// global $wp_version;
-		
-		// If this is a valid post we want to purge the post, 
+
+		// If this is a valid post we want to purge the post,
 		// the home page and any associated tags and categories
 		$valid_post_status = array( 'publish', 'private', 'trash' );
 		$this_post_status  = get_post_status( $postId );
@@ -452,11 +457,11 @@ class VarnishPurger {
 		$invalid_post_type = array( 'nav_menu_item', 'revision' );
 		$noarchive_post_type = array( 'post', 'page' );
 		$this_post_type = get_post_type( $postId );
-				
+
 		// Determine the route for the rest API
 		// This will need to be revisted if WP updates the version.
 		// Future me: Consider an array? 4.7-4.7.3 use v2, and then adapt from there?
-		$rest_api_route  = 'wp/v2'; 
+		$rest_api_route  = 'wp/v2';
 
 		// array to collect all our URLs
 		$listofurls = array();
@@ -470,7 +475,7 @@ class VarnishPurger {
 			// JSON API Permalink for the post based on type
 			// We only want to do this if the rest_base exists
 			// But we apparently have to force it for posts and pages (seriously?)
-			$post_type_object = get_post_type_object( $postId );	
+			$post_type_object = get_post_type_object( $postId );
 			$rest_permalink = false;
 			if ( isset( $post_type_object->rest_base ) ) {
 				$rest_permalink = get_rest_url() . $rest_api_route . '/' . $post_type_object->rest_base . '/' . $postId . '/';
@@ -479,14 +484,14 @@ class VarnishPurger {
 			} elseif ( $this_post_type == 'page' ) {
 				$rest_permalink = get_rest_url() . $rest_api_route . '/pages/' . $postId . '/';
 			}
-			
+
 			if ( $rest_permalink !== false ) array_push( $listofurls, $rest_permalink );
 
 			// Add in AMP permalink if Automattic's AMP is installed
 			if ( function_exists( 'amp_get_permalink' ) ) {
 				array_push( $listofurls, amp_get_permalink( $postId ) );
 			}
-			
+
 			// Regular AMP url for posts
 			array_push( $listofurls, get_permalink( $postId ) . 'amp/' );
 
@@ -503,7 +508,7 @@ class VarnishPurger {
 				foreach ( $categories as $cat ) {
 					$category_base = get_option( 'category_base');
 					if ( $category_base == '' ) $category_base = '/category/';
-					array_push( $listofurls, 
+					array_push( $listofurls,
 						get_category_link( $cat->term_id ),
 						get_rest_url() . $rest_api_route . '/categories/' . $cat->term_id . '/'
 					);
@@ -515,7 +520,7 @@ class VarnishPurger {
 				$tag_base = get_option( 'tag_base' );
 				if ( $tag_base == '' ) $tag_base = '/tag/';
 				foreach ( $tags as $tag ) {
-					array_push( $listofurls, 
+					array_push( $listofurls,
 						get_tag_link( $tag->term_id ),
 						get_rest_url() . $rest_api_route . $tag_base . $tag->term_id . '/'
 					);
@@ -524,21 +529,21 @@ class VarnishPurger {
 			// Custom Taxonomies
 			// Only show if the taxonomy is public
 			$taxonomies = get_post_taxonomies( $postId );
-			if ( $taxonomies ) {	
+			if ( $taxonomies ) {
 				foreach ( $taxonomies as $taxonomy ) {
-					$features = (array) get_taxonomy( $taxonomy );	
+					$features = (array) get_taxonomy( $taxonomy );
 					if ( $features['public'] ) {
 						$terms = wp_get_post_terms( $postId, $taxonomy );
 						foreach ( $terms as $term ) {
-							array_push( $listofurls, 
+							array_push( $listofurls,
 								get_term_link( $term ),
 								get_rest_url() . $rest_api_route . '/' . $term->taxonomy . '/' . $term->slug . '/'
 							);
-						}	
+						}
 					}
 				}
 			}
-			
+
 			// Author URL
 			$author_id = get_post_field( 'post_author', $postId );
 			array_push( $listofurls,
@@ -555,7 +560,7 @@ class VarnishPurger {
 					// Need to add in JSON?
 				);
 			}
-			
+
 			// Feeds
 			array_push( $listofurls,
 				get_bloginfo_rss( 'rdf_url' ),
@@ -567,7 +572,7 @@ class VarnishPurger {
 			);
 
 			// Home Pages and (if used) posts page
-			array_push( $listofurls, 
+			array_push( $listofurls,
 				get_rest_url(),
 				$this->the_home_url() . '/'
 				);
@@ -577,12 +582,12 @@ class VarnishPurger {
 					array_push( $listofurls, get_permalink( get_option( 'page_for_posts' ) ) );
 				}
 			}
-			
+
 		} else {
 			// We're not sure how we got here, but bail instead of processing anything else.
 			return;
 		}
-		
+
 		// Now flush all the URLs we've collected provided the array isn't empty
 		// And make sure each URL only gets purged once, eh?
 		if ( !empty( $listofurls ) ) {
@@ -612,7 +617,7 @@ if ( defined( 'WP_CLI' ) && WP_CLI ) {
 }
 
 /* Varnish Status Page
- * 
+ *
  * @since 4.0
  */
 include_once( 'varnish-status.php' );

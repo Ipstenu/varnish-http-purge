@@ -118,16 +118,6 @@ class WP_CLI_Varnish_Purge_Command extends WP_CLI_Command {
 			$url = $default_url;
 		}
 
-		// Ted Turner Section: Colorizing
-
-		$icons = array (
-			'awesome' => WP_CLI::colorize( "%gAwesome%n" ),
-			'good'    => WP_CLI::colorize( "%gGood%n" ),
-			'warning' => WP_CLI::colorize( "%yWarning%n" ),
-			'awkward' => WP_CLI::colorize( "%pAwkward%n" ),
-			'bad'     => WP_CLI::colorize( "%rBad%n" ),
-		);
-
 		if ( empty( $url ) || parse_url( $default_url, PHP_URL_HOST ) !== parse_url( $url, PHP_URL_HOST ) ) {
 			WP_CLI::error( __( 'You must enter a URL from your own domain to scan.', 'varnish-http-purge' ) );
 		} elseif ( !filter_var( $url, FILTER_VALIDATE_URL) ) {
@@ -166,7 +156,7 @@ class WP_CLI_Varnish_Purge_Command extends WP_CLI_Command {
 
 					$items[] = array(
 						'name'    => $type,
-						'status'  => $content['icon'],
+						'status'  => ucwords( $content['icon'] ),
 						'message' => $content['message'],
 					);
 				}

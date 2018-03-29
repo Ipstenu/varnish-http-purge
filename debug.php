@@ -49,16 +49,13 @@ class VarnishDebug {
 	 *
 	 * @since 4.4.0
 	 */
-	static function preflight( $response = '' ) {
+	static function preflight( $response ) {
 
 		// Defaults
 		$preflight = true;
 		$message   = __( 'Success', 'varnish-http-purge' );
 
-		if ( $response == '' ) {
-			$preflight = false;
-			$message   = __( 'There was no response from the server. Which shouldn\'t be possible since you can only check your own domain...', 'varnish-http-purge' );
-		} elseif ( is_wp_error( $response ) ) {
+		if ( is_wp_error( $response ) ) {
 			$preflight = false;
 			$message   = __( 'This request cannot be performed: ', 'varnish-http-purge' );
 			$message  .= $response->get_error_message();
@@ -80,11 +77,9 @@ class VarnishDebug {
 	 *
 	 * @since 4.4.0
 	 */
-	static function remote_ip( $headers = '' ) {
+	static function remote_ip( $headers ) {
 
-		if ( $headers == '' ) {
-			$remote_ip = false;
-		} elseif ( isset( $headers['X-Forwarded-For'] ) && filter_var( $headers['X-Forwarded-For'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 ) ) {
+		if ( isset( $headers['X-Forwarded-For'] ) && filter_var( $headers['X-Forwarded-For'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 ) ) {
 			$remote_ip = $headers['X-Forwarded-For'];
 		} elseif ( isset( $headers['HTTP_X_FORWARDED_FOR'] ) && filter_var( $headers['HTTP_X_FORWARDED_FOR'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 )
 		) {
@@ -153,7 +148,7 @@ class VarnishDebug {
 	 *
 	 * @since 4.4.0
 	 */
-	function remote_ip_results( $remote_ip = '', $varniship = '' ) {
+	function remote_ip_results( $remote_ip, $varniship ) {
 
 		// Set the defaults
 		$return = false;
@@ -185,13 +180,10 @@ class VarnishDebug {
 	 *
 	 * @since 4.4.0
 	 */
-	function server_results( $headers = '' ) {
+	function server_results( $headers ) {
 
 		// Set the defaults
 		$return = array();
-
-		// Early Bail
-		if ( $headers == '' ) return $return;
 
 		if ( isset( $headers['Server'] ) ) {
 			// nginx
@@ -225,7 +217,6 @@ class VarnishDebug {
 					'message' => __( 'This site is hosted on Pagely.', 'varnish-http-purge' ),
 				);
 			}
-
 		}
 
 		if ( isset( $varnish_headers['X-hacker'] ) ) {
@@ -252,29 +243,25 @@ class VarnishDebug {
 	 *
 	 * @since 4.4.0
 	 */
-	function gzip_results( $headers = '' ) {
+	function gzip_results( $headers ) {
 
 		// Set the defaults
 		$return = false;
 
-		if ( $headers !== '' && isset( $headers['Content-Encoding'] ) ) {
+		// GZip
+		if( strpos( $headers['Content-Encoding'] ,'gzip') !== false || ( isset( $headers['Vary'] ) && strpos( $headers['Vary'] ,'gzip' ) !== false ) ) {
+			$return = array( 
+				'icon'    => 'good',
+				'message' => __( 'Your site is compressing content and making the internet faster.', 'varnish-http-purge' ),
+			);
+		}
 
-			// GZip
-			if( strpos( $headers['Content-Encoding'] ,'gzip') !== false || ( isset( $headers['Vary'] ) && strpos( $headers['Vary'] ,'gzip' ) !== false ) ) {
-				$return = array( 
-					'icon'    => 'good',
-					'message' => __( 'Your site is compressing content and making the internet faster.', 'varnish-http-purge' ),
-				);
-			}
-
-			// Fastly
-			if ( strpos( $headers['Content-Encoding'] ,'Fastly') !== false ) {
-				$return = array( 
-					'icon'    => 'good',
-					'message' => sprintf( __( '<a href="%s">Fastly</a> is speeding up your site. Keep in mind, it may cache your CSS and images longer than Varnish does. Remember to empty all caches in all locations.', 'varnish-http-purge' ), esc_url( 'https://fastly.com' ) ),
-				);
-			}
-
+		// Fastly
+		if ( strpos( $headers['Content-Encoding'] ,'Fastly') !== false ) {
+			$return = array( 
+				'icon'    => 'good',
+				'message' => sprintf( __( '<a href="%s">Fastly</a> is speeding up your site. Keep in mind, it may cache your CSS and images longer than Varnish does. Remember to empty all caches in all locations.', 'varnish-http-purge' ), esc_url( 'https://fastly.com' ) ),
+			);
 		}
 
 		return $return;
@@ -287,13 +274,10 @@ class VarnishDebug {
 	 *
 	 * @since 4.4.0
 	 */
-	function cookie_results( $headers = '' ) {
+	function cookie_results( $headers ) {
 
 		// Defaults
 		$return = $cookies = array();
-
-		// Early bail
-		if ( $headers == '' ) return $return;
 
 		// Set the default returns
 		$cookie_warning = array(
@@ -344,49 +328,6 @@ class VarnishDebug {
 		return $return;
 	}
 
-	/**
-	 * Bad Actors
-	 *
-	 * Plugins and themes known to be problematic
-	 *
-	 * @since 4.4.0
-	 */
-	function bad_actors_results() {
-
-		$return = array();
-
-		$themes = array( 
-			'enfold' => __( 'The Enfold theme uses sessions for every call of shortcodes in certain situations. To check, change your theme and re-run this test. If this warning goes away, it\'s your theme.', 'varnish-http-purge' ),
-		);
-
-		$plugins = array( 
-			'pie-register' => array(
-				'path'    => 'pie-register/pie-register.php',
-				'message' => sprintf( __( '<a href="%s">Pie Register</a> sets output buffering in the header of every page load, which enforces sessions. There is no known fix at this time.', 'varnish-http-purge' ), 'https://wordpress.org/plugins/pie-register/' ),
-			),
-			'simple-session-support' => array(
-				'path'    => 'simple-session-support/simple-session-support.php',
-				'message' => sprintf( __( '<a href="%s">Simple Session Support</a> forces PHP Sessions. It\'s also no longer updated and not recommended for use.', 'varnish-http-purge' ), 'https://wordpress.org/plugins/simple-session-support/' ),
-			),
-		);
-
-		// Check all the themes. If one of the questionable ones are active, warn
-		foreach ( $themes as $theme => $message ) {
-			$my_theme = wp_get_theme( $theme );
-			if ( $my_theme->exists() ) {
-				$return[ $theme ] = array( 'icon' => 'warning', 'message' => $message );
-			}
-		}
-
-		// Check the plugins
-		foreach ( $plugins as $plugin => $data ) {
-			if ( is_plugin_active( $data['path'] ) ) {
-				$return[ $plugin ] = array( 'icon' => 'warning', 'message' => $data['message'] );
-			}
-		}
-
-		return $return;
-	}
 
 	/**
 	 * Cache
@@ -395,12 +336,9 @@ class VarnishDebug {
 	 *
 	 * @since 4.4.0
 	 */
-	function cache_results( $headers = '' ) {
+	function cache_results( $headers ) {
 
 		$return = array();
-
-		// Early Bail
-		if ( $headers == '' ) return $return;
 
 		// Cache Control
 		if ( isset( $headers['Cache-Control'] ) ) {
@@ -472,6 +410,81 @@ class VarnishDebug {
 		}
 
 		return $return;
+	}
+
+	/**
+	 * Bad Actors
+	 *
+	 * Plugins and themes known to be problematic
+	 *
+	 * @since 4.4.0
+	 */
+	function bad_actors_results( ) {
+
+		$return = array();
+
+		$themes = array( 
+			'enfold' => __( 'The Enfold theme uses sessions for every call of shortcodes in certain situations. To check, change your theme and re-run this test. If this warning goes away, it\'s your theme.', 'varnish-http-purge' ),
+		);
+
+		$plugins = array( 
+			'pie-register' => array(
+				'path'    => 'pie-register/pie-register.php',
+				'message' => sprintf( __( '<a href="%s">Pie Register</a> sets output buffering in the header of every page load, which enforces sessions. There is no known fix at this time.', 'varnish-http-purge' ), 'https://wordpress.org/plugins/pie-register/' ),
+			),
+			'simple-session-support' => array(
+				'path'    => 'simple-session-support/simple-session-support.php',
+				'message' => sprintf( __( '<a href="%s">Simple Session Support</a> forces PHP Sessions. It\'s also no longer updated and not recommended for use.', 'varnish-http-purge' ), 'https://wordpress.org/plugins/simple-session-support/' ),
+			),
+		);
+
+		// Check all the themes. If one of the questionable ones are active, warn
+		foreach ( $themes as $theme => $message ) {
+			$my_theme = wp_get_theme( $theme );
+			if ( $my_theme->exists() ) {
+				$return[ $theme ] = array( 'icon' => 'warning', 'message' => $message );
+			}
+		}
+
+		// Check the plugins
+		foreach ( $plugins as $plugin => $data ) {
+			if ( is_plugin_active( $data['path'] ) ) {
+				$return[ $plugin ] = array( 'icon' => 'warning', 'message' => $data['message'] );
+			}
+		}
+
+		return $return;
+	}
+
+	/**
+	 * Get all the results
+	 *
+	 * Collect everything, get all the data spit it out.
+	 * 
+	 * @since 4.4.0
+	 */
+	function get_all_the_results( $headers, $remote_ip, $varniship ) {
+		$output = array();
+		$output['varnish']   = self::varnish_results( $headers );
+		$output['remote_ip'] = self::remote_ip_results( $remote_ip, $varniship );
+
+		// Server Results
+		$sever_results       = self::server_results( $remote_ip, $varniship );
+		$output              = array_merge( $output, $sever_results );
+
+		// Cache Results
+		$cache_results       = self::cache_results( $headers );
+		$output              = array_merge( $output, $cache_results );
+
+		// Cookies
+		$cookie_results      = self::cookie_results( $headers );
+		$output              = array_merge( $output, $cookie_results );
+
+		// Bad Actors (plugins and themes that don't play nicely with Varnish)
+		$bad_actors_results  = self::bad_actors_results( $headers );
+		$output              = array_merge( $output, $bad_actors_results );
+		
+		return $output;
 	}
 
 }

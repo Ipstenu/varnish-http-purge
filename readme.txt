@@ -157,6 +157,7 @@ This plugin is installed by default for _all_ DreamPress installs on DreamHost, 
 
 = 4.4.0 =
 * March 2018
+* Improve translations
 * Massive improvements to the debugging tools
 * WP-CLI for debugging
 

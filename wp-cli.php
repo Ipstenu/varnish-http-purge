@@ -30,7 +30,8 @@ class WP_CLI_Varnish_Purge_Command extends WP_CLI_Command {
 	
 	/**
 	 * Forces a full Varnish Purge of the entire site (provided
-	 * regex is supported).
+	 * regex is supported). Alternately you can fluxh the cache
+	 * for specific pages or folders (using the --wildcard param)
 	 * 
 	 * ## EXAMPLES
 	 * 
@@ -38,15 +39,11 @@ class WP_CLI_Varnish_Purge_Command extends WP_CLI_Command {
 	 *
 	 *		wp varnish purge http://example.com/wp-content/themes/twentyeleventy/style.css
 	 *
-	 *		wp varnish purge "/wp-content/themes/twentysixty/style.css"
-	 *
 	 *		wp varnish purge http://example.com/wp-content/themes/ --wildcard
-	 *
-	 *		wp varnish purge "/wp-content/themes/" --wildcard
 	 *
 	 */
 	
-	function purge( $args , $assoc_args ) {	
+	function purge( $args, $assoc_args ) {	
 		
 		$wp_version = get_bloginfo( 'version' );
 		$cli_version = WP_CLI_VERSION;
@@ -103,8 +100,82 @@ class WP_CLI_Varnish_Purge_Command extends WP_CLI_Command {
 	 *
 	 */
 	
-	function debug( $args , $assoc_args ) {
+	function debug( $args, $assoc_args ) {
+
+		// Set the URL/path
+		if ( !empty($args) ) { list( $url ) = $args; }
+
+		$default_url = esc_url( $this->varnish_purge->the_home_url() );
+
+		if ( !empty( $url ) ) {
+			$parsed_input = parse_url($url);
+			if ( empty($parsed_input['scheme']) ) {
+				$schema_input = 'http://';
+				if ( is_ssl() ) $schema_input = 'https://';
+				$url = $schema_input . ltrim($url, '/');
+			}
+		} else {
+			$url = $default_url;
+		}
+
+		// Ted Turner Section: Colorizing
+
+		$icons = array (
+			'awesome' => WP_CLI::colorize( "%gAwesome%n" ),
+			'good'    => WP_CLI::colorize( "%gGood%n" ),
+			'warning' => WP_CLI::colorize( "%yWarning%n" ),
+			'awkward' => WP_CLI::colorize( "%pAwkward%n" ),
+			'bad'     => WP_CLI::colorize( "%rBad%n" ),
+		);
+
+		if ( empty( $url ) || parse_url( $default_url, PHP_URL_HOST ) !== parse_url( $url, PHP_URL_HOST ) ) {
+			WP_CLI::error( __( 'You must enter a URL from your own domain to scan.', 'varnish-http-purge' ) );
+		} elseif ( !filter_var( $url, FILTER_VALIDATE_URL) ) {
+			WP_CLI::error( __( 'You have entered an invalid URL address.', 'varnish-http-purge' ) );
+		} else {
+
+			// Include the debug code
+			include( 'debug.php' );
+
+			$varnishurl = get_option( 'vhp_varnish_url', $url );
+
+			// Get the response and headers
+			$remote_get = VarnishDebug::remote_get( $varnishurl );
+			$headers    = wp_remote_retrieve_headers( $remote_get );
 	
+			// Preflight checklist
+			$preflight = VarnishDebug::preflight( $remote_get );
+	
+			// Check for Remote IP
+			$remote_ip = VarnishDebug::remote_ip( $headers );
+	
+			// Get the Varnish IP
+			if ( VHP_VARNISH_IP != false ) {
+				$varniship = VHP_VARNISH_IP;
+			} else {
+				$varniship = get_option('vhp_varnish_ip');
+			}
+
+			if ( $preflight['preflight'] == false ) {
+				WP_CLI::error( $preflight['message'] );
+			} else {
+				$results = VarnishDebug::get_all_the_results( $headers, $remote_ip, $varniship );
+
+				// Generate array
+				foreach ( $results as $type => $content ) { 
+
+					$items[] = array(
+						'name'    => $type,
+						'status'  => $content['icon'],
+						'message' => $content['message'],
+					);
+				}
+
+				// Output the data
+				WP_CLI\Utils\format_items( $assoc_args['format'], $items, array( 'name', 'status', 'message' ) );
+			}
+		}
+
 	}
 
 }

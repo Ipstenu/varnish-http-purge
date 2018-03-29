@@ -1,6 +1,6 @@
 <?php
 /**
-	Copyright 2015-2017 Mika Epstein (email: ipstenu@halfelf.org)
+	Copyright 2015-2018 Mika Epstein (email: ipstenu@halfelf.org)
 	
 	This file is part of Varnish HTTP Purge, a plugin for WordPress.
 
@@ -12,9 +12,7 @@
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 */
 
-if ( !defined( 'ABSPATH' ) ) {
-    die();
-}
+if ( !defined( 'ABSPATH' ) ) die();
 
 // Bail if WP-CLI is not present
 if ( !defined( 'WP_CLI' ) ) return;
@@ -30,23 +28,23 @@ class WP_CLI_Varnish_Purge_Command extends WP_CLI_Command {
 		$this->varnish_purge = new VarnishPurger();
 	}
 	
-    /**
-     * Forces a full Varnish Purge of the entire site (provided
-     * regex is supported).
-     * 
-     * ## EXAMPLES
-     * 
-     *		wp varnish purge
-     *
-     *		wp varnish purge http://example.com/wp-content/themes/twentyeleventy/style.css
-     *
+	/**
+	 * Forces a full Varnish Purge of the entire site (provided
+	 * regex is supported).
+	 * 
+	 * ## EXAMPLES
+	 * 
+	 *		wp varnish purge
+	 *
+	 *		wp varnish purge http://example.com/wp-content/themes/twentyeleventy/style.css
+	 *
 	 *		wp varnish purge "/wp-content/themes/twentysixty/style.css"
 	 *
-     *		wp varnish purge http://example.com/wp-content/themes/ --wildcard
-     *
-     *		wp varnish purge "/wp-content/themes/" --wildcard
-     *
-     */
+	 *		wp varnish purge http://example.com/wp-content/themes/ --wildcard
+	 *
+	 *		wp varnish purge "/wp-content/themes/" --wildcard
+	 *
+	 */
 	
 	function purge( $args , $assoc_args ) {	
 		
@@ -91,6 +89,22 @@ class WP_CLI_Varnish_Purge_Command extends WP_CLI_Command {
 		}
 
 		WP_CLI::success( 'The Varnish cache was purged.' );
+	}
+
+	/**
+	 * Runs a debug check of the site to see if there are any known 
+	 * issues that would stop Varnish from caching.
+	 * 
+	 * ## EXAMPLES
+	 * 
+	 *		wp varnish debug
+	 *
+	 *		wp varnish debug http://example.com/wp-content/themes/twentyeleventy/style.css
+	 *
+	 */
+	
+	function debug( $args , $assoc_args ) {
+	
 	}
 
 }

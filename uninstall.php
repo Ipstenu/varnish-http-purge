@@ -1,6 +1,6 @@
 <?php
 /**
-	Copyright 2016-2017 Mika Epstein (email: ipstenu@halfelf.org)
+	Copyright 2016-2018 Mika Epstein (email: ipstenu@halfelf.org)
 
 	This file is part of Varnish HTTP Purge, a plugin for WordPress.
 

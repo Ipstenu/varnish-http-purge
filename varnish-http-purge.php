@@ -3,14 +3,14 @@
 Plugin Name: Varnish HTTP Purge
 Plugin URI: https://halfelf.org/plugins/varnish-http-purge/
 Description: Automatically empty pages cached by Varnish when content on your site is modified.
-Version: 4.3.1
+Version: 4.4.0
 Author: Mika Epstein
 Author URI: https://halfelf.org/
 License: http://www.apache.org/licenses/LICENSE-2.0
 Text Domain: varnish-http-purge
 Network: true
 
-	Copyright 2013-2017: Mika A. Epstein (email: ipstenu@halfelf.org)
+	Copyright 2013-2018: Mika A. Epstein (email: ipstenu@halfelf.org)
 
 	Original Author: Leon Weidauer ( http:/www.lnwdr.de/ )
 
@@ -57,7 +57,7 @@ class VarnishPurger {
 		// Add to 'right now'
 		add_action( 'activity_box_end', array( $this, 'varnish_rightnow' ), 100 );
 
-		// Failure: Pre WP 4.7		
+		// Failure: Pre WP 4.7
 		if ( version_compare( get_bloginfo( 'version' ), '4.7', '<=' ) ) {
 			deactivate_plugins( plugin_basename( __FILE__ ) );
 			add_action( 'admin_notices' , array( $this, 'require_wp_version_notice'));
@@ -108,7 +108,7 @@ class VarnishPurger {
 		if ( 
 			( isset( $_GET['vhp_flush_all'] ) && check_admin_referer( 'vhp-flush-all' ) ) || 
 			( isset( $_GET['vhp_flush_do'] ) && check_admin_referer( 'vhp-flush-do' ) ) ) {
-				add_action( 'admin_notices' , array( $this, 'purgeMessage') );
+				add_action( 'admin_notices', array( $this, 'purgeMessage') );
 		}
 		
 		// Add Admin Bar
@@ -592,10 +592,10 @@ class VarnishPurger {
 			}
 		}
 
-        // Filter to add or remove urls to the array of purged urls
-        // @param array $purgeUrls the urls (paths) to be purged
-        // @param int $postId the id of the new/edited post
-        $this->purgeUrls = apply_filters( 'vhp_purge_urls', $this->purgeUrls, $postId );
+		// Filter to add or remove urls to the array of purged urls
+		// @param array $purgeUrls the urls (paths) to be purged
+		// @param int $postId the id of the new/edited post
+		$this->purgeUrls = apply_filters( 'vhp_purge_urls', $this->purgeUrls, $postId );
 	}
 
 }
@@ -615,4 +615,4 @@ if ( defined( 'WP_CLI' ) && WP_CLI ) {
  * 
  * @since 4.0
  */
-include_once( 'varnish-status.php' );
+include_once( 'status.php' );

@@ -100,7 +100,7 @@ class VarnishDebug {
 	 *
 	 * @since 4.4.0
 	 */
-	function varnish_results( $headers = '' ) {
+	static function varnish_results( $headers = '' ) {
 
 		// Set the defaults
 		$return = array( 
@@ -148,7 +148,7 @@ class VarnishDebug {
 	 *
 	 * @since 4.4.0
 	 */
-	function remote_ip_results( $remote_ip, $varniship ) {
+	static function remote_ip_results( $remote_ip, $varniship ) {
 
 		// Set the defaults
 		$return = false;
@@ -180,7 +180,7 @@ class VarnishDebug {
 	 *
 	 * @since 4.4.0
 	 */
-	function server_results( $headers ) {
+	static function server_results( $headers ) {
 
 		// Set the defaults
 		$return = array();
@@ -243,7 +243,7 @@ class VarnishDebug {
 	 *
 	 * @since 4.4.0
 	 */
-	function gzip_results( $headers ) {
+	static function gzip_results( $headers ) {
 
 		// Set the defaults
 		$return = false;
@@ -274,7 +274,7 @@ class VarnishDebug {
 	 *
 	 * @since 4.4.0
 	 */
-	function cookie_results( $headers ) {
+	static function cookie_results( $headers ) {
 
 		// Defaults
 		$return = $cookies = array();
@@ -336,7 +336,7 @@ class VarnishDebug {
 	 *
 	 * @since 4.4.0
 	 */
-	function cache_results( $headers ) {
+	static function cache_results( $headers ) {
 
 		$return = array();
 
@@ -419,7 +419,7 @@ class VarnishDebug {
 	 *
 	 * @since 4.4.0
 	 */
-	function bad_actors_results( ) {
+	static function bad_actors_results( ) {
 
 		$return = array();
 
@@ -463,7 +463,7 @@ class VarnishDebug {
 	 * 
 	 * @since 4.4.0
 	 */
-	function get_all_the_results( $headers, $remote_ip, $varniship ) {
+	static function get_all_the_results( $headers, $remote_ip, $varniship ) {
 		$output = array();
 		$output['varnish']   = self::varnish_results( $headers );
 		$output['remote_ip'] = self::remote_ip_results( $remote_ip, $varniship );
@@ -489,4 +489,4 @@ class VarnishDebug {
 
 }
 
-$debug = new VarnishDebug();
+if ( class_exists( 'VarnishDebug' ) ) $varnish_debug = new VarnishDebug();

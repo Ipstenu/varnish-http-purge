@@ -209,7 +209,13 @@ class VarnishStatus {
 				}
 				foreach ( $headers as $header => $key ) {
 					if ( $header !== '0' ) {
-						echo '<tr><td width="200px" style="text-align:right;">' . $header . ':</td><td>' . htmlspecialchars( $key ) . '</td></tr>';
+						if ( is_array( $key ) ) {
+							$content = print_r( $key, true );
+						} else {
+							$content = wp_kses_post( $key );
+						}
+						
+						echo '<tr><td width="200px" style="text-align:right;">' . $header . ':</td><td>' . $content . '</td></tr>';
 					}
 				}
 				?>
@@ -323,5 +329,6 @@ class VarnishStatus {
 	}
 
 }
+
 
 $status = new VarnishStatus();

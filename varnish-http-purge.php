@@ -42,6 +42,7 @@ class VarnishPurger {
 	 */
 	public function __construct( ) {
 		defined( 'VHP_VARNISH_IP' ) || define( 'VHP_VARNISH_IP' , false );
+		defined( 'VHP_DEBUG' )      || define( 'VHP_DEBUG', false );
 		add_action( 'init', array( &$this, 'init' ) );
 		add_action( 'admin_init', array( &$this, 'admin_init' ) );
 	}
@@ -79,6 +80,10 @@ class VarnishPurger {
 	 */
 	public function init() {
 		global $blog_id;
+
+		// Cheap Dev Mode
+		// If VHP_DEBUG is true, throw down a session to 'break' caching
+		if ( VHP_DEBUG ) @session_start();
 
 		// get my events
 		$events = $this->getRegisterEvents();

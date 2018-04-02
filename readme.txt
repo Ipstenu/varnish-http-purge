@@ -34,7 +34,7 @@ On a multisite network using subfolders, only <strong>network admins</strong> ca
 = WP CLI = 
 
 * `wp varnish purge` - Flush the entire cache
-* `wp varnish debug` - Help for debugging why cache isn't
+* `wp varnish debug` - Help for debugging how well Varnish is (or isn't) working
 
 = Requirements =
 

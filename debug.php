@@ -425,20 +425,41 @@ class VarnishDebug {
 
 		$themes = array( 
 			'enfold' => __( 'The Enfold theme uses sessions for every call of shortcodes in certain situations. To check, change your theme and re-run this test. If this warning goes away, it\'s your theme.', 'varnish-http-purge' ),
+			'divi' => __( 'Divi themes use sessions in their headers for many of their themes. To check, change your theme and re-run this test. If this warning goes away, it\'s your theme.', 'varnish-http-purge' ),
 		);
 
 		$plugins = array( 
+			'bad-behavior' => array(
+				'path'    => 'bad-behavior/bad-behavior.php',
+				'message' => sprintf( __( '<a href="%s">Bad Behavior</a> may cause unexpected results with Varnish and not function properly.', 'varnish-http-purge' ), 'https://wordpress.org/plugins/bad-behavior/' ),
+			),
 			'pie-register' => array(
 				'path'    => 'pie-register/pie-register.php',
 				'message' => sprintf( __( '<a href="%s">Pie Register</a> sets output buffering in the header of every page load, which enforces sessions. There is no known fix at this time.', 'varnish-http-purge' ), 'https://wordpress.org/plugins/pie-register/' ),
+			),
+			'quick-cache' => array(
+				'path'    => 'quick-cache/quick-cache.php',
+				'message' => __( 'Quick Cache does not play well with Varnish.', 'varnish-http-purge' )
 			),
 			'simple-session-support' => array(
 				'path'    => 'simple-session-support/simple-session-support.php',
 				'message' => sprintf( __( '<a href="%s">Simple Session Support</a> forces PHP Sessions. It\'s also no longer updated and not recommended for use.', 'varnish-http-purge' ), 'https://wordpress.org/plugins/simple-session-support/' ),
 			),
-			'bad-behavior' => array(
-				'path'    => 'bad-behavior/bad-behavior.php',
-				'message' => sprintf( __( '<a href="%s">Bad Behavior</a> may cause unexpected results with Varnish and not function properly.', 'varnish-http-purge' ), 'https://wordpress.org/plugins/bad-behavior/' ),
+			'tweet-blender' => array(
+				'path'    => 'tweet-blender/tweet-blender.php',
+				'message' => sprintf( __( '<a href="%s">Tweet Blender</a> conflicts with most server based caching. It also has not been updated since 2014.', 'varnish-http-purge' ), 'https://wordpress.org/plugins/tweet-blender/' ),
+			),
+			'wp-cache' => array(
+				'path'    => 'wp-cache/wp-cache.php',
+				'message' => sprintf( __( '<a href="%s">WP Cache</a> is not necessary when using a Varnish based caching, and can cause redundancy in caches, resulting in unexpected data load.', 'varnish-http-purge' ), 'https://wordpress.org/plugins/wp-cache/' ),
+			),
+			'wp-file-cache' => array(
+				'path'    => 'wp-file-cache/file-cache.php',
+				'message' => sprintf( __( '<a href="%s">WP Files Cache</a> is not necessary when using a Varnish based caching, and can cause redundancy in caches, resulting in unexpected data load.', 'varnish-http-purge' ), 'https://wordpress.org/plugins/wp-file-cache/' ),
+			),
+			'wp-super-cache' => array(
+				'path'    => 'wp-super-cache/wp-cache.php',
+				'message' => sprintf( __( '<a href="%s">WP Super Cache</a> is not necessary when using a Varnish based caching, and can cause redundancy in caches, resulting in unexpected data load.', 'varnish-http-purge' ), 'https://wordpress.org/plugins/wp-super-cache/' ),
 			),
 		);
 

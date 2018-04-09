@@ -175,7 +175,7 @@ class VarnishPurger {
 		$args = array(
 			array(
 				'id'    => 'purge-varnish-cache',
-				'title' => __( 'Varnish', 'varnish-http-purge' ),
+				'title' => __( 'Empty Cache', 'varnish-http-purge' ),
 			),
 		);
 
@@ -191,10 +191,10 @@ class VarnishPurger {
 			$args[] = array(
 				'parent' => 'purge-varnish-cache',
 				'id'     => 'purge-varnish-cache-all',
-				'title'  => __( 'Empty Cache (All)', 'varnish-http-purge' ),
+				'title'  => __( 'Entire Cache (All Pages)', 'varnish-http-purge' ),
 				'href'   => wp_nonce_url( add_query_arg( 'vhp_flush_do', 'all' ), 'vhp-flush-do' ),
 				'meta'   => array(
-					'title' => __( 'Empty Cache (All)', 'varnish-http-purge' ),
+					'title' => __( 'Entire Cache (All Pages)', 'varnish-http-purge' ),
 				),
 			);
 		}
@@ -207,10 +207,10 @@ class VarnishPurger {
 			$args[] = array(
 				'parent' => 'purge-varnish-cache',
 				'id'     => 'purge-varnish-cache-this',
-				'title'  => __( 'Empty Cache (This Page)', 'varnish-http-purge' ),
+				'title'  => __( 'This Page\'s Cache', 'varnish-http-purge' ),
 				'href'   => wp_nonce_url( add_query_arg( 'vhp_flush_do', $page_url . '/'  ), 'vhp-flush-do' ),
 				'meta'   => array(
-					'title' => __( 'Empty Cache (This Page)', 'varnish-http-purge' ),
+					'title' => __( 'This Page\'s Cache', 'varnish-http-purge' ),
 				),
 			);
 		}
@@ -582,7 +582,7 @@ class VarnishPurger {
 					array_push( $listofurls, get_permalink( get_option( 'page_for_posts' ) ) );
 				}
 			}
-			
+
 		} else {
 			// We're not sure how we got here, but bail instead of processing anything else.
 			return;

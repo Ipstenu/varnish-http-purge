@@ -49,7 +49,7 @@ If you have code patches, [pull requests are welcome](https://github.com/Ipstenu
 
 = How can I tell if everything's working? =
 
-From your WordPress Dashboard, go to Tools -> Varnish Status. There a page will auto-scan your main plugin page and report back any issues found. This includes any known problematic plugins.
+From your WordPress Dashboard, go to Tools -> Varnish Status. There a page will auto-scan your front page and report back any issues found. This includes any known problematic plugins. You can use it to scan any URL on your domain (but ONLY on your own domain).
 
 = Does every WordPress plugin and theme work with Varnish? =
 
@@ -148,7 +148,7 @@ Yes! [Full documentation can be found on Custom Filters in the wiki](https://git
 * Yes, I do work for DreamHost.
 * No, this plugin is not really official nor DreamHost Only
 
-This plugin is installed by default for _all_ DreamPress installs on DreamHost, and I maintain it for DreamHost, but it was not originally an official DH plugin which means I will continue to support all users to the best of my ability.
+This plugin is installed by default for _all_ DreamPress installs on DreamHost, and I maintain it for DreamHost, but it was not originally an official DreamHost plugin which means I will continue to support all users to the best of my ability.
 
 == Changelog ==
 
@@ -156,24 +156,8 @@ This plugin is installed by default for _all_ DreamPress installs on DreamHost, 
 * March 2018
 * Improve translations
 * Massive improvements to the debugging tools
+* Allow for port to be added to host headers (props @davidbarratt)
 * WP-CLI for debugging
-
-= 4.3.1 = 
-* 10 October 2017
-* Copied a wrong line.
-
-= 4.3.0 =
-* 10 October 2017
-* Add Varnish Flush for "this" page on front end
-* Do not flush non-public taxonomies
-
-= 4.2.0 =
-* 30 August 2017
-* More flexible support for custom cat/tag bases
-* Added in support for custom taxonomies
-* New function to generate the URLs, so it can be called by external plugins
-* Move right now box to be called later, preventing double calls
-* Extra check for if it's a URL, because some plugins are weird (props @danielkun)
 
 == Screenshots ==
 

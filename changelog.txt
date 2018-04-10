@@ -1,3 +1,27 @@
+= 4.4.0 =
+* March 2018
+* Improve translations
+* Massive improvements to the debugging tools
+* Allow for port to be added to host headers (props @davidbarratt)
+* WP-CLI for debugging
+
+= 4.3.1 = 
+* 10 October 2017
+* Copied a wrong line.
+
+= 4.3.0 =
+* 10 October 2017
+* Add Varnish Flush for "this" page on front end
+* Do not flush non-public taxonomies
+
+= 4.2.0 =
+* 30 August 2017
+* More flexible support for custom cat/tag bases
+* Added in support for custom taxonomies
+* New function to generate the URLs, so it can be called by external plugins
+* Move right now box to be called later, preventing double calls
+* Extra check for if it's a URL, because some plugins are weird (props @danielkun)
+
 = 4.1.1 =
 
 * JSON - fixed overzealous json assumptions from causing errors

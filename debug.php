@@ -424,8 +424,9 @@ class VarnishDebug {
 		$return = array();
 
 		$themes = array( 
-			'enfold' => __( 'The Enfold theme uses sessions for every call of shortcodes in certain situations. To check, change your theme and re-run this test. If this warning goes away, it\'s your theme.', 'varnish-http-purge' ),
 			'divi' => __( 'Divi themes use sessions in their headers for many of their themes. To check, change your theme and re-run this test. If this warning goes away, it\'s your theme.', 'varnish-http-purge' ),
+			'enfold' => __( 'The Enfold theme uses sessions for every call of shortcodes in certain situations. To check, change your theme and re-run this test. If this warning goes away, it\'s your theme.', 'varnish-http-purge' ),
+			'prophoto6' => __( 'Prophoto version 6 requires you to be on version 6.21.8 or higher to work properly with Varnish. Please make sure you site is up to date.', 'varnish-http-purge' ),
 		);
 
 		$plugins = array( 

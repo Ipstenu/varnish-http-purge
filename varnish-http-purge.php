@@ -381,8 +381,20 @@ class VarnishPurger {
 			$host = $p['host'];
 		}
 
+		/*
+		 * Allow setting of ports in host name
+		 * Credit: davidbarratt - https://github.com/Ipstenu/varnish-http-purge/pull/38/
+		 * @since 4.4.0
+		 */
+		$host_headers = $p['host'];
+		if ( isset( $p['port'] ) ) {
+			$host_headers .= ':' . $p['port'];
+		}
+
+		// Create path to purge
 		$purgeme = $schema.$host.$path.$pregex;
 
+		// Check the queries...
 		if ( !empty( $p['query'] ) && $p['query'] != 'vhp-regex' ) {
 			$purgeme .= '?' . $p['query'];
 		}
@@ -392,7 +404,7 @@ class VarnishPurger {
 		 *
 		 * @since 4.1
 		 */
-		$headers  = apply_filters( 'varnish_http_purge_headers', array( 'host' => $p['host'], 'X-Purge-Method' => $x_purge_method ) );
+		$headers  = apply_filters( 'varnish_http_purge_headers', array( 'host' => $host_headers, 'X-Purge-Method' => $x_purge_method ) );
 		$response = wp_remote_request( $purgeme, array( 'method' => 'PURGE', 'headers' => $headers ) );
 
 		do_action( 'after_purge_url', $url, $purgeme, $response, $headers );

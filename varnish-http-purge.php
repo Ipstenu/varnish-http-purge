@@ -119,6 +119,7 @@ class VarnishPurger {
 		// Add Admin Bar
 		add_action( 'admin_bar_menu', array( $this, 'varnish_rightnow_adminbar' ), 100 );
 		add_action( 'admin_enqueue_scripts', array( $this, 'custom_css' ) );
+		add_action( 'wp_enqueue_style', array( $this, 'custom_css' ) );
 	}
 
 	/**

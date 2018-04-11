@@ -118,6 +118,7 @@ class VarnishPurger {
 		
 		// Add Admin Bar
 		add_action( 'admin_bar_menu', array( $this, 'varnish_rightnow_adminbar' ), 100 );
+		add_action( 'admin_enqueue_scripts', array( $this, 'custom_css' ) );
 	}
 
 	/**
@@ -163,6 +164,17 @@ class VarnishPurger {
 		return $home_url;
 	}
 
+
+	/**
+	 * Custom CSS to allow for coloring.
+	 * 
+	 * @since 4.5.0
+	 */
+	function custom_css() {
+		wp_register_style( 'varnish_http_purge', plugins_url( 'style.css', __FILE__ ), false, '1.0.0' );
+		wp_enqueue_style( 'varnish_http_purge' );
+	}
+
 	/**
 	 * Varnish Purge Button in the Admin Bar
 	 *
@@ -176,6 +188,9 @@ class VarnishPurger {
 			array(
 				'id'    => 'purge-varnish-cache',
 				'title' => __( 'Empty Cache', 'varnish-http-purge' ),
+				'meta'   => array(
+					'class' => 'varnish-http-purge'
+				),
 			),
 		);
 

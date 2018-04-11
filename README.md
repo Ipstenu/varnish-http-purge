@@ -10,3 +10,4 @@ You should install the plugin from the [WordPress.org Repository](http://wordpre
 * [WP Readme](readme.txt)
 * [Changelog](changelog.txt)
 * [VCLs](https://github.com/Ipstenu/varnish-http-purge/wiki/Sample-VCLs)
+* [Debug Service](https://github.com/Ipstenu/varnish-debug-service/)

@@ -51,7 +51,7 @@ class VarnishStatus {
 	 * @since 4.0
 	 */
 	function admin_menu() {
-		add_management_page( __( 'Is Varnish Working?', 'varnish-http-purge' ), __( 'Varnish Status', 'varnish-http-purge' ), 'manage_options', 'varnish-status', array( &$this, 'settings_page' ) );
+		add_management_page( __( 'Is Varnish Working?', 'varnish-http-purge' ), __( 'Varnish Debugging', 'varnish-http-purge' ), 'manage_options', 'varnish-status', array( &$this, 'settings_page' ) );
 	}
 
 	/**
@@ -131,12 +131,9 @@ class VarnishStatus {
 	 */
 	function options_callback_url() {
 
-		// Include the debug code
-		include( 'debug.php' );
-
 		?><p><?php _e( 'While it is impossible to detect all possible conflicts, this status page performs a check of the most common issues that prevent Varnish from caching your site properly.', 'varnish-http-purge' ); ?></p>
 		
-		<p><?php _e( 'This feature is provided to help you in debugging any conflicts on your own. When filing an issue with your web-host, we recommend you include the output in your ticket.', 'varnish-http-purge' ); ?></p>
+		<p><?php printf ( __( 'This feature is provided to help you in debugging any conflicts on your own by calling <a href="%s">a service hosted on DreamObjects</a>. When filing an issue with your web-host, we recommend you include the output in your ticket.', 'varnish-http-purge' ), 'https://varnish-http-purge.objects-us-east-1.dream.io/readme.txt' ); ?></p>
 		
 		<?php
 		// Set icons
@@ -147,6 +144,9 @@ class VarnishStatus {
 			'awkward' => '<span class="dashicons dashicons-flag" style="color:#FF9933;">',
 			'bad'     => '<span class="dashicons dashicons-thumbs-down" style="color:#990000;"></span>',
 		);
+
+		// Include the debug code
+		include( 'debug.php' );
 
 		// Get the base URL to start
 		$url        = esc_url( VarnishPurger::the_home_url() );

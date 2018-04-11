@@ -1,0 +1,77 @@
+{
+	"bad-behavior":{
+		"type": "warning",
+		"path": "bad-behavior/bad-behavior.php",
+		"reason": "incompatible"
+	},
+	"cleantalk":{
+		"type": "warning",
+		"path": "cleantalk/cleantalk.php",
+		"reason": "translation"
+	},
+	"gtranslate":{
+		"type": "warning",
+		"path": "gtranslate/gtranslate.php",
+		"reason": "translation"
+	},
+	"pie-register":{
+		"type": "warning",
+		"path": "pie-register/pie-register.php",
+		"reason": "sessions"
+	},
+	"polylang":{
+		"type": "warning",
+		"path": "polylang/polylang.php",
+		"reason": "translation"
+	},
+	"quick-cache":{
+		"type": "warning",
+		"path": "quick-cache/quick-cache.php",
+		"reason": "cache"
+	},
+	"qtranslate":{
+		"type": "warning",
+		"path": "qtranslate/qtranslate.php",
+		"reason": "translation"
+	},
+	"qtranslate-x":{
+		"type": "warning",
+		"path": "qtranslate-x/qtranslate.php",
+		"reason": "translation"
+	},
+	"simple-session-support":{
+		"type": "bad",
+		"path": "simple-session-support/simple-session-support.php",
+		"reason": "sessions"
+	},
+	"tweet-blender":{
+		"type": "warning",
+		"path": "tweet-blender/tweet-blender.php",
+		"reason": "incompatible"
+	},
+	"wglot":{
+		"type": "warning",
+		"path": "wglot/wglot.php",
+		"reason": "translation"
+	},
+	"wp-cache":{
+		"type": "warning",
+		"path": "wp-cache/wp-cache.php",
+		"reason": "cache"
+	},
+	"wp-file-cache":{
+		"type": "warning",
+		"path": "wp-file-cache/file-cache.php",
+		"reason": "cache"
+	},
+	"wp-super-cache":{
+		"type": "warning",
+		"path": "wp-super-cache/wp-cache.php",
+		"reason": "cache"
+	},
+	"xtranslate":{
+		"type": "warning",
+		"path": "xtranslate/xtranslate.php",
+		"reason": "translation"
+	}
+}

@@ -277,57 +277,45 @@ class VarnishDebug {
 	static function cookie_results( $headers ) {
 
 		// Defaults
-		$return = $cookies = array();
+		$return = $almost = array();
 
-		// Set the default returns
-		$cookie_warning = array(
+		// Early check. If there are no cookies, skip!
+		if ( !isset( $headers['Set-Cookie'] ) ) return $return;
+
+		// We have at least one cookie, so let's set this now:
+		$return['cookies'] = array(
 			'icon'    => 'warning',
 			'message' => __( 'Cookies have been detected on your site. This can cause Varnish to not properly cache unless it\'s configured specially to accommodate. Since it\'s impossible to cover all possible situations, please take the following alerts with a grain of salt. If you know certain cookies are safe on your server, this is fine. If you aren\'t sure, pass the details on to your webhost.', 'varnish-http-purge' ),
 		);
-		$default = array(
-			'phpsessid'           => array( 'icon' => 'bad', 'message' => __( 'A plugin or theme is setting a PHPSESSID cookie on every pageload. This makes Varnish not deliver cached pages.', 'varnish-http-purge' ) ),
-			'edd_wp_session'      => array( 'icon' => 'bad', 'message' => sprintf( __( '<a href="%s">Easy Digital Downloads</a> is being used with cookie sessions. This may cause your cache to misbehave. If you have issues, please set <code>define( "EDD_USE_PHP_SESSIONS", true );</code> in your <code>wp-config.php</code> file.', 'varnish-http-purge'  ), esc_url('https://wordpress.org/plugins/easy-digital-downloads/') ) ),
-			'edd_items_in_cart'   => array( 'icon' => 'warning', 'message' => sprintf( __( '<a href="%s">Easy Digital Downloads</a> is putting down a shopping cart cookie on every page load. Make sure Varnish is set up to ignore that when it\'s empty.', 'varnish-http-purge'  ), esc_url('https://wordpress.org/plugins/easy-digital-downloads/') ) ),
-			'wfvt'                => array( 'icon' => 'bad', 'message' => sprintf( __( '<a href="%s">Wordfence</a> is putting down cookies on every page load. Please check "Disable WordFence Cookies" under <a href="%s">General Wordfence Options</a> to resolve.', 'varnish-http-purge'  ), esc_url('https://wordpress.org/plugins/wordfence/'), admin_url( 'admin.php?page=WordfenceOptions' ) ) ),
-			'invite_anyone'       => array( 'icon' => 'bad', 'message' => sprintf( __( '<a href="%s">Invite Anyone</a>, a plugin for BuddyPress, is putting down a cookie on every page load.', 'varnish-http-purge'  ), esc_url('https://wordpress.org/plugins/invite-anyone/') ) ),
-			'charitable_sessions' => array( 'icon' => 'bad', 'message' => sprintf( __( '<a href="%s">Charitable</a> is putting down a cookie on every page load. This has been fixed as of version 1.5.0, so please upgrade to the latest version.', 'varnish-http-purge'  ), esc_url('https://wordpress.org/plugins/charitable/') ) ),
-		);
 
-		if ( isset( $headers['Set-Cookie'] ) ) {
+		// Call the cookies!
+		$request = wp_remote_get( 'https://varnish-http-purge.objects-us-east-1.dream.io/cookies.json' );
+
+		if( is_wp_error( $request ) ) return $return; // Bail if we can't hit the server
+
+		$body    = wp_remote_retrieve_body( $request );
+		$cookies = json_decode( $body );
+
+		if( empty( $cookies ) ) return $return; // Bail if the data was empty for some reason
+
+		foreach ( $cookies as $cookie => $info ) {
+			$has_cookie = false;
+
 			// If cookies are an array, scan the whole thing. Otherwise, we can use strpos.
 			if ( is_array( $headers['Set-Cookie'] ) ) {
-				$cookies = array(
-					'phpsessid'           => in_array( 'PHPSESSID', $headers['Set-Cookie'], true ),
-					'edd_wp_session'      => in_array( 'edd_wp_session', $headers['Set-Cookie'], true ),
-					'edd_items_in_cart'   => in_array( 'edd_items_in_cart', $headers['Set-Cookie'], true ),
-					'wfvt'                => in_array( 'wfvt_', $headers['Set-Cookie'], true ),
-					'invite_anyone'       => in_array( 'invite-anyone', $headers['Set-Cookie'], true ),
-					'charitable_sessions' => in_array( 'charitable_sessions', $headers['Set-Cookie'], true ),
-				);
+				if ( in_array( $info->cookie, $headers['Set-Cookie'], true ) ) $has_cookie = true;
 			} else {
-				$cookies = array(
-					'phpsessid'           => strpos( $headers['Set-Cookie'], 'PHPSESSID'),
-					'edd_wp_session'      => strpos( $headers['Set-Cookie'], 'edd_wp_session' ),
-					'edd_items_in_cart'   => strpos( $headers['Set-Cookie'], 'edd_items_in_cart' ),
-					'wfvt'                => strpos( $headers['Set-Cookie'], 'wfvt_' ),
-					'invite_anyone'       => strpos( $headers['Set-Cookie'], 'invite-anyone' ),
-					'charitable_sessions' => strpos( $varnish_headers['Set-Cookie'], 'charitable_sessions' ),
-				);
+				$strpos = strpos( $headers['Set-Cookie'], $info->cookie );
+				if ( $strpos !== false ) $has_cookie = true;
 			}
 
-			foreach ( $cookies as $name => $value ) {
-				if ( $value !== false ) {
-					$return[ $name ] = array( 'icon' => $default[ $name]['icon'], 'message' => $default[ $name]['message'] );
-				}
+			if ( $has_cookie ) {
+				$return[ $cookie ] = array( 'icon' => $info->type, 'message' => $info->message );
 			}
 		}
 
-		// If there's data in the array, add a Cookie Monster Warning to the top
-		if ( !empty( $return ) ) array_unshift( $return, $cookie_warning );
-
 		return $return;
 	}
-
 
 	/**
 	 * Cache
@@ -413,69 +401,76 @@ class VarnishDebug {
 	}
 
 	/**
-	 * Bad Actors
+	 * Bad Themes
 	 *
-	 * Plugins and themes known to be problematic
+	 * Themes known to be problematic
 	 *
-	 * @since 4.4.0
+	 * @since 4.5.0
 	 */
-	static function bad_actors_results( ) {
+	static function bad_themes_results() {
 
-		$return = array();
+		$return  = array();
+		$request = wp_remote_get( 'https://varnish-http-purge.objects-us-east-1.dream.io/themes.json' );
 
-		$themes = array( 
-			'divi' => __( 'Divi themes use sessions in their headers for many of their themes. To check, change your theme and re-run this test. If this warning goes away, it\'s your theme.', 'varnish-http-purge' ),
-			'enfold' => __( 'The Enfold theme uses sessions for every call of shortcodes in certain situations. To check, change your theme and re-run this test. If this warning goes away, it\'s your theme.', 'varnish-http-purge' ),
-			'prophoto6' => __( 'Prophoto version 6 requires you to be on version 6.21.8 or higher to work properly with Varnish. Please make sure you site is up to date.', 'varnish-http-purge' ),
-		);
+		if( is_wp_error( $request ) ) {
+			return $return; // Bail early
+		}
 
-		$plugins = array( 
-			'bad-behavior' => array(
-				'path'    => 'bad-behavior/bad-behavior.php',
-				'message' => sprintf( __( '<a href="%s">Bad Behavior</a> may cause unexpected results with Varnish and not function properly.', 'varnish-http-purge' ), 'https://wordpress.org/plugins/bad-behavior/' ),
-			),
-			'pie-register' => array(
-				'path'    => 'pie-register/pie-register.php',
-				'message' => sprintf( __( '<a href="%s">Pie Register</a> sets output buffering in the header of every page load, which enforces sessions. There is no known fix at this time.', 'varnish-http-purge' ), 'https://wordpress.org/plugins/pie-register/' ),
-			),
-			'quick-cache' => array(
-				'path'    => 'quick-cache/quick-cache.php',
-				'message' => __( 'Quick Cache does not play well with Varnish.', 'varnish-http-purge' )
-			),
-			'simple-session-support' => array(
-				'path'    => 'simple-session-support/simple-session-support.php',
-				'message' => sprintf( __( '<a href="%s">Simple Session Support</a> forces PHP Sessions. It\'s also no longer updated and not recommended for use.', 'varnish-http-purge' ), 'https://wordpress.org/plugins/simple-session-support/' ),
-			),
-			'tweet-blender' => array(
-				'path'    => 'tweet-blender/tweet-blender.php',
-				'message' => sprintf( __( '<a href="%s">Tweet Blender</a> conflicts with most server based caching. It also has not been updated since 2014.', 'varnish-http-purge' ), 'https://wordpress.org/plugins/tweet-blender/' ),
-			),
-			'wp-cache' => array(
-				'path'    => 'wp-cache/wp-cache.php',
-				'message' => sprintf( __( '<a href="%s">WP Cache</a> is not necessary when using a Varnish based caching, and can cause redundancy in caches, resulting in unexpected data load.', 'varnish-http-purge' ), 'https://wordpress.org/plugins/wp-cache/' ),
-			),
-			'wp-file-cache' => array(
-				'path'    => 'wp-file-cache/file-cache.php',
-				'message' => sprintf( __( '<a href="%s">WP Files Cache</a> is not necessary when using a Varnish based caching, and can cause redundancy in caches, resulting in unexpected data load.', 'varnish-http-purge' ), 'https://wordpress.org/plugins/wp-file-cache/' ),
-			),
-			'wp-super-cache' => array(
-				'path'    => 'wp-super-cache/wp-cache.php',
-				'message' => sprintf( __( '<a href="%s">WP Super Cache</a> is not necessary when using a Varnish based caching, and can cause redundancy in caches, resulting in unexpected data load.', 'varnish-http-purge' ), 'https://wordpress.org/plugins/wp-super-cache/' ),
-			),
-		);
+		$body    = wp_remote_retrieve_body( $request );
+		$themes  = json_decode( $body );
+
+		if( empty( $themes ) ) {
+			return $return; // Bail early
+		}
 
 		// Check all the themes. If one of the questionable ones are active, warn
-		foreach ( $themes as $theme => $message ) {
+		foreach ( $themes as $theme => $info ) {
 			$my_theme = wp_get_theme( $theme );
+			$message  = __( 'Active Theme ', 'varnish-http-purge') . ucfirst( $theme ) . ': ' . $info->message;
+			$warning  = $info->type;
 			if ( $my_theme->exists() ) {
-				$return[ $theme ] = array( 'icon' => 'warning', 'message' => $message );
+				$return[ 'theme' ] = array( 'icon' => $warning, 'message' => $message );
 			}
 		}
 
-		// Check the plugins
-		foreach ( $plugins as $plugin => $data ) {
-			if ( is_plugin_active( $data['path'] ) ) {
-				$return[ $plugin ] = array( 'icon' => 'warning', 'message' => $data['message'] );
+		return $return;
+	}
+
+	/**
+	 * Bad Plugins
+	 *
+	 * Plugins known to be problematic
+	 *
+	 * @since 4.5.0
+	 */
+	static function bad_plugins_results( ) {
+
+		$return   = array();
+		$messages = array(
+			'incompatible' => 'Causes unexpected results with Varnish and not function properly.',
+			'translation'  => 'Translation plugins generally use cookies and/or sessions, which prevent Varnish from caching.',
+			'sessions'     => 'This plugin uses sessions, which conflicts with Varnish Caching.',
+			'cache'        => 'This type of caching plugin does not work well with Varnish.',
+		);
+		$request = wp_remote_get( 'https://varnish-http-purge.objects-us-east-1.dream.io/plugins.json' );
+
+		if( is_wp_error( $request ) ) {
+			return $return; // Bail early
+		}
+
+		$body    = wp_remote_retrieve_body( $request );
+		$plugins  = json_decode( $body );
+
+		if( empty( $plugins ) ) {
+			return $return; // Bail early
+		}
+
+		// Check all the plugins. If one of the questionable ones are active, warn
+		foreach ( $plugins as $plugin => $info ) {
+			if ( is_plugin_active( $info->path ) ) {
+				$message  = __( 'Active plugin ', 'varnish-http-purge') . $plugin . ': ' . $messages[ $info->reason ];
+				$warning  = $info->type;
+				$return[ $plugin ] = array( 'icon' => $warning, 'message' => $message );
 			}
 		}
 
@@ -506,10 +501,14 @@ class VarnishDebug {
 		$cookie_results      = self::cookie_results( $headers );
 		$output              = array_merge( $output, $cookie_results );
 
-		// Bad Actors (plugins and themes that don't play nicely with Varnish)
-		$bad_actors_results  = self::bad_actors_results( $headers );
-		$output              = array_merge( $output, $bad_actors_results );
-		
+		// Themes that don't play nicely with Varnish)
+		$bad_themes_results  = self::bad_themes_results();
+		$output              = array_merge( $output, $bad_themes_results );
+
+		// Plugins that don't play nicely with Varnish)
+		$bad_plugins_results  = self::bad_plugins_results();
+		$output              = array_merge( $output, $bad_plugins_results );
+
 		return $output;
 	}
 

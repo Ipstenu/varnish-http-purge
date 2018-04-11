@@ -3,7 +3,7 @@ Contributors: Ipstenu, mikeschroder, techpriester
 Tags: varnish, purge, cache
 Requires at least: 4.7
 Tested up to: 4.9
-Stable tag: 4.4.0
+Stable tag: 4.5.0
 Requires PHP: 5.6
 
 Automatically empty Varnish Cache when content on your site is modified.
@@ -11,6 +11,8 @@ Automatically empty Varnish Cache when content on your site is modified.
 == Description ==
 
 Varnish HTTP Purge sends a request to delete (aka flush) the cached data of a page or post every time it it modified. This happens when updating, publishing, commenting on, or deleting an post, and when changing themes.
+
+In addition, it provides debugging tools to help you determine how effective your site setup is with Varnish. In order to provide the most up to date compatibility information, this tool contacts a service hosted on DreamObjects. [Public information about this service is available on DreamObjects](https://varnish-http-purge.objects-us-east-1.dream.io/readme.txt). The service is <em>ONLY</em> accessed when using the Varnish Debugging tool.
 
 <a href="https://www.varnish-cache.org/">Varnish</a> is a web application accelerator also known as a caching HTTP reverse proxy. You install it in front of any server that speaks HTTP and configure it to cache the contents. This plugin <em>does not</em> install Varnish for you, nor will it configure Varnish for WordPress.
 
@@ -152,12 +154,9 @@ This plugin is installed by default for _all_ DreamPress installs on DreamHost, 
 
 == Changelog ==
 
-= 4.4.0 =
-* March 2018
-* Improve translations
-* Massive improvements to the debugging tools
-* Allow for port to be added to host headers (props @davidbarratt)
-* WP-CLI for debugging
+= 4.5.0 =
+* XXXX 2018
+* Remote storage of problem plugins/themes
 
 == Screenshots ==
 
@@ -165,3 +164,9 @@ This plugin is installed by default for _all_ DreamPress installs on DreamHost, 
 2. Purge button on Toolbar
 3. Scanner results
 4. Change Varnish IP address
+
+== Upgrade Notice ==
+
+= 4.5.0 =
+
+As of this release, the Varnish debugger uses remote data to collect a list of cookies, plugins, and themes known to conflict with Varnish. This will reduce the need to update the plugin for information changes only. [Public information about this service is available on DreamObjects](https://varnish-http-purge.objects-us-east-1.dream.io/readme.txt).

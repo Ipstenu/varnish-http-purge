@@ -10,11 +10,11 @@ Automatically empty Varnish Cache when content on your site is modified.
 
 == Description ==
 
-Varnish HTTP Purge sends a request to delete (aka flush) the cached data of a page or post every time it it modified. This happens when updating, publishing, commenting on, or deleting an post, and when changing themes.
+<a href="https://www.varnish-cache.org/">Varnish</a> is a web application accelerator also known as a caching HTTP reverse proxy. You install it in front of any server that speaks HTTP and configure it to cache the contents. This plugin <em>does not</em> install Varnish for you, nor will it configure Varnish for WordPress.
+
+The Varnish HTTP Purge plugin sends a request to delete (aka flush) the cached data of a page or post every time it it modified. This happens when updating, publishing, commenting on, or deleting an post, and when changing themes.
 
 In addition, it provides debugging tools to help you determine how effective your site setup is with Varnish. In order to provide the most up to date compatibility information, this tool contacts a service hosted on DreamObjects. [Public information about this service is available on DreamObjects](https://varnish-http-purge.objects-us-east-1.dream.io/readme.txt). The service is <em>ONLY</em> accessed when using the Varnish Debugging tool.
-
-<a href="https://www.varnish-cache.org/">Varnish</a> is a web application accelerator also known as a caching HTTP reverse proxy. You install it in front of any server that speaks HTTP and configure it to cache the contents. This plugin <em>does not</em> install Varnish for you, nor will it configure Varnish for WordPress.
 
 Not all page caches are deleted every time, depending on your Varnish configuration. For example, when a post, page, or custom post type is edited, or a new comment is added, <em>only</em> the following pages will purge:
 
@@ -27,11 +27,11 @@ Not all page caches are deleted every time, depending on your Varnish configurat
 In addition, your <em>entire</em> cache will be deleted on the following actions:
 
 * Changing themes
-* Press the 'Purge Varnish Cache' button on the dashboard or toolbar
+* Pressing the <strong>Empty Cache</strong> button on the dashboard or toolbar
 
 Plugins can hook into the purge actions as well, to filter their own events to trigger a purge.
 
-On a multisite network using subfolders, only <strong>network admins</strong> can purge the main site. This is a security decision.
+On a multisite network using subfolders, only <strong>network admins</strong> can purge the main site. This is a security decision, as emptying the cache too often can be computationally expensive and cause server outages for a network.
 
 = WP CLI = 
 
@@ -57,23 +57,19 @@ If you have code patches, [pull requests are welcome](https://github.com/Ipstenu
 
 = How can I tell if everything's working? =
 
-From your WordPress Dashboard, go to Tools -> Varnish Status. There a page will auto-scan your front page and report back any issues found. This includes any known problematic plugins. You can use it to scan any URL on your domain (but ONLY on your own domain).
+From your WordPress Dashboard, go to <em>Tools</em> -> <em>Varnish Debugging</em>. There a page will auto-scan your front page and report back any issues found. This includes any known problematic plugins. You can use it to scan any URL on your domain (but ONLY on your own domain).
 
 = Does every WordPress plugin and theme work with Varnish? =
 
 No. Some of them have behaviour that causes Varnish not to cache, either by accident or design.
 
-= How can I debug my site? =
-
-Use the Varnish Debugging page. It will try and help you figure out what's wrong.
-
 = Why doesn't the debug page autoload anymore? =
 
-Since the scanning was moved to a service, in order to ensure people were not scanned without consent, the auto-scanning was disabled.
+The scan files were off-loaded to a service to allow for more frequent updates without having to require people to update the plugin. In order to ensure no one is scanned without consent, the auto-scanning was disabled.
 
 = Will you fix my site? =
 
-I don't have that much availability. I will try to point you towards solving it on your own. Bear in mind, that may mean you have to decide if using a specific plugin or theme is worth an imperfect cache.
+No, I don't offer that service at this time. I will try to point you towards solving it on your own. This may mean you have to decide if using a specific plugin or theme is worth an imperfect cache.
 
 = What version of Varnish is supported? =
 
@@ -91,7 +87,7 @@ WordPress can only flush the cache automatically when you use the internal file 
 
 Click the 'Empty Varnish Cache' button on the "Right Now" Dashboard (see the screenshot if you can't find it). There's also an "Empty Cache" button on the admin toolbar, and you can use `wp varnish purge` from the command line.
 
-= I don't see a button! =
+= Why don't I see a button? =
 
 That means your account doesn't have the appropriate permissions. Only administrators can empty the entire cache. In the case of a subfolder multisite network, only the <em>network</em> admins can empty the cache for the primary site.
 
@@ -167,6 +163,8 @@ This plugin is installed by default for _all_ DreamPress installs on DreamHost, 
 = 4.5.0 =
 * XXXX 2018
 * Remote storage of problem plugins/themes
+* Prevent auto-loading of scan for improved disclosure and compliance
+* Changed colour of the purge button for improved visibility
 
 == Screenshots ==
 
@@ -179,4 +177,4 @@ This plugin is installed by default for _all_ DreamPress installs on DreamHost, 
 
 = 4.5.0 =
 
-As of this release, the Varnish debugger uses remote data to collect a list of cookies, plugins, and themes known to conflict with Varnish. This will reduce the need to update the plugin for information changes only. [Public information about this service is available on DreamObjects](https://varnish-http-purge.objects-us-east-1.dream.io/readme.txt).
+As of this release, the Varnish debugger uses remote data to collect a list of cookies, plugins, and themes known to conflict with Varnish. This will reduce the need to update the plugin for informational changes only. [Public information about this service is available on DreamObjects](https://varnish-http-purge.objects-us-east-1.dream.io/readme.txt).

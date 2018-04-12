@@ -187,7 +187,7 @@ class VarnishDebug {
 
 		if ( isset( $headers['Server'] ) ) {
 			// nginx
-			if ( strpos( $varnish_headers['Server'] ,'nginx') !== false && strpos( $varnish_headers['Server'] ,'cloudflare') == false ) {
+			if ( strpos( $headers['Server'] ,'nginx') !== false && strpos( $headers['Server'] ,'cloudflare') == false ) {
 				$return['nginx'] = array( 
 					'icon'    => 'awkward',
 					'message' => __( 'Your server is running nginx and Apache was expected. This may be fine, especially if you use a passthrough proxy, but keep it in mind.', 'varnish-http-purge'  )
@@ -211,7 +211,7 @@ class VarnishDebug {
 			}
 
 			// Pagely
-			if ( strpos( $varnish_headers['Server'] ,'Pagely') !== false ) {
+			if ( strpos( $headers['Server'] ,'Pagely') !== false ) {
 				$return['pagely'] = array( 
 					'icon'    => 'good',
 					'message' => __( 'This site is hosted on Pagely.', 'varnish-http-purge' ),
@@ -219,14 +219,14 @@ class VarnishDebug {
 			}
 		}
 
-		if ( isset( $varnish_headers['X-hacker'] ) ) {
+		if ( isset( $headers['X-hacker'] ) ) {
 			$return['wordpresscom'] = array( 
 				'icon'    => 'bad',
 				'message' => __( 'This site is hosted on WordPress.com, which is cool but, last we checked, they don\'t use Varnish.', 'varnish-http-purge' ),
 			);
 		}
 		
-		if ( isset( $varnish_headers['X-Backend'] ) && strpos( $varnish_headers['X-Backend'] ,'wpaas_web_') !== false ) {
+		if ( isset( $headers['X-Backend'] ) && strpos( $headers['X-Backend'] ,'wpaas_web_') !== false ) {
 			$return['godaddy'] = array( 
 				'icon'    => 'good',
 				'message' => __( 'This site is hosted on GoDaddy.', 'varnish-http-purge' ),
@@ -490,8 +490,8 @@ class VarnishDebug {
 		$output['remote_ip'] = self::remote_ip_results( $remote_ip, $varniship );
 
 		// Server Results
-		$sever_results       = self::server_results( $remote_ip, $varniship );
-		$output              = array_merge( $output, $sever_results );
+		$server_results      = self::server_results( $headers );
+		$output              = array_merge( $output, $server_results );
 
 		// Cache Results
 		$cache_results       = self::cache_results( $headers );

@@ -85,7 +85,6 @@ class VarnishPurger {
 		// If VHP_DEBUG is true, throw down a session to 'break' caching
 		if ( VHP_DEBUG ) {
 			@session_start();
-			// Add ?nocache to all CSS and JS?
 		}
 
 		// get my events

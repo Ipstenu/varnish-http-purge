@@ -136,6 +136,10 @@ class VarnishStatus {
 		<p><?php printf ( __( 'This feature is provided to help you in debugging any conflicts on your own by calling <a href="%s">a service hosted on DreamObjects</a>. When filing an issue with your web-host, we recommend you include the output in your ticket.', 'varnish-http-purge' ), 'https://varnish-http-purge.objects-us-east-1.dream.io/readme.txt' ); ?></p>
 		
 		<?php
+
+		// If there's no post made, let's not...
+		if ( !isset( $_REQUEST['settings-updated'] ) || !$_REQUEST['settings-updated'] ) return; 
+
 		// Set icons
 		$icons = array (
 			'awesome' => '<span class="dashicons dashicons-heart" style="color:#008000;"></span>',
@@ -319,12 +323,12 @@ class VarnishStatus {
 		} elseif ( parse_url( $output, PHP_URL_HOST ) !== parse_url( $input, PHP_URL_HOST ) ) {
 			$set_message = __( 'You cannot scan URLs on other domains.', 'varnish-http-purge' );
 		} else {
-			$output = filter_var( $input, FILTER_VALIDATE_URL);
-			$set_message = __( 'Scanning New URL...', 'varnish-http-purge' );
-			$set_type = 'updated';
+			$set_type    = 'updated';
+			$set_message = __( 'URL Scanned.', 'varnish-http-purge' );
+			$output      = filter_var( $input, FILTER_VALIDATE_URL);
 		}
 		
-		add_settings_error( 'vhp_varnish_url', 'varnish-url', $set_message, $set_type );
+		if ( isset( $set_message ) ) add_settings_error( 'vhp_varnish_url', 'varnish-url', $set_message, $set_type );
 		return $output;
 	}
 

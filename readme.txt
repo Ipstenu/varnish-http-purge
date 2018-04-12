@@ -38,6 +38,12 @@ On a multisite network using subfolders, only <strong>network admins</strong> ca
 * `wp varnish purge` - Flush the entire cache
 * `wp varnish debug` - Help for debugging how well Varnish is (or isn't) working
 
+= Debugging =
+
+If you're working on a site and need to turn off caching, add this to your wp-config file: `define( 'VHP_DEBUG', true );`
+
+That will break cache on page loads. It is _not_ recommended for production!
+
 = Requirements =
 
 * Pretty Permalinks enabled
@@ -59,7 +65,11 @@ No. Some of them have behaviour that causes Varnish not to cache, either by acci
 
 = How can I debug my site? =
 
-Use the Varnish Status page. It will try and help you figure out what's wrong.
+Use the Varnish Debugging page. It will try and help you figure out what's wrong.
+
+= Why doesn't the debug page autoload anymore? =
+
+Since the scanning was moved to a service, in order to ensure people were not scanned without consent, the auto-scanning was disabled.
 
 = Will you fix my site? =
 

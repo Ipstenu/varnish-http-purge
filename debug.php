@@ -38,7 +38,7 @@ class VarnishDebug {
 				'redirection' => 10,
 			)
 		);
-		
+
 		$response = wp_remote_get( $url, $args );
 	
 		return $response;

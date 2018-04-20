@@ -246,12 +246,12 @@ class VarnishPurger {
 	 */
 	function varnish_rightnow() {
 		global $blog_id;
-		$url = wp_nonce_url( add_query_arg( 'vhp_flush_do', 'all' ), 'vhp-flush-do' );
-		$intro = sprintf( __( '<a href="%1$s">Varnish HTTP Purge</a> automatically deletes your cached posts when published or updated. When making major site changes, such as with a new theme, plugins, or widgets, you may need to manually empty the cache.', 'varnish-http-purge' ), 'http://wordpress.org/plugins/varnish-http-purge/' );
-		$button =  __( 'Press the button below to force it to empty your entire Varnish cache.', 'varnish-http-purge' );
-		$button .= '</p><p><span class="button"><a href="'.$url.'"><strong>';
-		$button .= __( 'Empty Cache', 'varnish-http-purge' );
-		$button .= '</strong></a></span>';
+		$url      = wp_nonce_url( add_query_arg( 'vhp_flush_do', 'all' ), 'vhp-flush-do' );
+		$intro    = sprintf( __( '<a href="%1$s">Varnish HTTP Purge</a> automatically deletes your cached posts when published or updated. When making major site changes, such as with a new theme, plugins, or widgets, you may need to manually empty the cache.', 'varnish-http-purge' ), 'http://wordpress.org/plugins/varnish-http-purge/' );
+		$button   =  __( 'Press the button below to force it to empty your entire Varnish cache.', 'varnish-http-purge' );
+		$button  .= '</p><p><span class="button"><a href="'.$url.'"><strong>';
+		$button  .= __( 'Empty Cache', 'varnish-http-purge' );
+		$button  .= '</strong></a></span>';
 		$nobutton =  __( 'You do not have permission to empty the Varnish cache for the whole site. Please contact your administrator.', 'varnish-http-purge' );
 
 		if (
@@ -280,13 +280,13 @@ class VarnishPurger {
 
 		// Define registered purge events
 		$actions = array(
-			'switch_theme',						// After a theme is changed
-			'autoptimize_action_cachepurged',	// Compat with https://wordpress.org/plugins/autoptimize/
-			'save_post',							// Save a post
-			'deleted_post',						// Delete a post
-			'trashed_post',						// Empty Trashed post
-			'edit_post',							// Edit a post - includes leaving comments
-			'delete_attachment',					// Delete an attachment - includes re-uploading
+			'switch_theme',                    // After a theme is changed
+			'autoptimize_action_cachepurged',  // Compat with https://wordpress.org/plugins/autoptimize/
+			'save_post',                       // Save a post
+			'deleted_post',                    // Delete a post
+			'trashed_post',                    // Empty Trashed post
+			'edit_post',                       // Edit a post - includes leaving comments
+			'delete_attachment',               // Delete an attachment - includes re-uploading
 		);
 
 		// send back the actions array, filtered
@@ -305,8 +305,8 @@ class VarnishPurger {
 
 		// Define registered purge events
 		$actions = array(
-			'switch_theme',						// After a theme is changed
-			'autoptimize_action_cachepurged,'	// Compat with https://wordpress.org/plugins/autoptimize/
+			'switch_theme',                    // After a theme is changed
+			'autoptimize_action_cachepurged,'  // Compat with https://wordpress.org/plugins/autoptimize/
 		);
 
 		// send back the actions array, filtered

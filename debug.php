@@ -506,7 +506,7 @@ class VarnishDebug {
 		$output              = array_merge( $output, $bad_themes_results );
 
 		// Plugins that don't play nicely with Varnish)
-		$bad_plugins_results  = self::bad_plugins_results();
+		$bad_plugins_results = self::bad_plugins_results();
 		$output              = array_merge( $output, $bad_plugins_results );
 
 		return $output;

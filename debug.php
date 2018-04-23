@@ -331,8 +331,16 @@ class VarnishDebug {
 		// Cache Control
 		if ( isset( $headers['Cache-Control'] ) ) {
 
+			if ( is_array( $headers['Cache-Control'] ) ) {
+				$no_cache = array_search( 'no-cache', $headers['Cache-Control'] );
+				$max_age  = array_search( 'max-age=0', $headers['Cache-Control'] );
+			} else {
+				$no_cache = strpos( $headers['Cache-Control'], 'no-cache' );
+				$max_age  = strpos( $headers['Cache-Control'], 'max-age=0' );
+			}
+
 			// No-Cache Set
-			if ( strpos( $headers['Cache-Control'], 'no-cache' ) !== false ) {
+			if ( $no_cache !== false ) {
 				$return['no_cache'] = array(
 					'icon'    => 'bad',
 					'message' => __( 'Something is setting the header Cache-Control to "no-cache" which means visitors will never get cached pages.', 'varnish-http-purge' ),
@@ -340,7 +348,7 @@ class VarnishDebug {
 			}
 
 			// Max-Age is 0
-			if ( strpos( $headers['Cache-Control'], 'max-age=0' ) !== false ) {
+			if ( $max_age !== false ) {
 				$return['max_age'] = array(
 					'icon'    => 'bad',
 					'message' => __( 'Something is setting the header Cache-Control to "max-age=0" which means a page can be no older than 0 seconds before it needs to regenerate the cache.', 'varnish-http-purge' ),

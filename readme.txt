@@ -165,7 +165,7 @@ This plugin is installed by default for _all_ DreamPress installs on DreamHost, 
 * Remote storage of problem plugins/themes
 * Prevent auto-loading of scan for improved disclosure and compliance
 * Changed colour of the purge button for improved visibility
-* Support for nginx proxy
+* Support for nginx proxy headers
 
 == Screenshots ==
 

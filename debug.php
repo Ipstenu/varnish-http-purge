@@ -362,10 +362,15 @@ class VarnishDebug {
 				'icon'    => 'bad',
 				'message' => __( 'Your domain does not report an "Age" header, which means we can\'t tell if the page is actually serving from cache.', 'varnish-http-purge' ),
 			);
-		} elseif( $headers['Age'] <= 0 || $headers['Age'] == 0 ) {
+		} elseif( ( $headers['Age'] <= 0 || $headers['Age'] == 0 ) && (bool)strtotime( $headers['Age'] ) == false ) {
 			$return['age'] = array(
 				'icon'    => 'warning',
-				'message' => __( 'The "Age" header is set to less than 1, which means you checked right when Varnish cleared the cache for that url or Varnish is not serving cached content for that url. Check again but if it happens again, then either the URL is intentionally excluded from caching, or a theme or plugin is sending cache headers or cookies that instruct varnish not to cache.', 'varnish-http-purge' ),
+				'message' => __( 'The "Age" header is set to less than 1 second, which means you checked right when Varnish cleared the cache for that url or Varnish is not serving cached content for that url. Check again but if it happens again, then either the URL is intentionally excluded from caching, or a theme or plugin is sending cache headers or cookies that instruct varnish not to cache.', 'varnish-http-purge' ),
+			);
+		} elseif ( (bool)strtotime( $headers['Age'] ) && time() <= strtotime( $headers['Age'] ) ) {
+			$return['age'] = array(
+				'icon'    => 'bad',
+				'message' => __( 'The "Age" header is set to an invalid time. Either you checked right when the cache was clearned for that url or your server is not serving cached content for that url. Please check again, and if it happens again then a theme or plugin is requesting the URL not be cached.', 'varnish-http-purge' ),
 			);
 		} else {
 			$return['age'] = array(

@@ -51,7 +51,7 @@ class VarnishStatus {
 	 * @since 4.0
 	 */
 	function admin_menu() {
-		add_management_page( __( 'Is Varnish Working?', 'varnish-http-purge' ), __( 'Varnish Debugging', 'varnish-http-purge' ), 'manage_options', 'varnish-status', array( &$this, 'settings_page' ) );
+		add_management_page( __( 'Is Caching Working?', 'varnish-http-purge' ), __( 'Varnish Debugging', 'varnish-http-purge' ), 'manage_options', 'varnish-status', array( &$this, 'settings_page' ) );
 	}
 
 	/**
@@ -61,7 +61,7 @@ class VarnishStatus {
 	 */
 	function register_settings_url() {
 		register_setting( 'varnish-http-purge-url', 'vhp_varnish_url', array( &$this, 'varnish_url_sanitize' ) );
-		add_settings_section( 'varnish-url-settings-section', __( 'Check Varnish Status', 'varnish-http-purge' ), array( &$this, 'options_callback_url'), 'varnish-url-settings' );
+		add_settings_section( 'varnish-url-settings-section', __( 'Check Caching Status', 'varnish-http-purge' ), array( &$this, 'options_callback_url'), 'varnish-url-settings' );
 		add_settings_field( 'varnish_url', __( 'Check A URL On Your Site:', 'varnish-http-purge' ), array( &$this, 'varnish_url_callback' ), 'varnish-url-settings', 'varnish-url-settings-section' );
 	}
 
@@ -72,8 +72,8 @@ class VarnishStatus {
 	 */
 	function register_settings_ip() {
 		register_setting( 'varnish-http-purge-ip', 'vhp_varnish_ip', array( &$this, 'varnish_ip_sanitize' ) );
-		add_settings_section( 'varnish-ip-settings-section', __('Configure Custom Varnish IP', 'varnish-http-purge'), array( &$this, 'options_callback_ip'), 'varnish-ip-settings' );
-		add_settings_field( 'varnish_ip', __('Set Varnish IP', 'varnish-http-purge'), array( &$this, 'varnish_ip_callback'), 'varnish-ip-settings', 'varnish-ip-settings-section' );
+		add_settings_section( 'varnish-ip-settings-section', __( 'Configure Custom Varnish IP', 'varnish-http-purge' ), array( &$this, 'options_callback_ip'), 'varnish-ip-settings' );
+		add_settings_field( 'varnish_ip', __( 'Set Varnish IP', 'varnish-http-purge' ), array( &$this, 'varnish_ip_callback' ), 'varnish-ip-settings', 'varnish-ip-settings-section' );
 	}
 
 	/**
@@ -84,12 +84,12 @@ class VarnishStatus {
 	function options_callback_ip() {
 		?>
 		<p><a name="#configure"></a><?php _e( 'The majority of users will never need to look down here. However there are cases when a custom Varnish IP Address will need to be set, in order to tell the plugin to empty the cache in a specific location. If you\'re using a CDN like Cloudflare or a Firewall Proxy like Sucuri, you will want to set this.', 'varnish-http-purge' ); ?></p>
-		<p><?php _e( 'Your Varnish IP the IP address of the server where Varnish is installed. Your Varnish IP must be one of the IPs that Varnish is listening. If you use multiple IPs, or if you\'ve customized your ACLs, you\'ll need to pick one that doesn\'t conflict with your other settings. For example, if you have Varnish listening on a public and private IP, pick the private. On the other hand, if you told Varnish to listen on 0.0.0.0 (i.e. "listen on every interface you can") you would need to check what IP you set your purge ACL to allow (commonly 127.0.0.1 aka localhost), and use that (i.e. 127.0.0.1).', 'varnish-http-purge' ); ?></p>
-		<p><?php _e( 'If your webhost set up Varnish for you, as is the case with DreamPress or WP Engine, ask them for the specifics if they don\'t have it documented. I\'ve listed the ones I know about here, however you should still check with them if you\'re not sure.', 'varnish-http-purge' ); ?></p>
+		<p><?php _e( 'Your Varnish IP the IP address of the server where your caching service (i.e. Varnish or Nginx) is installed. Your Varnish IP must be one of the IPs used by your cache service. If you use multiple IPs, or if you\'ve customized your ACLs, you\'ll need to pick one that doesn\'t conflict with your other settings. For example, if you have Varnish listening on a public and private IP, pick the private. On the other hand, if you told Varnish to listen on 0.0.0.0 (i.e. "listen on every interface you can") you would need to check what IP you set your purge ACL to allow (commonly 127.0.0.1 aka localhost), and use that (i.e. 127.0.0.1).', 'varnish-http-purge' ); ?></p>
+		<p><?php _e( 'If your webhost set the service up for you, as is the case with DreamPress or WP Engine, ask them for the specifics if they don\'t have it documented. I\'ve listed the ones I know about here, however you should still check with them if you\'re not sure.', 'varnish-http-purge' ); ?></p>
 		<p><strong><?php _e( 'If you aren\'t sure what to do, contact your webhost or server admin before making any changes.', 'varnish-http-purge' ); ?></strong></p>
 
 		<ul>
-			<li><?php _e( 'DreamHost - Go into the Panel and click on the DNS settings for the domain. The entry for <em>resolve-to.domain</em> (if set) will be your varnish server. If it\'s not set, then you don\'t need to worry about this at all. Example:', 'varnish-http-purge' ); ?> <code>resolve-to.www A 208.97.157.172</code></li>
+			<li><?php _e( 'DreamHost - Go into the Panel and click on the DNS settings for the domain. The entry for <em>resolve-to.domain</em> (if set) will be your cache server. If it\'s not set, then you don\'t need to worry about this at all. Example:', 'varnish-http-purge' ); ?> <code>resolve-to.www A 208.97.157.172</code></li>
 		</ul>
 		<?php
 	}
@@ -131,9 +131,9 @@ class VarnishStatus {
 	 */
 	function options_callback_url() {
 
-		?><p><?php _e( 'While it is impossible to detect all possible conflicts, this status page performs a check of the most common issues that prevent Varnish from caching your site properly.', 'varnish-http-purge' ); ?></p>
+		?><p><?php _e( 'While it is impossible to detect all possible conflicts, this status page performs a check of the most common issues that prevents your site from caching properly. This feature is provided to help you in debugging any conflicts on your own. When filing an issue with your web-host, we recommend you include the output in your ticket.', 'varnish-http-purge' ); ?></p>
 		
-		<p><?php printf ( __( 'This feature is provided to help you in debugging any conflicts on your own by calling <a href="%s">a service hosted on DreamObjects</a>. When filing an issue with your web-host, we recommend you include the output in your ticket.', 'varnish-http-purge' ), 'https://varnish-http-purge.objects-us-east-1.dream.io/readme.txt' ); ?></p>
+		<p><?php printf ( __( 'This check uses <a href="%s">remote service hosted on DreamObjects</a>. The service used only for providing up to date compatibility checks on plugins and themes that may conflict with running a server based cache (such as Varnish or Nginx).', 'varnish-http-purge' ), 'https://varnish-http-purge.objects-us-east-1.dream.io/readme.txt' ); ?></p>
 		
 		<?php
 
@@ -248,7 +248,7 @@ class VarnishStatus {
 		?>
 		<div class="wrap">
 
-			<h1><?php _e( 'Is Varnish Working?', 'varnish-http-purge' ); ?></h1>
+			<h1><?php _e( 'Is Caching Working?', 'varnish-http-purge' ); ?></h1>
 				
 			<?php settings_errors(); ?>
 

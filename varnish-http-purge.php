@@ -88,14 +88,14 @@ class VarnishPurger {
 		}
 
 		// get my events
-		$events = $this->getRegisterEvents();
+		$events     = $this->getRegisterEvents();
 		$noIDevents = $this->getNoIDEvents();
 
 		// make sure we have events and they're in an array
 		if ( !empty( $events ) && !empty( $noIDevents ) ) {
 
 			// Force it to be an array, in case someone's stupid
-			$events = (array) $events;
+			$events     = (array) $events;
 			$noIDevents = (array) $noIDevents;
 
 			// Add the action for each event
@@ -215,14 +215,25 @@ class VarnishPurger {
 					'title' => __( 'Entire Cache (All Pages)', 'varnish-http-purge' ),
 				),
 			);
+			// If a memcached file is found, we can do this too:
+			if ( file_exists( WP_CONTENT_DIR . '/object-cache.php' ) ) {
+				$args[] = array(
+					'parent' => 'purge-varnish-cache',
+					'id'     => 'purge-varnish-cache-db',
+					'title'  => __( 'Database Cache', 'varnish-http-purge' ),
+					'href'   => wp_nonce_url( add_query_arg( 'vhp_flush_object', 'all' ), 'vhp_flush_object' ),
+					'meta'   => array(
+						'title' => __( 'Database Cache', 'varnish-http-purge' ),
+					),
+				);
+			}
+
 		}
 
 		// If we're on a front end page and the current user can edit published posts, then they can do this:
 		if ( ! is_admin() && get_post() !== false && current_user_can( 'edit_published_posts' ) ) {
-			
 			$page_url = esc_url( home_url( $wp->request ) );
-					
-			$args[] = array(
+			$args[]   = array(
 				'parent' => 'purge-varnish-cache',
 				'id'     => 'purge-varnish-cache-this',
 				'title'  => __( 'This Page\'s Cache', 'varnish-http-purge' ),
@@ -327,12 +338,18 @@ class VarnishPurger {
 		$purgeUrls = array_unique( $this->purgeUrls );
 
 		if ( empty( $purgeUrls ) ) {
-			if ( isset( $_GET['vhp_flush_all'] ) && check_admin_referer( 'vhp-flush-all' ) ) {
+			if ( isset( $_GET['vhp_flush_object'] ) && check_admin_referer( 'vhp_flush_object' ) ) {
+				// Flush DB Cache
+				wp_cache_flush();
+			} elseif ( isset( $_GET['vhp_flush_all'] ) && check_admin_referer( 'vhp-flush-all' ) ) {
+				// Flush Varnish Cache recursize
 				$this->purgeUrl( $this->the_home_url() . '/?vhp-regex' );
 			} elseif ( isset( $_GET['vhp_flush_do'] ) && check_admin_referer( 'vhp-flush-do' ) ) {
 				if ( $_GET['vhp_flush_do'] == 'all' ) {
+					// Flush Varnish Cache recursize
 					$this->purgeUrl( $this->the_home_url() . '/?vhp-regex' );
 				} else {
+					// Flush the URL we're on
 					$p = parse_url( $_GET['vhp_flush_do'] );
 					if ( !isset( $p['host'] ) ) return;
 					$this->purgeUrl( $_GET['vhp_flush_do'] );
@@ -360,11 +377,11 @@ class VarnishPurger {
 		if ( !isset( $p['host'] ) ) return;
 
 		// Determine if we're using regex to flush all pages or not
-		$pregex = '';
+		$pregex         = '';
 		$x_purge_method = 'default';
 
 		if ( isset( $p['query'] ) && ( $p['query'] == 'vhp-regex' ) ) {
-			$pregex = '.*';
+			$pregex         = '.*';
 			$x_purge_method = 'regex';
 		}
 
@@ -514,7 +531,7 @@ class VarnishPurger {
 			} elseif ( $this_post_type == 'page' ) {
 				$rest_permalink = get_rest_url() . $rest_api_route . '/pages/' . $postId . '/';
 			}
-			
+
 			if ( $rest_permalink !== false ) array_push( $listofurls, $rest_permalink );
 
 			// Add in AMP permalink if Automattic's AMP is installed

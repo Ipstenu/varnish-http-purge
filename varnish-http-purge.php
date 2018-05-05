@@ -428,6 +428,8 @@ class VarnishPurger {
 				array_push( $this->purgeUrls, $url ) ;
 			}
 		}
+		
+		do_action( 'after_full_purge' );
 	}
 
 	/**

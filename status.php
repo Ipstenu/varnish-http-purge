@@ -133,7 +133,7 @@ class VarnishStatus {
 
 		?><p><?php _e( 'While it is impossible to detect all possible conflicts, this status page performs a check of the most common issues that prevents your site from caching properly. This feature is provided to help you in debugging any conflicts on your own. When filing an issue with your web-host, we recommend you include the output in your ticket.', 'varnish-http-purge' ); ?></p>
 		
-		<p><?php printf ( __( 'This check uses <a href="%s">remote service hosted on DreamObjects</a>. The service used only for providing up to date compatibility checks on plugins and themes that may conflict with running a server based cache (such as Varnish or Nginx).', 'varnish-http-purge' ), 'https://varnish-http-purge.objects-us-east-1.dream.io/readme.txt' ); ?></p>
+		<p><?php printf ( __( '<strong>This check uses <a href="%s">a remote service hosted on DreamObjects</a></strong>. The service used only for providing up to date compatibility checks on plugins and themes that may conflict with running a server based cache (such as Varnish or Nginx). No personally identifying information regarding persons running this check, nor the plugins and themes in use on this site will be transmitted. The bare minimum of usage information is collected, concerning only IPs and domains making requests of the service. If you do not wish to use this service, please do not use this debugging tool.', 'varnish-http-purge' ), 'https://varnish-http-purge.objects-us-east-1.dream.io/readme.txt' ); ?></p>
 		
 		<?php
 

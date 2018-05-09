@@ -33,21 +33,27 @@ Plugins can hook into the purge actions as well, to filter their own events to t
 
 On a multisite network using subfolders, only <strong>network admins</strong> can purge the main site. This is a security decision, as emptying the cache too often can be computationally expensive and cause server outages for a network.
 
-= WP CLI = 
+=== WP CLI ===
 
 * `wp varnish purge` - Flush the entire cache
 * `wp varnish debug` - Help for debugging how well Varnish is (or isn't) working
 
-= Debugging =
+=== Debugging ===
 
 If you're working on a site and need to turn off caching, add this to your wp-config file: `define( 'VHP_DEBUG', true );`
 
 That will break cache on page loads. It is _not_ recommended for production!
 
-= Requirements =
+=== Requirements ===
 
 * Pretty Permalinks enabled
 * Varnish 3.x or higher
+
+== Privacy Policy ===
+
+By default, no data is tracked. If you use the site scanner, your domain and IP address will access [a remote service hosted on DreamObjects](https://varnish-http-purge.objects-us-east-1.dream.io/readme.txt). No personally identifying transaction data is recorded or stored, only overall usage. IP addresses of the website making the request may be recorded by the service, but there is no way to access them and use it to correspond with individuals or processes.
+
+Use of this service is required for the debugging tool, in order to provide up to date compatibility checks on plugins and themes that may conflict with running a server based cache (such as Varnish or Nginx) without needing to update the plugin every day.
 
 == Frequently Asked Questions ==
 
@@ -69,7 +75,7 @@ The scan files were off-loaded to a service to allow for more frequent updates w
 
 = Will you fix my site? =
 
-No, I don't offer that service at this time. I will try to point you towards solving it on your own. This may mean you have to decide if using a specific plugin or theme is worth an imperfect cache.
+No. I will try to point you towards solving it on your own. This may mean you have to decide if using a specific plugin or theme is worth an imperfect cache.
 
 = What version of Varnish is supported? =
 
@@ -122,7 +128,7 @@ Your Varnish IP must be one of the IPs that Varnish is listening on. If you use 
 If your webhost set up Varnish, you may need to ask them for the specifics if they don't have it documented. I've listed the ones I know about here, however you should still check with them if you're not sure.
 
 <ul>
-    <li><strong>DreamHost</strong> - If you're using DreamPress and Cloudflare, go into the Panel and click on the DNS settings for the domain. The entry for <em>resolve-to.domain</em> is your varnish server: `resolve-to.www A 208.97.157.172` -- If you're <em>NOT</em> using Cloudflare, you don't need it; it's just your normal IP.</li>
+	<li><strong>DreamHost</strong> - If you're using DreamPress and Cloudflare, go into the Panel and click on the DNS settings for the domain. The entry for <em>resolve-to.domain</em> is your varnish server: `resolve-to.www A 208.97.157.172` -- If you're <em>NOT</em> using Cloudflare, you don't need it; it's just your normal IP.</li>
 </ul>
 
 = What if I have multiple varnish IPs? =
@@ -161,7 +167,7 @@ This plugin is installed by default for _all_ DreamPress installs on DreamHost, 
 == Changelog ==
 
 = 4.5.0 =
-* XXXX 2018
+* May 2018
 * Remote storage of problem plugins/themes
 * Prevent auto-loading of scan for improved disclosure and compliance
 * Changed colour of the purge button for improved visibility

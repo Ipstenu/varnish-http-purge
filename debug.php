@@ -571,4 +571,4 @@ class VarnishDebug {
 
 }
 
-if ( class_exists( 'VarnishDebug' ) ) $varnish_debug = new VarnishDebug();
+$varnish_debug = new VarnishDebug();

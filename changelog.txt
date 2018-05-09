@@ -1,5 +1,7 @@
+## CHANGELOG
+
 = 4.5.0 = 
-* XXXX 2018
+* May 2018
 * Remote storage of problem plugins/themes
 
 = 4.4.0 =

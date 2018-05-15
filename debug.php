@@ -505,6 +505,7 @@ class VarnishDebug {
 			'cookies'      => __( 'This plugin uses cookies, which prevents server side caching.', 'varnish-http-purge' ),
 			'cache'        => __( 'This type of caching plugin does not work well with server side caching.', 'varnish-http-purge' ),
 			'ancient'      => __( 'This plugin is not up to date with WordPress best practices and breaks caching.', 'varnish-http-purge' ),
+			'removed'      => __( 'This plugin was removed from WordPress.org and we do not recommend it\'s use.', 'varnish-http-purge' ),
 		);
 		$request = wp_remote_get( 'https://varnish-http-purge.objects-us-east-1.dream.io/plugins.json' );
 

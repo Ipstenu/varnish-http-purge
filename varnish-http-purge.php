@@ -120,7 +120,7 @@ class VarnishPurger {
 		// Add Admin Bar
 		add_action( 'admin_bar_menu', array( $this, 'varnish_rightnow_adminbar' ), 100 );
 		add_action( 'admin_enqueue_scripts', array( $this, 'custom_css' ) );
-		add_action( 'wp_enqueue_style', array( $this, 'custom_css' ) );
+		add_action( 'wp_enqueue_scripts', array( $this, 'custom_css' ) );
 	}
 
 	/**
@@ -258,7 +258,7 @@ class VarnishPurger {
 		$url      = wp_nonce_url( add_query_arg( 'vhp_flush_do', 'all' ), 'vhp-flush-do' );
 		$intro    = sprintf( __( '<a href="%1$s">Varnish HTTP Purge</a> automatically deletes your cached posts when published or updated. When making major site changes, such as with a new theme, plugins, or widgets, you may need to manually empty the cache.', 'varnish-http-purge' ), 'http://wordpress.org/plugins/varnish-http-purge/' );
 		$button   =  __( 'Press the button below to force it to empty your entire Varnish cache.', 'varnish-http-purge' );
-		$button  .= '</p><p><span class="button"><a href="'.$url.'"><strong>';
+		$button  .= '</p><p><span class="button"><span class="dashicons dashicons-carrot varnish-http-purge"></span> <a href="'.$url.'"><strong>';
 		$button  .= __( 'Empty Cache', 'varnish-http-purge' );
 		$button  .= '</strong></a></span>';
 		$nobutton =  __( 'You do not have permission to empty the Varnish cache for the whole site. Please contact your administrator.', 'varnish-http-purge' );

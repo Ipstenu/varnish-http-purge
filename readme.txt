@@ -168,8 +168,8 @@ This plugin is installed by default for _all_ DreamPress installs on DreamHost, 
 
 = 4.5.1 =
 
-* ?????? 2018
-* Due to contention (devs hate it, users like it) the empty cache button colour is removed, and replaced with a carrot icon
+* May 2018
+* Due to contention (devs hate it, users like it) the empty cache button colour is removed, and replaced with an orange carrot icon
 * FAQ update re nginx 
 
 = 4.5.0 =

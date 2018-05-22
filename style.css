@@ -10,3 +10,9 @@
 	color: #F56E28;
 	vertical-align: middle;
 }
+
+@media screen and (max-width: 782px) {
+	#wpadminbar li#wp-admin-bar-purge-varnish-cache{
+		display: block!important;
+	}
+}

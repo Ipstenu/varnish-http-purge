@@ -184,16 +184,18 @@ class VarnishPurger {
 	function varnish_rightnow_adminbar( $admin_bar ) {
 		global $wp;
 
-		// Main Array
-		$args = array(
-			array(
-				'id'    => 'purge-varnish-cache',
-				'title' => '<span class="ab-icon"></span><span class="ab-label">' . __( 'Empty Cache', 'varnish-http-purge' ) . '</span>',
-				'meta'   => array(
-					'class' => 'varnish-http-purge'
+		if ( ( !is_admin() && get_post() !== false && current_user_can( 'edit_published_posts' ) ) || current_user_can( 'activate_plugins' ) ) {
+			// Main Array
+			$args = array(
+				array(
+					'id'    => 'purge-varnish-cache',
+					'title' => '<span class="ab-icon"></span><span class="ab-label">' . __( 'Empty Cache', 'varnish-http-purge' ) . '</span>',
+					'meta'   => array(
+						'class' => 'varnish-http-purge'
+					),
 				),
-			),
-		);
+			);
+		}
 
 		// Checking user permissions for who can and cannot use the all flush
 		if (
@@ -204,6 +206,7 @@ class VarnishPurger {
 			// Multisite - Site admins can purge UNLESS it's a subfolder install and we're on site #1
 			( is_multisite() && current_user_can( 'activate_plugins' ) && ( SUBDOMAIN_INSTALL || ( !SUBDOMAIN_INSTALL && ( BLOG_ID_CURRENT_SITE != $blog_id ) ) ) )
 			) {
+
 			$args[] = array(
 				'parent' => 'purge-varnish-cache',
 				'id'     => 'purge-varnish-cache-all',
@@ -225,7 +228,6 @@ class VarnishPurger {
 					),
 				);
 			}
-
 		}
 
 		// If we're on a front end page and the current user can edit published posts, then they can do this:

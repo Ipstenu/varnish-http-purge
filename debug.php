@@ -39,9 +39,11 @@ class VarnishDebug {
 			)
 		);
 
-		$response = wp_remote_get( $url, $args );
-	
-		return $response;
+		// Lazy run twice to make sure we get a primed cache page
+		$response1 = wp_remote_get( $url, $args );
+		$response2 = wp_remote_get( $url, $args );
+
+		return $response2;
 	}
 
 	/**

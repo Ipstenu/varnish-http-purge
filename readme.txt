@@ -168,10 +168,11 @@ This plugin is installed by default for _all_ DreamPress installs on DreamHost, 
 
 = 4.5.1 =
 
-* May 2018
-* Due to contention (devs hate it, users like it) the empty cache button colour on the toolbar is removed, and replaced with a carrot icon
+* June 2018
+* Due to contention (devs hate it, users like it) the empty cache button colour on the toolbar is removed, and replaced with a carrot icon (I did not make it orange, but I wanted to)
 * Add carrot icon to collapsed (mobile) toolbar
 * Better button hiding
+* Fixed a stupid argument issue with flushing memcached and I should have known better but oh well
 * FAQ update re nginx 
 
 = 4.5.0 =

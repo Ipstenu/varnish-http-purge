@@ -222,7 +222,7 @@ class VarnishPurger {
 					'parent' => 'purge-varnish-cache',
 					'id'     => 'purge-varnish-cache-db',
 					'title'  => __( 'Database Cache', 'varnish-http-purge' ),
-					'href'   => wp_nonce_url( add_query_arg( 'vhp_flush_object', 'all' ), 'vhp_flush_object' ),
+					'href'   => wp_nonce_url( add_query_arg( 'vhp_flush_do', 'object' ), 'vhp-flush-do' ),
 					'meta'   => array(
 						'title' => __( 'Database Cache', 'varnish-http-purge' ),
 					),
@@ -337,15 +337,15 @@ class VarnishPurger {
 	public function executePurge() {
 		$purgeUrls = array_unique( $this->purgeUrls );
 
-		if ( empty( $purgeUrls ) ) {
-			if ( isset( $_GET['vhp_flush_object'] ) && check_admin_referer( 'vhp_flush_object' ) ) {
-				// Flush DB Cache
-				wp_cache_flush();
-			} elseif ( isset( $_GET['vhp_flush_all'] ) && check_admin_referer( 'vhp-flush-all' ) ) {
+		if ( empty( $purgeUrls ) && isset( $_GET ) ) {
+			if ( isset( $_GET['vhp_flush_all'] ) && check_admin_referer( 'vhp-flush-all' ) ) {
 				// Flush Varnish Cache recursize
 				$this->purgeUrl( $this->the_home_url() . '/?vhp-regex' );
 			} elseif ( isset( $_GET['vhp_flush_do'] ) && check_admin_referer( 'vhp-flush-do' ) ) {
-				if ( $_GET['vhp_flush_do'] == 'all' ) {
+				if ( $_GET['vhp_flush_do'] == 'object' ) {
+					// Flush Object Cache (with a double check)
+					if ( file_exists( WP_CONTENT_DIR . '/object-cache.php' ) ) wp_cache_flush();
+				} elseif ( $_GET['vhp_flush_do'] == 'all' ) {
 					// Flush Varnish Cache recursize
 					$this->purgeUrl( $this->the_home_url() . '/?vhp-regex' );
 				} else {

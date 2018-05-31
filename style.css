@@ -6,7 +6,7 @@
 }
 
 /* Add Orange Carrot to Button */
-.dashicons.dashicons-carrot.varnish-http-purge {
+span.dashicons.dashicons-carrot.varnish-http-purge {
 	color: #F56E28;
 	vertical-align: middle;
 }

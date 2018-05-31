@@ -1,8 +1,19 @@
 ## CHANGELOG
 
+=== 4.5.1 ===
+* June 2018
+* Due to contention (devs hate it, users like it) the empty cache button colour on the toolbar is removed, and replaced with a carrot icon (I did not make it orange, but I wanted to)
+* Add carrot icon to collapsed (mobile) toolbar
+* Better button hiding
+* Fixed a stupid argument issue with flushing memcached and I should have known better but oh well
+* FAQ update re nginx 
+
 === 4.5.0 ===
 * May 2018
 * Remote storage of problem plugins/themes
+* Prevent auto-loading of scan for improved disclosure and compliance
+* Changed colour of the purge button for improved visibility
+* Support for nginx proxy headers
 
 === 4.4.0 ===
 * March 2018

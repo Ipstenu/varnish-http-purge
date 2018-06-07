@@ -84,8 +84,10 @@ class VarnishPurger {
 		global $blog_id;
 
 		// If Debugging is true, throw down a session to 'break' caching
-		if ( self::debug_check() ) {
+		if ( VarnishDebug::debug_check() ) {
 			@session_start();
+			// To Do: Add in a ?nocache param to URLs
+			// Need to add in for css and JS and images most of all
 		}
 
 		// get my events
@@ -123,33 +125,6 @@ class VarnishPurger {
 		add_action( 'admin_bar_menu', array( $this, 'varnish_rightnow_adminbar' ), 100 );
 		add_action( 'admin_enqueue_scripts', array( $this, 'custom_css' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'custom_css' ) );
-	}
-
-	/**
-	 * Debug Check
-	 * See if debugging is active
-	 *
-	 * @since 4.6.0
-	 * @returns true|false
-	 */
-	public function debug_check() {
-
-		$return = FALSE;
-		$debug  = get_option( 'vhp_varnish_debug', self::$options )
-
-		if ( VHP_DEBUG ) {
-			$return = TRUE;
-		} elseif ( $debug['active'] ) {
-			// if expire is less that NOW, it's over
-			if ( $debug['expire'] >= time() ) {
-				$debug['active'] = FALSE;
-				update_option( 'vhp_varnis_debug', $debug );
-			} else {
-				$return = TRUE;
-			}
-		}
-
-		return $return;
 	}
 
 	/**

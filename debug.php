@@ -23,6 +23,33 @@ if ( !defined( 'ABSPATH' ) ) die();
 class VarnishDebug {
 
 	/**
+	 * Debug Check
+	 * See if debugging is active
+	 *
+	 * @since 4.6.0
+	 * @returns true|false
+	 */
+	public function debug_check() {
+
+		$return = FALSE;
+		$debug  = get_option( 'vhp_varnish_debug', self::$options )
+
+		if ( VHP_DEBUG ) {
+			$return = TRUE;
+		} elseif ( $debug['active'] ) {
+			// if expire is less that NOW, it's over
+			if ( $debug['expire'] >= time() ) {
+				$debug['active'] = FALSE;
+				update_option( 'vhp_varnis_debug', $debug );
+			} else {
+				$return = TRUE;
+			}
+		}
+
+		return $return;
+	}
+
+	/**
 	 * Remote Get Varnish URL
 	 *
 	 * @since 4.4.0
@@ -546,8 +573,18 @@ class VarnishDebug {
 	 */
 	static function get_all_the_results( $headers, $remote_ip, $varniship ) {
 		$output = array();
-		$output['Cache Service']   = self::varnish_results( $headers );
-		$output['Remote IP'] = self::remote_ip_results( $remote_ip, $varniship );
+
+		// Preface with Debugging Warning
+		if ( self::debug_check() ) {
+			$output['Debugging'] = array( 
+				'icon'    => 'warning',
+				'message' => __( 'Debugging is active on this domain, so caching is intentionally inactive.', 'varnish-http-purge' ),
+			);
+		}
+
+		// Basic Checks
+		$output['Cache Service'] = self::varnish_results( $headers );
+		$output['Remote IP']     = self::remote_ip_results( $remote_ip, $varniship );
 
 		// Server Results
 		$server_results      = self::server_results( $headers, $remote_ip, $varniship );
@@ -571,7 +608,6 @@ class VarnishDebug {
 
 		return $output;
 	}
-
 }
 
 $varnish_debug = new VarnishDebug();

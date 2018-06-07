@@ -172,7 +172,7 @@ class VarnishPurger {
 	 * @since 4.5.0
 	 */
 	function custom_css() {
-		wp_register_style( 'varnish_http_purge', plugins_url( 'style.css', __FILE__ ), false, '1.0.0' );
+		wp_register_style( 'varnish_http_purge', plugins_url( 'style.css', __FILE__ ), false, '4.5.1' );
 		wp_enqueue_style( 'varnish_http_purge' );
 	}
 

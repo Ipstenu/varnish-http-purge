@@ -40,7 +40,7 @@ class VarnishDebug {
 			// if expire is less that NOW, it's over
 			if ( $debug['expire'] >= time() ) {
 				$debug['active'] = FALSE;
-				update_option( 'vhp_varnis_debug', $debug );
+				update_option( 'vhp_varnish_debug', $debug );
 			} else {
 				$return = TRUE;
 			}

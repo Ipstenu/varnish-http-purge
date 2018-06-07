@@ -3,7 +3,7 @@ Contributors: Ipstenu, mikeschroder, techpriester
 Tags: varnish, purge, cache
 Requires at least: 4.7
 Tested up to: 4.9
-Stable tag: 4.5.1
+Stable tag: 4.6.0
 Requires PHP: 5.6
 
 Automatically empty Varnish Cache when content on your site is modified.
@@ -119,6 +119,10 @@ Replace "123.45.67.89" with the IP of your <em>Varnish Server</em> (not CloudFla
 
 If you want to use WP-CLI, you can set an option in the database. This will NOT take precedence over the define, it's just there to let hosts who are using something like wp-cli do this for you in an automated fashion: `wp option update vhp_varnish_ip 123.45.67.890`
 
+= Why do I get a 503 or 504 error on every post update? =
+
+Your Varnish IP address is probably wrong. Check the IP of your server and then the setting for your Varnish IP. If they're _not_ the same, that's likely why.
+
 = How do I find my Varnish IP? =
 
 Your Varnish IP must be one of the IPs that Varnish is listening on. If you use multiple IPs, or if you've customized your ACLs, you'll need to pick on that doesn't conflict with your other settings. For example, if you have Varnish listening on a public and private IP, you'll want to pick the private. On the other hand, if you told Varnish to listen on 0.0.0.0 (i.e. "listen on every interface you can") you would need to check what IP you set your purge ACL to allow (commonly 127.0.0.1 aka localhost), and use that (i.e. 127.0.0.1).
@@ -165,6 +169,11 @@ Danger! Here be dragons! If you're command line savvy, you can monitor the inter
 This plugin is installed by default for _all_ DreamPress installs on DreamHost, and I maintain it for DreamHost, but it was not originally an official DreamHost plugin which means I will continue to support all users to the best of my ability.
 
 == Changelog ==
+
+= 4.6.0 = 
+
+* June 2018
+* Now with disabling!
 
 = 4.5.1 =
 

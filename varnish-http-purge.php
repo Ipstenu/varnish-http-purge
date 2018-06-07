@@ -32,6 +32,7 @@ Network: true
 
 class VarnishPurger {
 	protected $purgeUrls = array();
+	protected $options   = array();
 
 	/**
 	 * Init
@@ -44,6 +45,8 @@ class VarnishPurger {
 		defined( 'VHP_DEBUG' )      || define( 'VHP_DEBUG', false );
 		add_action( 'init', array( &$this, 'init' ) );
 		add_action( 'admin_init', array( &$this, 'admin_init' ) );
+		
+		self::$options = array( 'active' => false, 'expire' => now() );
 	}
 
 	/**
@@ -80,9 +83,8 @@ class VarnishPurger {
 	public function init() {
 		global $blog_id;
 
-		// Cheap Dev Mode
-		// If VHP_DEBUG is true, throw down a session to 'break' caching
-		if ( VHP_DEBUG ) {
+		// If Debugging is true, throw down a session to 'break' caching
+		if ( self::debug_check() ) {
 			@session_start();
 		}
 
@@ -121,6 +123,33 @@ class VarnishPurger {
 		add_action( 'admin_bar_menu', array( $this, 'varnish_rightnow_adminbar' ), 100 );
 		add_action( 'admin_enqueue_scripts', array( $this, 'custom_css' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'custom_css' ) );
+	}
+
+	/**
+	 * Debug Check
+	 * See if debugging is active
+	 *
+	 * @since 4.6.0
+	 * @returns true|false
+	 */
+	public function debug_check() {
+
+		$return = FALSE;
+		$debug  = get_option( 'vhp_varnish_debug', self::$options )
+
+		if ( VHP_DEBUG ) {
+			$return = TRUE;
+		} elseif ( $debug['active'] ) {
+			// if expire is less that NOW, it's over
+			if ( $debug['expire'] >= time() ) {
+				$debug['active'] = FALSE;
+				update_option( 'vhp_varnis_debug', $debug );
+			} else {
+				$return = TRUE;
+			}
+		}
+
+		return $return;
 	}
 
 	/**
@@ -172,7 +201,7 @@ class VarnishPurger {
 	 * @since 4.5.0
 	 */
 	function custom_css() {
-		wp_register_style( 'varnish_http_purge', plugins_url( 'style.css', __FILE__ ), false, '4.5.1' );
+		wp_register_style( 'varnish_http_purge', plugins_url( 'style.css', __FILE__ ), false, '4.6.0' );
 		wp_enqueue_style( 'varnish_http_purge' );
 	}
 
@@ -184,7 +213,8 @@ class VarnishPurger {
 	function varnish_rightnow_adminbar( $admin_bar ) {
 		global $wp;
 
-		if ( ( !is_admin() && get_post() !== false && current_user_can( 'edit_published_posts' ) ) || current_user_can( 'activate_plugins' ) ) {
+		if ( ( !is_admin() && get_post() !== false && current_user_can( 'edit_published_posts' ) ) 
+		     || current_user_can( 'activate_plugins' ) ) {
 			// Main Array
 			$args = array(
 				array(
@@ -507,7 +537,7 @@ class VarnishPurger {
 				
 		// Determine the route for the rest API
 		// This will need to be revisted if WP updates the version.
-		// Future me: Consider an array? 4.7-4.7.3 use v2, and then adapt from there?
+		// Future me: Consider an array? 4.7-4.9 use v2, and then adapt from there?
 		$rest_api_route  = 'wp/v2'; 
 
 		// array to collect all our URLs

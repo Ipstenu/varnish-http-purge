@@ -3,7 +3,11 @@ Contributors: Ipstenu, mikeschroder, techpriester
 Tags: varnish, purge, cache
 Requires at least: 4.7
 Tested up to: 4.9
+<<<<<<< HEAD
 Stable tag: 4.6.0
+=======
+Stable tag: 4.5.2
+>>>>>>> master
 Requires PHP: 5.6
 
 Automatically empty Varnish Cache when content on your site is modified.
@@ -170,10 +174,17 @@ This plugin is installed by default for _all_ DreamPress installs on DreamHost, 
 
 == Changelog ==
 
+<<<<<<< HEAD
 = 4.6.0 = 
 
 * June 2018
 * Now with disabling!
+=======
+= 4.5.2 =
+
+* June 2018
+* Bug Fix: Prevent error for non-admins
+>>>>>>> master
 
 = 4.5.1 =
 

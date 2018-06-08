@@ -184,6 +184,8 @@ class VarnishPurger {
 	function varnish_rightnow_adminbar( $admin_bar ) {
 		global $wp;
 
+		$can_purge = FALSE;
+
 		if ( ( !is_admin() && get_post() !== false && current_user_can( 'edit_published_posts' ) ) || current_user_can( 'activate_plugins' ) ) {
 			// Main Array
 			$args = array(
@@ -195,6 +197,7 @@ class VarnishPurger {
 					),
 				),
 			);
+			$can_purge = TRUE;
 		}
 
 		// Checking user permissions for who can and cannot use the all flush
@@ -244,8 +247,10 @@ class VarnishPurger {
 			);
 		}
 
-		foreach ( $args as $arg ) {
-			$admin_bar->add_node( $arg );
+		if ( $can_purge ) {
+			foreach ( $args as $arg ) {
+				$admin_bar->add_node( $arg );
+			}
 		}
 	}
 

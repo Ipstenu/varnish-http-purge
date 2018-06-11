@@ -41,8 +41,8 @@ class VarnishStatus {
 	 * @since 4.0
 	 */
 	function admin_init() {
-		$this->register_settings_url();		
-		if ( !is_multisite() ) $this->register_settings_ip();
+		if ( !is_multisite() ) $this->register_settings();
+		$this->register_debug();
 	}
 
 	/**
@@ -51,26 +51,30 @@ class VarnishStatus {
 	 * @since 4.0
 	 */
 	function admin_menu() {
-		add_management_page( __( 'Is Caching Working?', 'varnish-http-purge' ), __( 'Varnish Debugging', 'varnish-http-purge' ), 'manage_options', 'varnish-status', array( &$this, 'settings_page' ) );
+		// Main Menu Page
+		add_menu_page( __( 'Varnish HTTP Purge', 'varnish-http-purge' ), __( 'Varnish', 'varnish-http-purge' ), 'manage_options', 'varnish-status', array( &$this, 'settings_page' ), 'dashicons-carrot', 75 );
+		add_submenu_page( 'varnish-status', __( 'Varnish HTTP Purge', 'varnish-http-purge' ), __( 'Settings', 'varnish-http-purge' ), 'manage_options', 'varnish-status', array( &$this, 'settings_page' ) );
+		// Debug Subpage
+		add_submenu_page( 'varnish-status', __( 'Debug', 'varnish-http-purge' ), __( 'Debug', 'varnish-http-purge' ), 'manage_options', 'varnish-debug', array( &$this, 'debug_page' ) );
 	}
 
 	/**
-	 * Register Admin Settings URL
+	 * Register Debug URL
 	 *
 	 * @since 4.0
 	 */
-	function register_settings_url() {
+	function register_debug() {
 		register_setting( 'varnish-http-purge-url', 'vhp_varnish_url', array( &$this, 'varnish_url_sanitize' ) );
-		add_settings_section( 'varnish-url-settings-section', __( 'Check Caching Status', 'varnish-http-purge' ), array( &$this, 'options_callback_url'), 'varnish-url-settings' );
+		add_settings_section( 'varnish-url-settings-section', __( 'Check Caching Status', 'varnish-http-purge' ), array( &$this, 'options_debug' ), 'varnish-url-settings' );
 		add_settings_field( 'varnish_url', __( 'Check A URL On Your Site:', 'varnish-http-purge' ), array( &$this, 'varnish_url_callback' ), 'varnish-url-settings', 'varnish-url-settings-section' );
 	}
 
 	/**
-	 * Register Admin Settings IP
+	 * Register Settings IP
 	 *
 	 * @since 4.0.2
 	 */
-	function register_settings_ip() {
+	function register_settings() {
 		register_setting( 'varnish-http-purge-ip', 'vhp_varnish_ip', array( &$this, 'varnish_ip_sanitize' ) );
 		add_settings_section( 'varnish-ip-settings-section', __( 'Configure Custom Varnish IP', 'varnish-http-purge' ), array( &$this, 'options_callback_ip'), 'varnish-ip-settings' );
 		add_settings_field( 'varnish_ip', __( 'Set Varnish IP', 'varnish-http-purge' ), array( &$this, 'varnish_ip_callback' ), 'varnish-ip-settings', 'varnish-ip-settings-section' );
@@ -129,7 +133,7 @@ class VarnishStatus {
 	 *
 	 * @since 4.0
 	 */
-	function options_callback_url() {
+	function options_debug() {
 
 		?><p><?php _e( 'While it is impossible to detect all possible conflicts, this status page performs a check of the most common issues that prevents your site from caching properly. This feature is provided to help you in debugging any conflicts on your own. When filing an issue with your web-host, we recommend you include the output in your ticket.', 'varnish-http-purge' ); ?></p>
 		
@@ -248,15 +252,9 @@ class VarnishStatus {
 		?>
 		<div class="wrap">
 
-			<h1><?php _e( 'Is Caching Working?', 'varnish-http-purge' ); ?></h1>
-				
-			<?php settings_errors(); ?>
+			<h1><?php _e( 'Varnish HTTP Purge Settings', 'varnish-http-purge' ); ?></h1>
 
-			<form action="options.php" method="POST" ><?php
-				settings_fields( 'varnish-http-purge-url' );
-				do_settings_sections( 'varnish-url-settings' );
-				submit_button( __( 'Check URL', 'varnish-http-purge' ), 'primary');
-			?></form>
+			<?php settings_errors(); ?>
 
 			<form action="options.php" method="POST" ><?php
 				// Only available if _not_ multisite
@@ -265,6 +263,29 @@ class VarnishStatus {
 					do_settings_sections( 'varnish-ip-settings' );
 					submit_button( __( 'Save IP', 'varnish-http-purge' ), 'secondary');
 				}
+			?></form>
+
+		</div>
+		<?php
+	}
+
+	/*
+	 * Call Debug page
+	 *
+	 * @since 4.6.0
+	 */
+	function debug_page() {
+		?>
+		<div class="wrap">
+
+			<h1><?php _e( 'Is Caching Working?', 'varnish-http-purge' ); ?></h1>
+				
+			<?php settings_errors(); ?>
+
+			<form action="options.php" method="POST" ><?php
+				settings_fields( 'varnish-http-purge-url' );
+				do_settings_sections( 'varnish-url-settings' );
+				submit_button( __( 'Check URL', 'varnish-http-purge' ), 'primary');
 			?></form>
 
 		</div>

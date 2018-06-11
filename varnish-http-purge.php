@@ -11,7 +11,6 @@ Text Domain: varnish-http-purge
 Network: true
 
 	Copyright 2013-2018: Mika A. Epstein (email: ipstenu@halfelf.org)
-
 	Original Author: Leon Weidauer ( http:/www.lnwdr.de/ )
 
 	This file is part of Varnish HTTP Purge, a plugin for WordPress.
@@ -32,7 +31,7 @@ Network: true
 
 class VarnishPurger {
 	protected $purgeUrls = array();
-	protected $options   = array();
+	public static $options   = array();
 
 	/**
 	 * Init
@@ -46,7 +45,7 @@ class VarnishPurger {
 		add_action( 'init', array( &$this, 'init' ) );
 		add_action( 'admin_init', array( &$this, 'admin_init' ) );
 		
-		self::$options = array( 'active' => false, 'expire' => now() );
+		self::$options = array( 'active' => false, 'expire' => time() );
 	}
 
 	/**
@@ -662,8 +661,6 @@ class VarnishPurger {
 
 }
 
-$purger = new VarnishPurger();
-
 /**
  * Purge Varnish via WP-CLI
  *
@@ -673,8 +670,12 @@ if ( defined( 'WP_CLI' ) && WP_CLI ) {
 	include( 'wp-cli.php' );
 }
 
-/* Varnish Status Page
+/* Settings Page
  * 
  * @since 4.0
  */
-include_once( 'status.php' );
+include_once( 'settings.php' );
+
+include_once( 'debug.php' );
+
+$purger = new VarnishPurger();

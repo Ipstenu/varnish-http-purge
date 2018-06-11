@@ -29,10 +29,10 @@ class VarnishDebug {
 	 * @since 4.6.0
 	 * @returns true|false
 	 */
-	public function debug_check() {
+	public static function debug_check() {
 
 		$return = FALSE;
-		$debug  = get_option( 'vhp_varnish_debug', self::$options )
+		$debug  = get_option( 'vhp_varnish_debug', VarnishPurger::$options );
 
 		if ( VHP_DEBUG ) {
 			$return = TRUE;
@@ -68,6 +68,7 @@ class VarnishDebug {
 
 		// Lazy run twice to make sure we get a primed cache page
 		$response1 = wp_remote_get( $url, $args );
+		wait( 3 );
 		$response2 = wp_remote_get( $url, $args );
 
 		return $response2;

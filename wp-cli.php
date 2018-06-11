@@ -127,27 +127,27 @@ if ( !class_exists( 'WP_CLI_Varnish_Command' ) ) {
 			} else {
 	
 				// Include the debug code
-				include( 'debug.php' );
+				if ( !class_exists( 'VarnishDebug' ) ) include( 'debug.php' );
 	
 				$varnishurl = get_option( 'vhp_varnish_url', $url );
 	
 				// Get the response and headers
 				$remote_get = VarnishDebug::remote_get( $varnishurl );
 				$headers    = wp_remote_retrieve_headers( $remote_get );
-		
+
 				// Preflight checklist
 				$preflight = VarnishDebug::preflight( $remote_get );
 		
 				// Check for Remote IP
 				$remote_ip = VarnishDebug::remote_ip( $headers );
-		
+
 				// Get the Varnish IP
 				if ( VHP_VARNISH_IP != false ) {
 					$varniship = VHP_VARNISH_IP;
 				} else {
 					$varniship = get_option('vhp_varnish_ip');
 				}
-	
+
 				if ( $preflight['preflight'] == false ) {
 					WP_CLI::error( $preflight['message'] );
 				} else {

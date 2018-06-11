@@ -36,9 +36,9 @@ class VarnishDebug {
 
 		if ( VHP_DEBUG ) {
 			$return = TRUE;
-		} elseif ( $debug['active'] ) {
+		} elseif ( isset( $debug['active'] ) && $debug['active'] ) {
 			// if expire is less that NOW, it's over
-			if ( $debug['expire'] >= time() ) {
+			if ( $debug['expire'] <= current_time( 'timestamp' ) ) {
 				$debug['active'] = FALSE;
 				update_option( 'vhp_varnish_debug', $debug );
 			} else {
@@ -68,7 +68,7 @@ class VarnishDebug {
 
 		// Lazy run twice to make sure we get a primed cache page
 		$response1 = wp_remote_get( $url, $args );
-		wait( 3 );
+		sleep( 3 );
 		$response2 = wp_remote_get( $url, $args );
 
 		return $response2;
@@ -499,7 +499,7 @@ class VarnishDebug {
 
 		if( empty( $themes ) ) {
 			if ( WP_DEBUG ) {
-				$return[ 'Theme Error' ] = array( 'icon' => 'warning', 'message' => __( 'Error: Theme data cannot be loaded.', 'varnish-http-purge' ) );
+				$return[ 'Theme Check' ] = array( 'icon' => 'warning', 'message' => __( 'Error: Theme data cannot be loaded.', 'varnish-http-purge' ) );
 			}
 			
 			return $return; // Bail early
@@ -513,6 +513,10 @@ class VarnishDebug {
 			if ( $my_theme->exists() ) {
 				$return[ 'Theme: ' . ucfirst( $theme ) ] = array( 'icon' => $warning, 'message' => $message );
 			}
+		}
+
+		if ( empty( $return ) ) {
+			$return[ 'Theme Check' ] = array( 'icon' => 'awesome', 'message' => __( 'No known theme conflicts detected.', 'varnish-http-purge' ) );
 		}
 
 		return $return;
@@ -539,15 +543,16 @@ class VarnishDebug {
 		);
 		$request = wp_remote_get( 'https://varnish-http-purge.objects-us-east-1.dream.io/plugins.json' );
 
+
 		if( is_wp_error( $request ) ) {
 			if ( WP_DEBUG ) {
-				$return[ 'Plugin Error' ] = array( 'icon' => 'warning', 'message' => __( 'Error: Plugin data cannot be loaded.', 'varnish-http-purge' ) );
+				$return[ 'Plugin Check' ] = array( 'icon' => 'warning', 'message' => __( 'Error: Plugin data cannot be loaded.', 'varnish-http-purge' ) );
 			}
 			return $return; // Bail early
 		}
 
 		$body    = wp_remote_retrieve_body( $request );
-		$plugins  = json_decode( $body );
+		$plugins = json_decode( $body );
 
 		if( empty( $plugins ) ) {
 			return $return; // Bail early
@@ -560,6 +565,10 @@ class VarnishDebug {
 				$warning  = $info->type;
 				$return[ 'Plugin: ' . ucfirst( $plugin ) ] = array( 'icon' => $warning, 'message' => $message );
 			}
+		}
+
+		if ( empty( $return ) ) {
+			$return[ 'Plugin Check' ] = array( 'icon' => 'awesome', 'message' => __( 'No known plugin conflicts detected.', 'varnish-http-purge' ) );
 		}
 
 		return $return;
@@ -578,7 +587,7 @@ class VarnishDebug {
 		// Preface with Debugging Warning
 		if ( self::debug_check() ) {
 			$output['Debugging'] = array( 
-				'icon'    => 'warning',
+				'icon'    => 'awkward',
 				'message' => __( 'Debugging is active on this domain, so caching is intentionally inactive.', 'varnish-http-purge' ),
 			);
 		}
@@ -599,13 +608,13 @@ class VarnishDebug {
 		$cookie_results      = self::cookie_results( $headers );
 		$output              = array_merge( $output, $cookie_results );
 
-		// Themes that don't play nicely with Varnish)
-		$bad_themes_results  = self::bad_themes_results();
-		$output              = array_merge( $output, $bad_themes_results );
-
 		// Plugins that don't play nicely with Varnish)
 		$bad_plugins_results = self::bad_plugins_results();
 		$output              = array_merge( $output, $bad_plugins_results );
+
+		// Themes that don't play nicely with Varnish)
+		$bad_themes_results  = self::bad_themes_results();
+		$output              = array_merge( $output, $bad_themes_results );
 
 		return $output;
 	}

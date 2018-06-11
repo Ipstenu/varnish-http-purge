@@ -3,11 +3,7 @@ Contributors: Ipstenu, mikeschroder, techpriester
 Tags: varnish, purge, cache
 Requires at least: 4.7
 Tested up to: 4.9
-<<<<<<< HEAD
 Stable tag: 4.6.0
-=======
-Stable tag: 4.5.2
->>>>>>> master
 Requires PHP: 5.6
 
 Automatically empty Varnish Cache when content on your site is modified.
@@ -97,11 +93,23 @@ Yes! [Full documentation can be found on Custom Filters in the wiki](https://git
 
 = Can I turn off caching? =
 
-Yes and no. Remember, the plugin isn't doing the caching so it really depends on your server setup. You can set the following define in your `wp-config.php` file to attempt and disable caching, however this may not work on all setups: `define( 'VHP_DEBUG', true );`
+There are two ways to disable caching:
+
+1. Add `define( 'VHP_DEBUG', true );` to your `wp-config.php` file 
+
+2. Go to Varnish -> Settings and enable debug mode for 24 hours at a time
+
+= Why don't I have access to turn off caching? =
+
+Due to the damage this can cause a site, access is limited to admins only. In the case of a multisite network, only <em>Network Admins</em> can disable caching.
+
+= Why are some pages still cached when I disable caching? =
+
+The plugin isn't doing the caching so your server will actually continue to cache content. That means files that exist outside of WordPress (like CSS or images) will still be cached and may serve cached content.
 
 = How can I tell if everything's caching? =
 
-From your WordPress Dashboard, go to <em>Tools</em> -> <em>Varnish Debugging</em>. There a page will auto-scan your front page and report back any issues found. This includes any known problematic plugins. You can use it to scan any URL on your domain (but ONLY on your own domain).
+From your WordPress Dashboard, go to <em>Varnish</em> -> <em> Debugging</em>. There a page will auto-scan your front page and report back any issues found. This includes any known problematic plugins. You can use it to scan any URL on your domain (but ONLY on your own domain).
 
 = Why doesn't the debug page autoload anymore? =
 
@@ -174,17 +182,17 @@ This plugin is installed by default for _all_ DreamPress installs on DreamHost, 
 
 == Changelog ==
 
-<<<<<<< HEAD
 = 4.6.0 = 
 
 * June 2018
-* Now with disabling!
-=======
+* Moved Varnish to it's own menu (with the carrot)
+* Add option to enable debugging (for super-admins only)
+* Add new action hook for after a full purge (props @futtta)
+
 = 4.5.2 =
 
 * June 2018
 * Bug Fix: Prevent error for non-admins
->>>>>>> master
 
 = 4.5.1 =
 

@@ -45,7 +45,7 @@ class VarnishPurger {
 		add_action( 'init', array( &$this, 'init' ) );
 		add_action( 'admin_init', array( &$this, 'admin_init' ) );
 		
-		self::$options = array( 'active' => false, 'expire' => time() );
+		self::$options = array( 'active' => FALSE, 'expire' => current_time( 'timestamp' ) );
 	}
 
 	/**
@@ -66,10 +66,18 @@ class VarnishPurger {
 			return;
 		}
 
-		// Warning: No Pretty Permalinks!
-		if ( '' == get_option( 'permalink_structure' ) && current_user_can( 'manage_options' ) ) {
-			add_action( 'admin_notices' , array( $this, 'require_pretty_permalinks_notice' ) );
-			return;
+		// Admin notices
+		if ( current_user_can( 'manage_options' ) ) {
+
+			// Warning: Debug is active
+			if ( VarnishDebug::debug_check() ) {
+				add_action( 'admin_notices' , array( $this, 'debugging_is_active_notice' ) );
+			}
+
+			// Warning: No Pretty Permalinks!
+			if ( '' == get_option( 'permalink_structure' )  ) {
+				add_action( 'admin_notices' , array( $this, 'require_pretty_permalinks_notice' ) );
+			}
 		}
 	}
 
@@ -154,6 +162,23 @@ class VarnishPurger {
 	 */
 	function require_wp_version_notice() {
 		echo "<div id='message' class='error'><p>" . sprintf( __( 'Varnish HTTP Purge requires WordPress 4.7 or greater. Please <a href="%1$s">upgrade WordPress</a>.', 'varnish-http-purge' ), admin_url( 'update-core.php' ) ) . "</p></div>";
+	}
+
+	/**
+	 * Warning: Debugging
+	 * Debugging is active
+	 *
+	 * @since 4.6.0
+	 */
+	function debugging_is_active_notice() {
+		if ( VHP_DEBUG ) {
+			$message = __( 'Varnish HTTP Purge debugging is active because it has been defined in wp-config. You will need to remove that to disable debugging.', 'varnish-http-purge' );
+		} else {
+			$options = get_option( 'vhp_varnish_debug', VarnishPurger::$options );
+			$time    = human_time_diff( current_time( 'timestamp' ), $options['expire'] );
+			$message = sprintf( __( 'Varnish HTTP Purge debugging is active for %1$s. You can disable this at the <a href="%2$s">Varnish Settings Page</a>.', 'varnish-http-purge' ), $time, admin_url( 'admin.php?page=varnish-status' ) );
+		}
+		echo '<div class="notice notice-warning"><p>' . $message. '</p></div>';
 	}
 
 	/**

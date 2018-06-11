@@ -497,6 +497,8 @@ class VarnishPurger {
 				array_push( $this->purgeUrls, $url ) ;
 			}
 		}
+		
+		do_action( 'after_full_purge' );
 	}
 
 	/**
@@ -695,12 +697,11 @@ if ( defined( 'WP_CLI' ) && WP_CLI ) {
 	include( 'wp-cli.php' );
 }
 
-/* Settings Page
+/* Settings Pages
  * 
  * @since 4.0
  */
 include_once( 'settings.php' );
-
 include_once( 'debug.php' );
 
 $purger = new VarnishPurger();

@@ -99,13 +99,15 @@ There are two ways to disable caching:
 
 2. Go to Varnish -> Settings and enable debug mode for 24 hours at a time
 
+Personally I recommend you _only_ use the define if you're developing on a separate site for an extended period of time. If you put that on your production site, you will slow your site down and lose all the benefits of caching in the first place.
+
 = Why don't I have access to turn off caching? =
 
 Due to the damage this can cause a site, access is limited to admins only. In the case of a multisite network, only <em>Network Admins</em> can disable caching.
 
 = Why are some pages still cached when I disable caching? =
 
-The plugin isn't doing the caching so your server will actually continue to cache content. That means files that exist outside of WordPress (like CSS or images) will still be cached and may serve cached content.
+The plugin isn't doing the caching so your server will actually continue to cache content. That means files that exist outside of WordPress (like CSS or images) will still be cached and _may_ serve cached content. The plugin does its best to add a No Cache parameter to javascript and CSS, however if a theme or plugin _doesn't_ use proper WordPress enqueues, then their content will be shown cached.
 
 = How can I tell if everything's caching? =
 
@@ -125,7 +127,7 @@ If you're using nginx, it's `pagespeed ModifyCachingHeaders off;`
 
 When you use CloudFlare or any other similar service, you've put a proxy in front of the Varnish proxy. In general this isn't a bad thing, though it can introduce some network latency (that means your site may run slower because it has to go through multiple layers to get to the content). The problem arises when WordPress tries to send the purge request to your domain name and, with a proxy, that means the proxy service and not your website.
 
-On single-site, you can edit this via the Tools -> Varnish Status page. On Multisite, you'll need to add the following to your wp-config.php file: `define('VHP_VARNISH_IP','123.45.67.89');`
+On single-site, you can edit this via the Varnish -> Debug page. On Multisite, you'll need to add the following to your wp-config.php file: `define('VHP_VARNISH_IP','123.45.67.89');`
 
 Replace "123.45.67.89" with the IP of your <em>Varnish Server</em> (not CloudFlare, Varnish). <em>DO NOT</em> put in http in this define.
 

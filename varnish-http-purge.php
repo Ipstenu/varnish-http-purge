@@ -30,8 +30,8 @@ Network: true
  */
 
 class VarnishPurger {
-	protected $purgeUrls = array();
-	public static $options   = array();
+	protected $purgeUrls   = array();
+	public static $options = array();
 
 	/**
 	 * Init
@@ -90,11 +90,9 @@ class VarnishPurger {
 	public function init() {
 		global $blog_id;
 
-		// If Debugging is true, throw down a session to 'break' caching
+		// If Debugging is true, do the Debug
 		if ( VarnishDebug::debug_check() ) {
-			@session_start();
-			// To Do: Add in a ?nocache param to URLs
-			// Need to add in for css and JS and images most of all
+			VarnishDebug::debug_do()
 		}
 
 		// get my events

@@ -49,6 +49,34 @@ class VarnishDebug {
 		return $return;
 	}
 
+
+	/**
+	 * Do the Debug actions.
+	 * 
+	 * @access public
+	 * @static
+	 * @return void
+	 */
+	public static function debug_do() {
+		// Sessions to break PHP caching
+		@session_start();
+		
+		// Add nocacche to CSS and JS
+		add_filter( 'style_loader_src',  array( $this, 'nocache_cssjs' ), 10, 2 );
+		add_filter( 'script_loader_src', array( $this, 'nocache_cssjs' ), 10, 2 );
+	}
+
+	/**
+	 * Append the ?nocache parameter to JS and CSS files
+	 * 
+	 * @since 4.6.0
+	 */
+	function nocache_cssjs( $src ) {
+		$src = remove_query_arg( 'ver', $src );
+		$src = add_query_arg( 'nocache', '', $src );
+		return esc_url( $src );
+	}
+
 	/**
 	 * Remote Get Varnish URL
 	 *

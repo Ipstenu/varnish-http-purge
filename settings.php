@@ -58,7 +58,7 @@ class VarnishStatus {
 		add_menu_page( __( 'Varnish HTTP Purge', 'varnish-http-purge' ), __( 'Varnish', 'varnish-http-purge' ), 'manage_options', 'varnish-status', array( &$this, 'settings_page' ), 'dashicons-carrot', 75 );
 		add_submenu_page( 'varnish-status', __( 'Varnish HTTP Purge', 'varnish-http-purge' ), __( 'Settings', 'varnish-http-purge' ), 'manage_options', 'varnish-status', array( &$this, 'settings_page' ) );
 		// Debug Subpage
-		add_submenu_page( 'varnish-status', __( 'Debug', 'varnish-http-purge' ), __( 'Debug', 'varnish-http-purge' ), 'manage_options', 'varnish-debug', array( &$this, 'debug_page' ) );
+		add_submenu_page( 'varnish-status', __( 'Check Caching', 'varnish-http-purge' ), __( 'Check Caching', 'varnish-http-purge' ), 'manage_options', 'varnish-debug', array( &$this, 'debug_page' ) );
 	}
 
 	/**
@@ -88,7 +88,7 @@ class VarnishStatus {
 	function options_settings_debug() {
 		?>
 		<p><a name="#configuredebug"></a><?php _e( 'You can enable debugging for 24 hours. After that time, debugging will disable itself. While debugging is active, your site will still perform caching, but users will not see cached content. This will make your site run slower, so please use with caution.', 'varnish-http-purge' ); ?></p>
-		<p><?php _e( 'If you need to activate debugging for extended periods of time, you can add <code>define( \'VHP_DEBUG\', true );</code> in your wp-config file.', 'varnish-http-purge' ); ?></p>
+		<p><?php _e( 'If you need to activate debugging for extended periods of time, you can add <code>define( \'VHP_DEVMODE\', true );</code> in your wp-config file.', 'varnish-http-purge' ); ?></p>
 		<?php
 	}
 
@@ -243,11 +243,11 @@ class VarnishStatus {
 
 		// Set icons
 		$icons = array (
-			'awesome' => '<span class="dashicons dashicons-heart" style="color:#008000;"></span>',
-			'good'    => '<span class="dashicons dashicons-thumbs-up" style="color:#008000;"></span>',
-			'warning' => '<span class="dashicons dashicons-warning" style="color:#FF9933"></span>',
-			'awkward' => '<span class="dashicons dashicons-flag" style="color:#FF9933;">',
-			'bad'     => '<span class="dashicons dashicons-thumbs-down" style="color:#990000;"></span>',
+			'awesome' => '<span class="dashicons dashicons-heart" style="color:#46B450;"></span>',
+			'good'    => '<span class="dashicons dashicons-thumbs-up" style="color:#00A0D2;"></span>',
+			'warning' => '<span class="dashicons dashicons-warning" style="color:#FFB900"></span>',
+			'awkward' => '<span class="dashicons dashicons-flag" style="color:#826EB4;">',
+			'bad'     => '<span class="dashicons dashicons-thumbs-down" style="color:#DC3232;"></span>',
 		);
 
 		// Get the base URL to start

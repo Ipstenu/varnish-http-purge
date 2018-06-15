@@ -42,7 +42,7 @@ On a multisite network using subfolders, only <strong>network admins</strong> ca
 
 If you're working on a site and need to turn off caching in one of two ways:
 
-1. Add `define( 'VHP_DEBUG', true );` to your `wp-config.php` file 
+1. Add `define( 'VHP_DEVMODE', true );` to your `wp-config.php` file 
 2. Go to Varnish -> Settings and enable debug mode for 24 hours at a time
 
 That will break cache on page loads. It is _not_ recommended for production!
@@ -98,7 +98,7 @@ Yes! [Full documentation can be found on Custom Filters in the wiki](https://git
 
 There are two ways to disable caching:
 
-1. Add `define( 'VHP_DEBUG', true );` to your `wp-config.php` file 
+1. Add `define( 'VHP_DEVMODE', true );` to your `wp-config.php` file 
 
 2. Go to Varnish -> Settings and enable debug mode for 24 hours at a time
 
@@ -191,7 +191,9 @@ This plugin is installed by default for _all_ DreamPress installs on DreamHost, 
 
 * June 2018
 * Moved Varnish to it's own menu (with the carrot)
-* Add option to enable debugging (for super-admins only)
+* Add option to enable debugging for 24 hours (for super-admins only)
+* Improve development mode
+* Improve 
 * Add new action hook for after a full purge (props @futtta)
 
 = 4.5.2 =
@@ -222,6 +224,8 @@ This plugin is installed by default for _all_ DreamPress installs on DreamHost, 
 2. Purge button on Toolbar
 3. Scanner results
 4. Change Varnish IP address
+5. Activate Debugging
+6. Debugging Warning (24 hour notice)
 
 == Upgrade Notice ==
 

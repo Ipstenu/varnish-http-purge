@@ -23,18 +23,18 @@ if ( !defined( 'ABSPATH' ) ) die();
 class VarnishDebug {
 
 	/**
-	 * Debug Check
-	 * See if debugging is active
+	 * Devmode Check
+	 * See if Dev Mode is active
 	 *
 	 * @since 4.6.0
 	 * @returns true|false
 	 */
-	public static function debug_check() {
+	public static function devmode_check() {
 
 		$return = FALSE;
 		$debug  = get_option( 'vhp_varnish_debug', VarnishPurger::$options );
 
-		if ( VHP_DEBUG ) {
+		if ( VHP_DEVMODE ) {
 			$return = TRUE;
 		} elseif ( isset( $debug['active'] ) && $debug['active'] ) {
 			// if expire is less that NOW, it's over
@@ -596,10 +596,10 @@ class VarnishDebug {
 		$output = array();
 
 		// Preface with Debugging Warning
-		if ( self::debug_check() ) {
+		if ( self::devmode_check() ) {
 			$output['Debugging'] = array( 
 				'icon'    => 'awkward',
-				'message' => __( 'Debugging is active on this domain, so caching is intentionally inactive.', 'varnish-http-purge' ),
+				'message' => __( 'Dev Mode is currently active. All caching is intentionally disabled.', 'varnish-http-purge' ),
 			);
 		}
 

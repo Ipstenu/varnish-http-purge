@@ -41,7 +41,7 @@ class VarnishPurger {
 	 */
 	public function __construct( ) {
 		defined( 'VHP_VARNISH_IP' ) || define( 'VHP_VARNISH_IP' , false );
-		defined( 'VHP_DEBUG' )      || define( 'VHP_DEBUG', false );
+		defined( 'VHP_DEVMODE' )    || define( 'VHP_DEVMODE', false );
 		add_action( 'init', array( &$this, 'init' ) );
 		add_action( 'admin_init', array( &$this, 'admin_init' ) );
 		
@@ -70,7 +70,7 @@ class VarnishPurger {
 		if ( current_user_can( 'manage_options' ) ) {
 
 			// Warning: Debug is active
-			if ( VarnishDebug::debug_check() ) {
+			if ( VarnishDebug::devmode_check() ) {
 				add_action( 'admin_notices' , array( $this, 'debugging_is_active_notice' ) );
 			}
 
@@ -90,8 +90,8 @@ class VarnishPurger {
 	public function init() {
 		global $blog_id;
 
-		// If Debugging is true, do the Debug
-		if ( VarnishDebug::debug_check() ) {
+		// If Dev Mode is true, kill caching
+		if ( VarnishDebug::devmode_check() ) {
 			if ( !is_admin() ) {
 				// Sessions to break PHP caching
 				if ( !is_user_logged_in() ) @session_start();
@@ -176,7 +176,7 @@ class VarnishPurger {
 	 * @since 4.6.0
 	 */
 	function debugging_is_active_notice() {
-		if ( VHP_DEBUG ) {
+		if ( VHP_DEVMODE ) {
 			$message = __( 'Varnish HTTP Purge debugging is active because it has been defined in wp-config. You will need to remove that to disable debugging.', 'varnish-http-purge' );
 		} else {
 			$options = get_option( 'vhp_varnish_debug', VarnishPurger::$options );

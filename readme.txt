@@ -40,7 +40,10 @@ On a multisite network using subfolders, only <strong>network admins</strong> ca
 
 = Debugging =
 
-If you're working on a site and need to turn off caching, add this to your wp-config file: `define( 'VHP_DEBUG', true );`
+If you're working on a site and need to turn off caching in one of two ways:
+
+1. Add `define( 'VHP_DEBUG', true );` to your `wp-config.php` file 
+2. Go to Varnish -> Settings and enable debug mode for 24 hours at a time
 
 That will break cache on page loads. It is _not_ recommended for production!
 

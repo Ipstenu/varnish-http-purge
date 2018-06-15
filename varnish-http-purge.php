@@ -92,7 +92,14 @@ class VarnishPurger {
 
 		// If Debugging is true, do the Debug
 		if ( VarnishDebug::debug_check() ) {
-			VarnishDebug::debug_do()
+			if ( !is_admin() ) {
+				// Sessions to break PHP caching
+				if ( !is_user_logged_in() ) @session_start();
+		
+				// Add nocacche to CSS and JS
+				add_filter( 'style_loader_src',  array( 'VarnishDebug', 'nocache_cssjs' ), 10, 2 );
+				add_filter( 'script_loader_src', array( 'VarnishDebug', 'nocache_cssjs' ), 10, 2 );
+			}
 		}
 
 		// get my events

@@ -93,7 +93,23 @@ if ( !class_exists( 'WP_CLI_Varnish_Command' ) ) {
 		/**
 		 * Runs a debug check of the site to see if there are any known 
 		 * issues that would stop Varnish from caching.
-		 * 
+		 *
+		 * ## OPTIONS
+		 *
+		 * [<url>]
+		 * : Specify a URL for testing against. Default is the home URL.
+		 *
+		 * [--format=<format>]
+		 * : Render output in a particular format.
+		 * ---
+		 * default: table
+		 * options:
+		 *   - table
+		 *   - csv
+		 *   - json
+		 *   - yaml
+		 * ---
+		 *
 		 * ## EXAMPLES
 		 * 
 		 *		wp varnish debug

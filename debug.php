@@ -550,7 +550,7 @@ class VarnishDebug {
 			$my_theme = wp_get_theme( $theme );
 			$message  = __( 'Active Theme ', 'varnish-http-purge') . ucfirst( $theme ) . ': ' . $info->message;
 			$warning  = $info->type;
-			if ( $my_theme->exists() ) {
+			if ( $my_theme->exists() && $theme == get_template() ) {
 				$return[ 'Theme: ' . ucfirst( $theme ) ] = array( 'icon' => $warning, 'message' => $message );
 			}
 		}

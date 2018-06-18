@@ -548,9 +548,10 @@ class VarnishDebug {
 		// Check all the themes. If one of the questionable ones are active, warn
 		foreach ( $themes as $theme => $info ) {
 			$my_theme = wp_get_theme( $theme );
-			$message  = __( 'Active Theme ', 'varnish-http-purge') . ucfirst( $theme ) . ': ' . $info->message;
+			$prefix = ( $theme == get_template() )? __( 'Active Theme', 'varnish-http-purge') : __( 'Inactive Theme', 'varnish-http-purge');
+			$message  = $prefix . ' ' . ucfirst( $theme ) . ': ' . $info->message;
 			$warning  = $info->type;
-			if ( $my_theme->exists() && $theme == get_template() ) {
+			if ( $my_theme->exists() ) {
 				$return[ 'Theme: ' . ucfirst( $theme ) ] = array( 'icon' => $warning, 'message' => $message );
 			}
 		}

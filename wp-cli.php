@@ -163,6 +163,9 @@ if ( !class_exists( 'WP_CLI_Varnish_Command' ) ) {
 				if ( WP_CLI\Utils\get_flag_value( $assoc_args, 'include-headers' ) ) {
 					WP_CLI::log( 'Headers:' );
 					foreach ( $headers as $key => $value ) {
+						if ( is_array( $value ) ) {
+							$value = implode( ', ', $value );
+						}
 						WP_CLI::log( " - {$key}: {$value}" );
 					}
 				}

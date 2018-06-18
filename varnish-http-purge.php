@@ -44,8 +44,13 @@ class VarnishPurger {
 		defined( 'VHP_DEVMODE' )    || define( 'VHP_DEVMODE', false );
 		add_action( 'init', array( &$this, 'init' ) );
 		add_action( 'admin_init', array( &$this, 'admin_init' ) );
-		
+
+		// Development mode defaults to off
 		self::$devmode = array( 'active' => FALSE, 'expire' => current_time( 'timestamp' ) );
+		if( !get_option( 'vhp_varnish_devmode' ) ){
+			update_option( 'vhp_varnish_devmode', self::$devmode );
+		}
+
 	}
 
 	/**

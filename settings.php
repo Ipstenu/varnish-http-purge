@@ -141,6 +141,9 @@ class VarnishStatus {
 			$set_type         = 'updated';
 		}
 
+		// If it's true then we're activating so let's kill the cache.
+		if ( $output['active'] ) VarnishPurger::purgeUrl( VarnishPurger::the_home_url() . '/?vhp-regex' );
+
 		add_settings_error( 'vhp_varnish_debug', 'varnish-debug', $set_message, $set_type );
 		return $output;
 	}

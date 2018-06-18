@@ -99,6 +99,9 @@ if ( !class_exists( 'WP_CLI_Varnish_Command' ) ) {
 		 * [<url>]
 		 * : Specify a URL for testing against. Default is the home URL.
 		 *
+		 * [--include-headers]
+		 * : Include headers in debug check output.
+		 *
 		 * [--format=<format>]
 		 * : Render output in a particular format.
 		 * ---
@@ -156,6 +159,13 @@ if ( !class_exists( 'WP_CLI_Varnish_Command' ) ) {
 				sleep( 1 );
 				$remote_get = VarnishDebug::remote_get( $varnishurl );
 				$headers    = wp_remote_retrieve_headers( $remote_get );
+
+				if ( WP_CLI\Utils\get_flag_value( $assoc_args, 'include-headers' ) ) {
+					WP_CLI::log( 'Headers:' );
+					foreach ( $headers as $key => $value ) {
+						WP_CLI::log( " - {$key}: {$value}" );
+					}
+				}
 
 				// Preflight checklist
 				$preflight = VarnishDebug::preflight( $remote_get );

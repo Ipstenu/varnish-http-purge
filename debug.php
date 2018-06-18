@@ -487,6 +487,15 @@ class VarnishDebug {
 			}
 		}
 
+		// If no questionable themes are found, let the user know
+		// with a success message.
+		if ( empty( $return ) ) {
+			$return[ 'Theme Success' ] = array(
+				'icon'    => 'good',
+				'message' => 'No themes were found on the Varnish conflicts list.',
+			);
+		}
+
 		return $return;
 	}
 
@@ -532,6 +541,15 @@ class VarnishDebug {
 				$warning  = $info->type;
 				$return[ 'Plugin: ' . ucfirst( $plugin ) ] = array( 'icon' => $warning, 'message' => $message );
 			}
+		}
+
+		// If no questionable plugins are found, let the user know
+		// with a success message.
+		if ( empty( $return ) ) {
+			$return[ 'Plugin Success' ] = array(
+				'icon'    => 'good',
+				'message' => 'No active plugins were found on the Varnish conflicts list.',
+			);
 		}
 
 		return $return;

@@ -30,22 +30,20 @@ class VarnishDebug {
 	 * @returns true|false
 	 */
 	public static function devmode_check() {
-
-		$return = FALSE;
-		$debug  = get_option( 'vhp_varnish_debug', VarnishPurger::$options );
+		$return  = FALSE;
+		$devmode = get_option( 'vhp_varnish_debug', VarnishPurger::$devmode );
 
 		if ( VHP_DEVMODE ) {
 			$return = TRUE;
-		} elseif ( isset( $debug['active'] ) && $debug['active'] ) {
+		} elseif ( isset( $devmode['active'] ) && $devmode['active'] ) {
 			// if expire is less that NOW, it's over
-			if ( $debug['expire'] <= current_time( 'timestamp' ) ) {
-				$debug['active'] = FALSE;
-				update_option( 'vhp_varnish_debug', $debug );
+			if ( $devmode['expire'] <= current_time( 'timestamp' ) ) {
+				$devmode['active'] = FALSE;
+				update_option( 'vhp_varnish_debug', $devmode );
 			} else {
 				$return = TRUE;
 			}
 		}
-
 		return $return;
 	}
 
@@ -60,6 +58,37 @@ class VarnishDebug {
 		return $src;
 	}
 
+	/**
+	 * Validate URL
+	 *
+	 * @since 4.6.0
+	 */
+	static function is_url_valid( $input ) {
+
+		$default = esc_url( VarnishPurger::the_home_url() );
+
+		if ( !empty( $input ) ) {
+			$parsed_input = parse_url( $input );
+			if ( empty( $parsed_input['scheme'] ) ) {
+				$schema_input = 'http://';
+				if ( is_ssl() ) $schema_input = 'https://';
+				$input = $schema_input . ltrim( $input, '/' );
+			}
+		}
+
+		if ( empty( $input ) ) {
+			$output = 'empty';
+		} elseif ( parse_url( $default, PHP_URL_HOST ) !== parse_url( $input, PHP_URL_HOST ) ) {
+			$output = 'domain';
+		} elseif ( !filter_var( $input, FILTER_VALIDATE_URL) ) {
+			$output = 'invalid';
+		} else {
+			$output = 'valid';
+		}
+
+		return $output;
+	}
+	
 	/**
 	 * Remote Get Varnish URL
 	 *

@@ -44,8 +44,8 @@ class VarnishStatus {
 		// Settings page
 		$this->register_settings();
 
-		// Debug page
-		$this->register_debug();
+		// Check Caching page
+		$this->register_check_caching();
 	}
 
 	/**
@@ -58,7 +58,7 @@ class VarnishStatus {
 		add_menu_page( __( 'Varnish HTTP Purge', 'varnish-http-purge' ), __( 'Varnish', 'varnish-http-purge' ), 'manage_options', 'varnish-status', array( &$this, 'settings_page' ), 'dashicons-carrot', 75 );
 		add_submenu_page( 'varnish-status', __( 'Varnish HTTP Purge', 'varnish-http-purge' ), __( 'Settings', 'varnish-http-purge' ), 'manage_options', 'varnish-status', array( &$this, 'settings_page' ) );
 		// Debug Subpage
-		add_submenu_page( 'varnish-status', __( 'Check Caching', 'varnish-http-purge' ), __( 'Check Caching', 'varnish-http-purge' ), 'manage_options', 'varnish-debug', array( &$this, 'debug_page' ) );
+		add_submenu_page( 'varnish-status', __( 'Check Caching', 'varnish-http-purge' ), __( 'Check Caching', 'varnish-http-purge' ), 'manage_options', 'varnish-devmode', array( &$this, 'check_caching_page' ) );
 	}
 
 	/**
@@ -69,9 +69,9 @@ class VarnishStatus {
 	function register_settings() {
 		if ( !is_multisite() || current_user_can( 'manage_network' ) ) {
 			// Debug Settings
-			register_setting( 'vhp-settings-debug', 'vhp_varnish_debug', array( &$this, 'settings_debug_sanitize' ) );
-			add_settings_section( 'vhp-settings-debug-section', __( 'Configure Debugging Settings', 'varnish-http-purge' ), array( &$this, 'options_settings_debug'), 'varnish-debug-settings' );
-			add_settings_field( 'varnish_debug', __( 'Debugging', 'varnish-http-purge' ), array( &$this, 'settings_debug_callback' ), 'varnish-debug-settings', 'vhp-settings-debug-section' );
+			register_setting( 'vhp-settings-devmode', 'vhp_varnish_devmode', array( &$this, 'settings_devmode_sanitize' ) );
+			add_settings_section( 'vhp-settings-devmode-section', __( 'Development Mode Settings', 'varnish-http-purge' ), array( &$this, 'options_settings_devmode'), 'varnish-devmode-settings' );
+			add_settings_field( 'varnish_devmode', __( 'Development Mode', 'varnish-http-purge' ), array( &$this, 'settings_devmode_callback' ), 'varnish-devmode-settings', 'vhp-settings-devmode-section' );
 
 			// IP Settings
 			register_setting( 'vhp-settings-ip', 'vhp_varnish_ip', array( &$this, 'settings_ip_sanitize' ) );
@@ -81,38 +81,38 @@ class VarnishStatus {
 	}
 
 	/**
-	 * Options Settings - Debug
+	 * Options Settings - Dev Mode
 	 *
 	 * @since 4.6
 	 */
-	function options_settings_debug() {
+	function options_settings_devmode() {
 		?>
-		<p><a name="#configuredebug"></a><?php _e( 'You can enable debugging for 24 hours. After that time, debugging will disable itself. While debugging is active, your site will still perform caching, but users will not see cached content. This will make your site run slower, so please use with caution.', 'varnish-http-purge' ); ?></p>
-		<p><?php _e( 'If you need to activate debugging for extended periods of time, you can add <code>define( \'VHP_DEVMODE\', true );</code> in your wp-config file.', 'varnish-http-purge' ); ?></p>
+		<p><a name="#configuredevmode"></a><?php _e( 'In Development Mode, WordPress will prevent visitors from seeing cached content on your site. You can enable this for 24 hours, after which it will automatically disable itself. This will make your site run slower, so please use with caution.', 'varnish-http-purge' ); ?></p>
+		<p><?php _e( 'If you need to activate development mode for extended periods of time, you can add <code>define( \'VHP_DEVMODE\', true );</code> in your wp-config file.', 'varnish-http-purge' ); ?></p>
 		<?php
 	}
 
 	/**
-	 * Settings Debug Callback
+	 * Settings Dev Mode Callback
 	 *
 	 * @since 4.0
 	 */
-	function settings_debug_callback() {
+	function settings_devmode_callback() {
 
-		$debug  = get_option( 'vhp_varnish_debug', VarnishPurger::$options );
-		$active = ( isset( $debug['active'] ) )? $debug['active'] : false;
-		$expire = current_time( 'timestamp' ) + DAY_IN_SECONDS;
+		$devmode = get_option( 'vhp_varnish_devmode', VarnishPurger::$devmode );
+		$active  = ( isset( $devmode['active'] ) )? $devmode['active'] : false;
+		$expire  = current_time( 'timestamp' ) + DAY_IN_SECONDS;
 
 		?>
-		<input type="hidden" name="vhp_varnish_debug[expire]" value="<?php $expire; ?>" />
-		<input type="checkbox" name="vhp_varnish_debug[active]" value="true" <?php checked( $active, true ); ?> />
-		<label for="vhp_varnish_debug['active']">
+		<input type="hidden" name="vhp_varnish_devmode[expire]" value="<?php $expire; ?>" />
+		<input type="checkbox" name="vhp_varnish_devmode[active]" value="true" <?php checked( $active, true ); ?> />
+		<label for="vhp_varnish_devmode['active']">
 			<?php
-			if ( $active && isset( $debug['expire'] ) ) { 
-				$timestamp = date_i18n( get_option( 'date_format' ), $debug['expire'] ) .' @ '. date_i18n( get_option( 'time_format' ), $debug['expire'] );
-				echo sprintf( __( 'Debugging is active until %s. After that, it will automatically disable the next time someone visits your site.', 'varnish-http-purge' ), $timestamp );
+			if ( $active && isset( $devmode['expire'] ) ) { 
+				$timestamp = date_i18n( get_option( 'date_format' ), $devmode['expire'] ) .' @ '. date_i18n( get_option( 'time_format' ), $devmode['expire'] );
+				echo sprintf( __( 'Development Mode is active until %s. After that, it will automatically disable the next time someone visits your site.', 'varnish-http-purge' ), $timestamp );
 			} else {
-				_e( 'Activate debugging', 'varnish-http-purge' );
+				_e( 'Activate Development Mode', 'varnish-http-purge' );
 			}
 			?>
 		</label>
@@ -120,12 +120,12 @@ class VarnishStatus {
 	}
 
 	/**
-	 * Sanitization and validation for Debugging
+	 * Sanitization and validation for Dev Mode
 	 *
 	 * @param $input the input to be sanitized
 	 * @since 4.6.0
 	 */
-	function settings_debug_sanitize( $input ) {
+	function settings_devmode_sanitize( $input ) {
 
 		$output      = array();
 		$expire      = current_time( 'timestamp' ) + DAY_IN_SECONDS;
@@ -137,14 +137,16 @@ class VarnishStatus {
 		} else {
 			$output['active'] = ( isset( $input['active'] ) || $input['active'] )? true : false;
 			$output['expire'] = ( isset( $input['expire'] ) && is_int( $input['expire'] ) )? $input['expire'] : $expire;
-			$set_message      = 'Debugging Options Updated.';
+			$set_message      = ( $output['active'] )? __( 'Development Mode Activated', 'varnish-http-purge' ) : __( 'Development Mode Dectivated', 'varnish-http-purge' );
 			$set_type         = 'updated';
 		}
 
 		// If it's true then we're activating so let's kill the cache.
-		if ( $output['active'] ) VarnishPurger::purgeUrl( VarnishPurger::the_home_url() . '/?vhp-regex' );
-
-		add_settings_error( 'vhp_varnish_debug', 'varnish-debug', $set_message, $set_type );
+		if ( $output['active'] ) {
+			VarnishPurger::purgeUrl( VarnishPurger::the_home_url() . '/?vhp-regex' );
+		}
+		
+		add_settings_error( 'vhp_varnish_devmode', 'varnish-devmode', $set_message, $set_type );
 		return $output;
 	}
 
@@ -219,14 +221,14 @@ class VarnishStatus {
 	}
 
 	/**
-	 * Register Debug
+	 * Register Check Caching
 	 *
 	 * @since 4.0
 	 */
-	function register_debug() {
+	function register_check_caching() {
 		register_setting( 'varnish-http-purge-url', 'vhp_varnish_url', array( &$this, 'varnish_url_sanitize' ) );
-		add_settings_section( 'varnish-url-settings-section', __( 'Check Caching Status', 'varnish-http-purge' ), array( &$this, 'options_debug_scan' ), 'varnish-url-settings' );
-		add_settings_field( 'varnish_url', __( 'Check A URL On Your Site:', 'varnish-http-purge' ), array( &$this, 'debug_callback' ), 'varnish-url-settings', 'varnish-url-settings-section' );
+		add_settings_section( 'varnish-url-settings-section', __( 'Check Caching Status', 'varnish-http-purge' ), array( &$this, 'options_check_caching_scan' ), 'varnish-url-settings' );
+		add_settings_field( 'varnish_url', __( 'Check A URL On Your Site:', 'varnish-http-purge' ), array( &$this, 'check_caching_callback' ), 'varnish-url-settings', 'varnish-url-settings-section' );
 	}
 
 	/**
@@ -234,11 +236,11 @@ class VarnishStatus {
 	 *
 	 * @since 4.0
 	 */
-	function options_debug_scan() {
-		?><p><?php _e( 'While it is impossible to detect all possible conflicts, this status page performs a check of the most common issues that prevents your site from caching properly. This feature is provided to help you in debugging any conflicts on your own. When filing an issue with your web-host, we recommend you include the output in your ticket.', 'varnish-http-purge' ); ?></p>
+	function options_check_caching_scan() {
+		?><p><?php _e( 'While it is impossible to detect all possible conflicts, this status page performs a check of the most common issues that prevents your site from caching properly. This feature is provided to help you in resolve potential conflicts on your own. When filing an issue with your web-host, we recommend you include the output in your ticket.', 'varnish-http-purge' ); ?></p>
 		
-		<p><?php printf ( __( '<strong>This check uses <a href="%s">a remote service hosted on DreamObjects</a></strong>. The service used only for providing up to date compatibility checks on plugins and themes that may conflict with running a server based cache (such as Varnish or Nginx). No personally identifying information regarding persons running this check, nor the plugins and themes in use on this site will be transmitted. The bare minimum of usage information is collected, concerning only IPs and domains making requests of the service. If you do not wish to use this service, please do not use this debugging tool.', 'varnish-http-purge' ), 'https://varnish-http-purge.objects-us-east-1.dream.io/readme.txt' ); ?></p>
-		
+		<p><?php printf ( __( '<strong>This check uses <a href="%s">a remote service hosted on DreamObjects</a></strong>. The service used only for providing up to date compatibility checks on plugins and themes that may conflict with running a server based cache (such as Varnish or Nginx). No personally identifying information regarding persons running this check, nor the plugins and themes in use on this site will be transmitted. The bare minimum of usage information is collected, concerning only IPs and domains making requests of the service. If you do not wish to use this service, please do not use this service.', 'varnish-http-purge' ), 'https://varnish-http-purge.objects-us-east-1.dream.io/readme.txt' ); ?></p>
+
 		<?php
 
 		// If there's no post made, let's not...
@@ -257,74 +259,79 @@ class VarnishStatus {
 		$url        = esc_url( VarnishPurger::the_home_url() );
 		$varnishurl = get_option( 'vhp_varnish_url', $url );
 
-		// Get the response and headers
-		$remote_get = VarnishDebug::remote_get( $varnishurl );
-		$headers    = wp_remote_retrieve_headers( $remote_get );
-
-		// Preflight checklist
-		$preflight = VarnishDebug::preflight( $remote_get );
-
-		// Check for Remote IP
-		$remote_ip = VarnishDebug::remote_ip( $headers );
-
-		// Get the Varnish IP
-		if ( VHP_VARNISH_IP != false ) {
-			$varniship = VHP_VARNISH_IP;
-		} else {
-			$varniship = get_option( 'vhp_varnish_ip' );
-		}
-		?>
-		
-		<h4><?php printf( __( 'Results for %s', 'varnish-http-purge'  ), $varnishurl ); ?></h4>
-		
-		<table class="wp-list-table widefat fixed posts">
-		<?php
-
-			// If we failed the preflight checks, we fail.
-			if ( $preflight['preflight'] == false ) {
-				?><tr>
-					<td width="40px"><?php echo $icons['bad']; ?></td>
-					<td><?php echo $preflight['message']; ?></td>
-				</tr><?php
+		// Is this a good URL?
+		$valid_url = VarnishDebug::is_url_valid( $varnishurl );
+		if ( $valid_url == 'valid' ) {
+			// Get the response and headers
+			$remote_get = VarnishDebug::remote_get( $varnishurl );
+			$headers    = wp_remote_retrieve_headers( $remote_get );
+	
+			// Preflight checklist
+			$preflight = VarnishDebug::preflight( $remote_get );
+	
+			// Check for Remote IP
+			$remote_ip = VarnishDebug::remote_ip( $headers );
+	
+			// Get the Varnish IP
+			if ( VHP_VARNISH_IP != false ) {
+				$varniship = VHP_VARNISH_IP;
 			} else {
-				// We passed the checks, let's get the data!
-
-				$output = VarnishDebug::get_all_the_results( $headers, $remote_ip, $varniship );
-
-				foreach ( $output as $item ) {
-					if ( $item !== false && is_array( $item ) ) {
-						?><tr>
-							<td width="40px"><?php echo $icons[ $item['icon'] ]; ?></td>
-							<td><?php echo $item['message'] ?></td>
-						</tr><?php
-					}
-				}
+				$varniship = get_option( 'vhp_varnish_ip' );
 			}
-		?>
-		</table>
-
-		<?php
-		if ( $preflight['preflight'] !== false ) {
-		?>
-			<h4><?php _e( 'Technical Details', 'varnish-http-purge'  ); ?></h4>
+			?>
+			
+			<h4><?php printf( __( 'Results for %s', 'varnish-http-purge'  ), $varnishurl ); ?></h4>
+			
 			<table class="wp-list-table widefat fixed posts">
-				<?php
-				if ( !empty( $headers[0] ) ) {
-					echo '<tr><td width="200px">&nbsp;</td><td>' . $headers[0] . '</td></tr>';
-				}
-				foreach ( $headers as $header => $key ) {
-					if ( $header !== '0' ) {
-						if ( is_array( $key ) ) {
-							$content = print_r( $key, true );
-						} else {
-							$content = wp_kses_post( $key );
+			<?php
+	
+				// If we failed the preflight checks, we fail.
+				if ( $preflight['preflight'] == false ) {
+					?><tr>
+						<td width="40px"><?php echo $icons['bad']; ?></td>
+						<td><?php echo $preflight['message']; ?></td>
+					</tr><?php
+				} else {
+					// We passed the checks, let's get the data!
+	
+					$output = VarnishDebug::get_all_the_results( $headers, $remote_ip, $varniship );
+	
+					foreach ( $output as $item ) {
+						if ( $item !== false && is_array( $item ) ) {
+							?><tr>
+								<td width="40px"><?php echo $icons[ $item['icon'] ]; ?></td>
+								<td><?php echo $item['message'] ?></td>
+							</tr><?php
 						}
-						echo '<tr><td width="200px" style="text-align:right;">' . ucfirst( $header ) . ':</td><td>' . $content . '</td></tr>';
 					}
 				}
-				?>
+			?>
 			</table>
-		<?php
+	
+			<?php
+			if ( $preflight['preflight'] !== false ) {
+			?>
+				<h4><?php _e( 'Technical Details', 'varnish-http-purge'  ); ?></h4>
+				<table class="wp-list-table widefat fixed posts">
+					<?php
+					if ( !empty( $headers[0] ) ) {
+						echo '<tr><td width="200px">&nbsp;</td><td>' . $headers[0] . '</td></tr>';
+					}
+					foreach ( $headers as $header => $key ) {
+						if ( $header !== '0' ) {
+							if ( is_array( $key ) ) {
+								$content = print_r( $key, true );
+							} else {
+								$content = wp_kses_post( $key );
+							}
+							echo '<tr><td width="200px" style="text-align:right;">' . ucfirst( $header ) . ':</td><td>' . $content . '</td></tr>';
+						}
+					}
+					?>
+				</table>
+			<?php
+			}
+
 		}
 	}
 
@@ -333,7 +340,7 @@ class VarnishStatus {
 	 *
 	 * @since 4.0
 	 */
-	function debug_callback() {
+	function check_caching_callback() {
 		$url        = esc_url( VarnishPurger::the_home_url() );
 		$varnishurl = get_option( 'vhp_varnish_url', $url );
 		?><input type="text" id="vhp_varnish_url" name="vhp_varnish_url" value="<?php echo $varnishurl; ?>" size="50" /><?php
@@ -351,27 +358,30 @@ class VarnishStatus {
 		$output   = esc_url( VarnishPurger::the_home_url() );
 		$set_type = 'error';
 
-		if ( !empty( $input ) ) {
-			$parsed_input = parse_url( $input );
-			if ( empty( $parsed_input['scheme'] ) ) {
-				$schema_input = 'http://';
-				if ( is_ssl() ) $schema_input = 'https://';
-				$input = $schema_input . ltrim( $input, '/' );
+		if ( empty( $input ) ) {
+			$set_message = __( 'You must enter a URL from your own domain to scan.', 'varnish-http-purge' );
+		} else {
+			$valid_url = VarnishDebug::is_url_valid( esc_url( $input ) );
+
+			switch ( $valid_url ) {
+				case 'empty':
+				case 'domain':
+					$set_message = __( 'You must provide a URL on your own domain to scan.', 'varnish-http-purge' );
+					break;
+				case 'invalid':
+					$set_message = __( 'You have entered an invalid URL address.', 'varnish-http-purge' );
+					break;
+				case 'valid':
+					$set_type    = 'updated';
+					$set_message = __( 'URL Scanned.', 'varnish-http-purge' );
+					$output      = esc_url( $input );
+					break;
+				default:
+					$set_message = __( 'An unknown error has occurred.', 'varnish-http-purge' );
+					break;
 			}
 		}
 
-		if ( empty( $input ) ) {
-			$set_message = __( 'You must enter a URL from your own domain to scan.', 'varnish-http-purge' );
-		} elseif ( !filter_var( $input, FILTER_VALIDATE_URL) ) {
-			$set_message = __( 'You have entered an invalid URL address.', 'varnish-http-purge' );
-		} elseif ( parse_url( $output, PHP_URL_HOST ) !== parse_url( $input, PHP_URL_HOST ) ) {
-			$set_message = __( 'You cannot scan URLs on other domains.', 'varnish-http-purge' );
-		} else {
-			$set_type    = 'updated';
-			$set_message = __( 'URL Scanned.', 'varnish-http-purge' );
-			$output      = filter_var( $input, FILTER_VALIDATE_URL);
-		}
-		
 		if ( isset( $set_message ) ) add_settings_error( 'vhp_varnish_url', 'varnish-url', $set_message, $set_type );
 		return $output;
 	}
@@ -392,9 +402,9 @@ class VarnishStatus {
 			<?php
 			if ( !is_multisite() || current_user_can( 'manage_network' ) ) {
 				?><form action="options.php" method="POST" ><?php
-					settings_fields( 'vhp-settings-debug' );
-					do_settings_sections( 'varnish-debug-settings' );
-					submit_button( __( 'Save Debug Settings', 'varnish-http-purge' ), 'primary');
+					settings_fields( 'vhp-settings-devmode' );
+					do_settings_sections( 'varnish-devmode-settings' );
+					submit_button( __( 'Save Settings', 'varnish-http-purge' ), 'primary');
 				?></form>
 	
 				<form action="options.php" method="POST" ><?php
@@ -413,11 +423,11 @@ class VarnishStatus {
 	}
 
 	/*
-	 * Call Debug page
+	 * Call the Check Caching
 	 *
 	 * @since 4.6.0
 	 */
-	function debug_page() {
+	function check_caching_page() {
 		?>
 		<div class="wrap">
 
@@ -435,6 +445,5 @@ class VarnishStatus {
 	}
 
 }
-
 
 $status = new VarnishStatus();

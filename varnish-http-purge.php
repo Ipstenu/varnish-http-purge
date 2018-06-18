@@ -31,7 +31,7 @@ Network: true
 
 class VarnishPurger {
 	protected $purgeUrls   = array();
-	public static $options = array();
+	public static $devmode = array();
 
 	/**
 	 * Init
@@ -45,7 +45,7 @@ class VarnishPurger {
 		add_action( 'init', array( &$this, 'init' ) );
 		add_action( 'admin_init', array( &$this, 'admin_init' ) );
 		
-		self::$options = array( 'active' => FALSE, 'expire' => current_time( 'timestamp' ) );
+		self::$devmode = array( 'active' => FALSE, 'expire' => current_time( 'timestamp' ) );
 	}
 
 	/**
@@ -71,7 +71,7 @@ class VarnishPurger {
 
 			// Warning: Debug is active
 			if ( VarnishDebug::devmode_check() ) {
-				add_action( 'admin_notices' , array( $this, 'debugging_is_active_notice' ) );
+				add_action( 'admin_notices' , array( $this, 'devmode_is_active_notice' ) );
 			}
 
 			// Warning: No Pretty Permalinks!
@@ -170,18 +170,18 @@ class VarnishPurger {
 	}
 
 	/**
-	 * Warning: Debugging
-	 * Debugging is active
+	 * Warning: Development Mode 
+	 * Checks if DevMode is active
 	 *
 	 * @since 4.6.0
 	 */
-	function debugging_is_active_notice() {
+	function devmode_is_active_notice() {
 		if ( VHP_DEVMODE ) {
-			$message = __( 'Varnish HTTP Purge debugging is active because it has been defined in wp-config. You will need to remove that to disable debugging.', 'varnish-http-purge' );
+			$message = __( 'Varnish HTTP Purge Development Mode is active because it has been defined in wp-config. You will need to remove that in order to allow visitors to see cached data.', 'varnish-http-purge' );
 		} else {
-			$options = get_option( 'vhp_varnish_debug', VarnishPurger::$options );
-			$time    = human_time_diff( current_time( 'timestamp' ), $options['expire'] );
-			$message = sprintf( __( 'Varnish HTTP Purge debugging is active for %1$s. You can disable this at the <a href="%2$s">Varnish Settings Page</a>.', 'varnish-http-purge' ), $time, admin_url( 'admin.php?page=varnish-status' ) );
+			$devmode = get_option( 'vhp_varnish_devmode', VarnishPurger::$devmode );
+			$time    = human_time_diff( current_time( 'timestamp' ), $devmode['expire'] );
+			$message = sprintf( __( 'Varnish HTTP Purge Development Mode is active for %1$s. You can disable this at the <a href="%2$s">Varnish Settings Page</a>.', 'varnish-http-purge' ), $time, admin_url( 'admin.php?page=varnish-status' ) );
 		}
 		echo '<div class="notice notice-warning"><p>' . $message. '</p></div>';
 	}

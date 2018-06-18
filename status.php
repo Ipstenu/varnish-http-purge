@@ -160,6 +160,12 @@ class VarnishStatus {
 		$remote_get = VarnishDebug::remote_get( $varnishurl );
 		$headers    = wp_remote_retrieve_headers( $remote_get );
 
+		// Because the 'Age' header is an important check,
+		// wait a second and fetch the headers again.
+		sleep( 1 );
+		$remote_get = VarnishDebug::remote_get( $varnishurl );
+		$headers    = wp_remote_retrieve_headers( $remote_get );
+
 		// Preflight checklist
 		$preflight = VarnishDebug::preflight( $remote_get );
 

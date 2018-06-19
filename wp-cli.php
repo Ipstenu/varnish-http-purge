@@ -75,19 +75,61 @@ if ( !class_exists( 'WP_CLI_Varnish_Command' ) ) {
 			
 			if ( version_compare( $wp_version, '4.6', '>=' ) && ( version_compare( $cli_version, '0.25.0', '<' ) || version_compare( $cli_version, '0.25.0-alpha', 'eq' ) ) ) {
 				
-				WP_CLI::log( sprintf( 'This plugin does not work on WP 4.6 and up, unless WP-CLI is version 0.25.0 or greater. You\'re using WP-CLI %s and WordPress %s.', $cli_version, $wp_version ) );
-				WP_CLI::log( 'To flush your cache, please run the following command:');
+				WP_CLI::log( sprintf( __( 'This plugin does not work on WP 4.6 and up, unless WP-CLI is version 0.25.0 or greater. You\'re using WP-CLI %s and WordPress %s.', 'varnish-http-purge' ), $cli_version, $wp_version ) );
+				WP_CLI::log( __( 'To flush your cache, please run the following command:', 'varnish-http-purge' ) );
 				WP_CLI::log( sprintf( '$ curl -X PURGE "%s"' , $url . $wild ) );
-				WP_CLI::error( 'Varnish Cache must be purged manually.' );
+				WP_CLI::error( __( 'Varnish Cache must be purged manually.', 'varnish-http-purge' ) );
 			}
 	
 			$this->varnish_purge->purgeUrl( $url . $pregex );
 			
 			if ( WP_DEBUG == true ) {
-				WP_CLI::log( sprintf( 'Flushing URL: %s with params: %s.', $url, $pregex ) );
+				WP_CLI::log( sprintf( __( 'Flushing URL: %s with params: %s.', 'varnish-http-purge' ), $url, $pregex ) );
 			}
 	
-			WP_CLI::success( 'The Varnish cache was purged.' );
+			WP_CLI::success( __( 'The Varnish cache was purged.', 'varnish-http-purge' ) );
+		}
+
+		/**
+		 * Activate, deactivate, or toggle Development Mode.
+		 * 
+		 * ## OPTIONS
+		 *
+		 * [<state>]
+		 * : Change the state of Development Mode
+		 * ---
+		 * options:
+		 *   - activate
+		 *   - deactivate
+		 *   - toggle
+		 * ---
+		 *
+		 * ## EXAMPLES
+		 * 
+		 *		wp varnish devmode activate
+		 *		wp varnish devmode deactivate
+		 *		wp varnish devmode toggle
+		 *
+		 */
+		function devmode( $args, $assoc_args ) {
+		
+			$valid_modes = array( 'activate', 'deactivate', 'toggle' );
+			$devmode     = get_option( 'vhp_varnish_devmode', VarnishPurger::$devmode );
+
+			// Check for valid arguments
+			if ( empty( $args[0] ) ) {
+				// No params, echo state
+				$state  = ( $devmode['active'] )? __( 'activated', 'varnish-http-purge' ) : __( 'deactivated', 'varnish-http-purge' );
+				WP_CLI::success( sprintf( __( 'Varnish HTTP Purge development mode is currently %s.', 'varnish-http-purge' ), $state ) );
+			} elseif ( !in_array( $args[0], $valid_modes ) ) {
+				// Invalid Params, warn
+				WP_CLI::error( sprintf( __( '%s is not a valid subcommand for varnish development mode.', 'varnish-http-purge'), sanitize_text_field( $args[0] ) ) );
+			} else {
+				// Run the toggle!
+				$result = VarnishDebug::devmode_toggle( sanitize_text_field( $args[0] ) );	
+				$state  = ( $result )? __( 'activated', 'varnish-http-purge' ) : __( 'deactivated', 'varnish-http-purge' );
+				WP_CLI::success( sprintf( __( 'Varnish HTTP Purge development mode has been %s.', 'varnish-http-purge' ), $state ) );
+			}
 		}
 	
 		/**
@@ -125,29 +167,31 @@ if ( !class_exists( 'WP_CLI_Varnish_Command' ) ) {
 	
 			// Set the URL/path
 			if ( !empty($args) ) list( $url ) = $args;
-	
-			$default_url = esc_url( $this->varnish_purge->the_home_url() );
-	
-			if ( !empty( $url ) ) {
-				$parsed_input = parse_url($url);
-				if ( empty($parsed_input['scheme']) ) {
-					$schema_input = 'http://';
-					if ( is_ssl() ) $schema_input = 'https://';
-					$url = $schema_input . ltrim($url, '/');
+
+			if ( empty( $url ) ) {
+				$url = esc_url( $this->varnish_purge->the_home_url() );;
+			}
+
+			// Include the debug code
+			if ( !class_exists( 'VarnishDebug' ) ) include( 'debug.php' );
+
+			// Validate the URL
+			$valid_url = VarnishDebug::is_url_valid( $url );
+
+			if ( $valid_url !== 'valid' ) {
+				switch ( $valid_url ) {
+					case 'empty':
+					case 'domain':
+						WP_CLI::error( __( 'You must provide a URL on your own domain to scan.', 'varnish-http-purge' ) );
+						break;
+					case 'invalid':
+						WP_CLI::error( __( 'You have entered an invalid URL address.', 'varnish-http-purge' ) );
+						break;
+					default:
+						WP_CLI::error( __( 'An unknown error has occurred.', 'varnish-http-purge' ) );
+						break;
 				}
 			} else {
-				$url = $default_url;
-			}
-	
-			if ( empty( $url ) || parse_url( $default_url, PHP_URL_HOST ) !== parse_url( $url, PHP_URL_HOST ) ) {
-				WP_CLI::error( __( 'You must enter a URL from your own domain to scan.', 'varnish-http-purge' ) );
-			} elseif ( !filter_var( $url, FILTER_VALIDATE_URL) ) {
-				WP_CLI::error( __( 'You have entered an invalid URL address.', 'varnish-http-purge' ) );
-			} else {
-	
-				// Include the debug code
-				if ( !class_exists( 'VarnishDebug' ) ) include( 'debug.php' );
-	
 				$varnishurl = get_option( 'vhp_varnish_url', $url );
 	
 				// Get the response and headers

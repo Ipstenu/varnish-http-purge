@@ -55,10 +55,10 @@ class VarnishStatus {
 	 */
 	function admin_menu() {
 		// Main Menu Page
-		add_menu_page( __( 'Varnish HTTP Purge', 'varnish-http-purge' ), __( 'Varnish', 'varnish-http-purge' ), 'manage_options', 'varnish-status', array( &$this, 'settings_page' ), 'dashicons-carrot', 75 );
-		add_submenu_page( 'varnish-status', __( 'Varnish HTTP Purge', 'varnish-http-purge' ), __( 'Settings', 'varnish-http-purge' ), 'manage_options', 'varnish-status', array( &$this, 'settings_page' ) );
+		add_menu_page( __( 'Varnish HTTP Purge', 'varnish-http-purge' ), __( 'Varnish', 'varnish-http-purge' ), 'manage_options', 'varnish-page', array( &$this, 'settings_page' ), 'dashicons-carrot', 75 );
+		add_submenu_page( 'varnish-page', __( 'Varnish HTTP Purge', 'varnish-http-purge' ), __( 'Settings', 'varnish-http-purge' ), 'manage_options', 'varnish-page', array( &$this, 'settings_page' ) );
 		// Debug Subpage
-		add_submenu_page( 'varnish-status', __( 'Check Caching', 'varnish-http-purge' ), __( 'Check Caching', 'varnish-http-purge' ), 'manage_options', 'varnish-devmode', array( &$this, 'check_caching_page' ) );
+		add_submenu_page( 'varnish-page', __( 'Check Caching', 'varnish-http-purge' ), __( 'Check Caching', 'varnish-http-purge' ), 'manage_options', 'varnish-check-caching', array( &$this, 'check_caching_page' ) );
 	}
 
 	/**
@@ -68,7 +68,7 @@ class VarnishStatus {
 	 */
 	function register_settings() {
 		if ( !is_multisite() || current_user_can( 'manage_network' ) ) {
-			// Debug Settings
+			// Development Mode Settings
 			register_setting( 'vhp-settings-devmode', 'vhp_varnish_devmode', array( &$this, 'settings_devmode_sanitize' ) );
 			add_settings_section( 'vhp-settings-devmode-section', __( 'Development Mode Settings', 'varnish-http-purge' ), array( &$this, 'options_settings_devmode'), 'varnish-devmode-settings' );
 			add_settings_field( 'varnish_devmode', __( 'Development Mode', 'varnish-http-purge' ), array( &$this, 'settings_devmode_callback' ), 'varnish-devmode-settings', 'vhp-settings-devmode-section' );
@@ -331,7 +331,6 @@ class VarnishStatus {
 				</table>
 			<?php
 			}
-
 		}
 	}
 

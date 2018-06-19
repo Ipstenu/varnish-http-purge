@@ -49,13 +49,14 @@ That will break cache on page loads. It is _not_ recommended for production!
 = WP CLI =
 
 * `wp varnish purge` - Flush the entire cache
-* `wp varnish debug` - Help for debugging how well Varnish is (or isn't) working
+* `wp varnish debug [<url>]` - Help for debugging how well Varnish is (or isn't) working
+* `wp varnish devmode [<activate|deactivate|toggle>` - Change development mode state
 
 = Privacy Policy =
 
 By default, no data is tracked. If you use the site scanner/debugging tool, your domain and IP address will access [a remote service hosted on DreamObjects](https://varnish-http-purge.objects-us-east-1.dream.io/readme.txt). No personally identifying transaction data is recorded or stored, only overall usage. IP addresses of the website making the request may be recorded by the service, but there is no way to access them and use it to correspond with individuals or processes.
 
-Use of this service is required for the debugging tool, in order to provide up to date compatibility checks on plugins and themes that may conflict with running a server based cache (such as Varnish or Nginx) without needing to update the plugin every day.
+Use of this service is required for the cache checking in order to provide up to date compatibility checks on plugins and themes that may conflict with running a server based cache (such as Varnish or Nginx) without needing to update the plugin every day.
 
 == Installation ==
 
@@ -187,10 +188,13 @@ This plugin is installed by default for _all_ DreamPress installs on DreamHost, 
 
 * June 2018
 * Moved Varnish to it's own menu (with the carrot)
-* Add option to enable debugging for 24 hours (for super-admins only)
-* Improve development mode
-* Improve 
+* Add option to enable development for 24 hours (for super-admins only)
+* Change debug mode to development mode and greatly improve
 * Add new action hook for after a full purge (props @futtta)
+* Change check for age-header to not require a second run (props @danielbachhuber)
+* Confirm plugin and theme blacklist check (props @danielbachhuber)
+* WP-CLI: add option to show all header output (props @danielbachhuber)
+* WP-CLI: add command to change devmode state
 
 = 4.5.2 =
 

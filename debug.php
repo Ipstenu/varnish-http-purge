@@ -47,6 +47,31 @@ class VarnishDebug {
 		return $return;
 	}
 
+	static function devmode_toggle( $state = 'deactivate' ) {
+		$devmode = get_option( 'vhp_varnish_devmode', VarnishPurger::$devmode );
+
+		// Weirdly this doesn't actually matter...
+		$devmode['expire'] = current_time( 'timestamp' ) + DAY_IN_SECONDS;
+		
+		switch ( sanitize_text_field( $state ) ) {
+			case 'activate':
+				$devmode['active'] = TRUE;
+				break;
+			case 'toggle':
+				$devmode['active'] = ( $devmode['active'] )? FALSE : TRUE;
+				break;
+			case 'deactivate':
+			default:
+				$devmode['active'] = FALSE;
+				break;
+		}
+
+		// Update options
+		update_option( 'vhp_varnish_devmode', $devmode );
+
+		return $devmode['active'];
+	}
+
 	/**
 	 * Append the ?nocache parameter to JS and CSS files
 	 * 
@@ -545,15 +570,14 @@ class VarnishDebug {
 			if ( WP_DEBUG ) {
 				$return[ 'Theme Check' ] = array( 'icon' => 'warning', 'message' => __( 'Error: Theme data cannot be loaded.', 'varnish-http-purge' ) );
 			}
-			
 			return $return; // Bail early
 		}
 
 		// Check all the themes. If one of the questionable ones are active, warn
 		foreach ( $themes as $theme => $info ) {
 			$my_theme = wp_get_theme( $theme );
-			$prefix = ( $theme == get_template() )? __( 'Active Theme', 'varnish-http-purge') : __( 'Inactive Theme', 'varnish-http-purge');
-			$message  = $prefix . ' ' . ucfirst( $theme ) . ': ' . $info->message;
+			$active   = ( $theme == get_template() )? __( '(Active)', 'varnish-http-purge') : __( '(Inactive)', 'varnish-http-purge');
+			$message  = $info->message . ' ' . $active;
 			$warning  = $info->type;
 			if ( $my_theme->exists() ) {
 				$return[ 'Theme: ' . ucfirst( $theme ) ] = array( 'icon' => $warning, 'message' => $message );

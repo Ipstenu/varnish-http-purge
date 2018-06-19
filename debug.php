@@ -665,9 +665,9 @@ class VarnishDebug {
 
 		// Preface with Debugging Warning
 		if ( self::devmode_check() ) {
-			$output['Debugging'] = array( 
+			$output['Development Mode'] = array( 
 				'icon'    => 'awkward',
-				'message' => __( 'Dev Mode is currently active. All caching is intentionally disabled.', 'varnish-http-purge' ),
+				'message' => __( 'NOTICE: Caching is disabled while Development Mode is active.', 'varnish-http-purge' ),
 			);
 		}
 

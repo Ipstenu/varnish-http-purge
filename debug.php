@@ -31,7 +31,7 @@ class VarnishDebug {
 	 */
 	public static function devmode_check() {
 		$return  = FALSE;
-		$devmode = get_option( 'vhp_varnish_devmode', VarnishPurger::$devmode );
+		$devmode = get_site_option( 'vhp_varnish_devmode', VarnishPurger::$devmode );
 
 		if ( VHP_DEVMODE ) {
 			$return = TRUE;
@@ -39,7 +39,7 @@ class VarnishDebug {
 			// if expire is less that NOW, it's over
 			if ( $devmode['expire'] <= current_time( 'timestamp' ) ) {
 				$devmode['active'] = FALSE;
-				update_option( 'vhp_varnish_devmode', $devmode );
+				update_site_option( 'vhp_varnish_devmode', $devmode );
 			} else {
 				$return = TRUE;
 			}
@@ -48,7 +48,7 @@ class VarnishDebug {
 	}
 
 	static function devmode_toggle( $state = 'deactivate' ) {
-		$devmode = get_option( 'vhp_varnish_devmode', VarnishPurger::$devmode );
+		$devmode = get_site_option( 'vhp_varnish_devmode', VarnishPurger::$devmode );
 
 		// Weirdly this doesn't actually matter...
 		$devmode['expire'] = current_time( 'timestamp' ) + DAY_IN_SECONDS;
@@ -67,7 +67,7 @@ class VarnishDebug {
 		}
 
 		// Update options
-		update_option( 'vhp_varnish_devmode', $devmode );
+		update_site_option( 'vhp_varnish_devmode', $devmode );
 
 		return $devmode['active'];
 	}

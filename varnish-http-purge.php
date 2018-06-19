@@ -42,14 +42,26 @@ class VarnishPurger {
 	public function __construct( ) {
 		defined( 'VHP_VARNISH_IP' ) || define( 'VHP_VARNISH_IP' , false );
 		defined( 'VHP_DEVMODE' )    || define( 'VHP_DEVMODE', false );
-		add_action( 'init', array( &$this, 'init' ) );
-		add_action( 'admin_init', array( &$this, 'admin_init' ) );
 
 		// Development mode defaults to off
 		self::$devmode = array( 'active' => FALSE, 'expire' => current_time( 'timestamp' ) );
-		if( !get_option( 'vhp_varnish_devmode' ) ){
-			update_option( 'vhp_varnish_devmode', self::$devmode );
+		if( !get_site_option( 'vhp_varnish_devmode' ) ) {
+			update_site_option( 'vhp_varnish_devmode', self::$devmode );
 		}
+
+		// Default URL is home
+		if( !get_site_option( 'vhp_varnish_url' ) ) {
+			update_site_option( 'vhp_varnish_url', $this->the_home_url() );
+		}
+
+		// Default IP is nothing
+		if( !get_site_option( 'vhp_varnish_ip' ) && !VHP_VARNISH_IP ) {
+			update_site_option( 'vhp_varnish_ip', '' );
+		}
+
+		// Release the hounds
+		add_action( 'init', array( &$this, 'init' ) );
+		add_action( 'admin_init', array( &$this, 'admin_init' ) );
 
 	}
 
@@ -80,7 +92,7 @@ class VarnishPurger {
 			}
 
 			// Warning: No Pretty Permalinks!
-			if ( '' == get_option( 'permalink_structure' )  ) {
+			if ( '' == get_site_option( 'permalink_structure' )  ) {
 				add_action( 'admin_notices' , array( $this, 'require_pretty_permalinks_notice' ) );
 			}
 		}
@@ -184,7 +196,7 @@ class VarnishPurger {
 		if ( VHP_DEVMODE ) {
 			$message = __( 'Varnish HTTP Purge Development Mode is active because it has been defined in wp-config. You will need to remove that in order to allow visitors to see cached data.', 'varnish-http-purge' );
 		} else {
-			$devmode = get_option( 'vhp_varnish_devmode', VarnishPurger::$devmode );
+			$devmode = get_site_option( 'vhp_varnish_devmode', VarnishPurger::$devmode );
 			$time    = human_time_diff( current_time( 'timestamp' ), $devmode['expire'] );
 			$message = sprintf( __( 'Varnish HTTP Purge Development Mode is active for %1$s. You can disable this at the <a href="%2$s">Varnish Settings Page</a>.', 'varnish-http-purge' ), $time, admin_url( 'admin.php?page=varnish-status' ) );
 		}
@@ -433,7 +445,7 @@ class VarnishPurger {
 		if ( VHP_VARNISH_IP != false ) {
 			$varniship = VHP_VARNISH_IP;
 		} else {
-			$varniship = get_option( 'vhp_varnish_ip' );
+			$varniship = get_site_option( 'vhp_varnish_ip' );
 		}
 		$varniship = apply_filters( 'vhp_varnish_ip' , $varniship );
 
@@ -599,7 +611,7 @@ class VarnishPurger {
 			$categories = get_the_category( $postId) ;
 			if ( $categories ) {
 				foreach ( $categories as $cat ) {
-					$category_base = get_option( 'category_base');
+					$category_base = get_site_option( 'category_base');
 					if ( $category_base == '' ) $category_base = '/category/';
 					array_push( $listofurls, 
 						get_category_link( $cat->term_id ),
@@ -610,7 +622,7 @@ class VarnishPurger {
 			// Tag purge based on Donnacha's work in WP Super Cache
 			$tags = get_the_tags( $postId );
 			if ( $tags ) {
-				$tag_base = get_option( 'tag_base' );
+				$tag_base = get_site_option( 'tag_base' );
 				if ( $tag_base == '' ) $tag_base = '/tag/';
 				foreach ( $tags as $tag ) {
 					array_push( $listofurls, 
@@ -669,10 +681,10 @@ class VarnishPurger {
 				get_rest_url(),
 				$this->the_home_url() . '/'
 				);
-			if ( get_option( 'show_on_front' ) == 'page' ) {
+			if ( get_site_option( 'show_on_front' ) == 'page' ) {
 				// Ensure we have a page_for_posts setting to avoid empty URL
-				if ( get_option('page_for_posts') ) {
-					array_push( $listofurls, get_permalink( get_option( 'page_for_posts' ) ) );
+				if ( get_site_option('page_for_posts') ) {
+					array_push( $listofurls, get_permalink( get_site_option( 'page_for_posts' ) ) );
 				}
 			}
 

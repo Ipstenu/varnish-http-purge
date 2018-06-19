@@ -114,7 +114,7 @@ if ( !class_exists( 'WP_CLI_Varnish_Command' ) ) {
 		function devmode( $args, $assoc_args ) {
 		
 			$valid_modes = array( 'activate', 'deactivate', 'toggle' );
-			$devmode     = get_option( 'vhp_varnish_devmode', VarnishPurger::$devmode );
+			$devmode     = get_site_option( 'vhp_varnish_devmode', VarnishPurger::$devmode );
 
 			// Check for valid arguments
 			if ( empty( $args[0] ) ) {
@@ -192,7 +192,7 @@ if ( !class_exists( 'WP_CLI_Varnish_Command' ) ) {
 						break;
 				}
 			}
-			$varnishurl = get_option( 'vhp_varnish_url', $url );
+			$varnishurl = get_site_option( 'vhp_varnish_url', $url );
 	
 			// Get the response and headers
 			$remote_get = VarnishDebug::remote_get( $varnishurl );
@@ -218,7 +218,7 @@ if ( !class_exists( 'WP_CLI_Varnish_Command' ) ) {
 			if ( VHP_VARNISH_IP != false ) {
 				$varniship = VHP_VARNISH_IP;
 			} else {
-				$varniship = get_option('vhp_varnish_ip');
+				$varniship = get_site_option('vhp_varnish_ip');
 			}
 
 			if ( $preflight['preflight'] == false ) {

@@ -99,7 +99,7 @@ class VarnishStatus {
 	 */
 	function settings_devmode_callback() {
 
-		$devmode = get_option( 'vhp_varnish_devmode', VarnishPurger::$devmode );
+		$devmode = get_site_option( 'vhp_varnish_devmode', VarnishPurger::$devmode );
 		$active  = ( isset( $devmode['active'] ) )? $devmode['active'] : false;
 		$expire  = current_time( 'timestamp' ) + DAY_IN_SECONDS;
 
@@ -109,7 +109,7 @@ class VarnishStatus {
 		<label for="vhp_varnish_devmode['active']">
 			<?php
 			if ( $active && isset( $devmode['expire'] ) ) { 
-				$timestamp = date_i18n( get_option( 'date_format' ), $devmode['expire'] ) .' @ '. date_i18n( get_option( 'time_format' ), $devmode['expire'] );
+				$timestamp = date_i18n( get_site_option( 'date_format' ), $devmode['expire'] ) .' @ '. date_i18n( get_site_option( 'time_format' ), $devmode['expire'] );
 				echo sprintf( __( 'Development Mode is active until %s. After that, it will automatically disable the next time someone visits your site.', 'varnish-http-purge' ), $timestamp );
 			} else {
 				_e( 'Activate Development Mode', 'varnish-http-purge' );
@@ -179,7 +179,7 @@ class VarnishStatus {
 			$disabled = true;
 			$varniship = VHP_VARNISH_IP;
 		} else {
-			$varniship = get_option( 'vhp_varnish_ip' );
+			$varniship = get_site_option( 'vhp_varnish_ip' );
 		}
 
 		?>
@@ -257,7 +257,7 @@ class VarnishStatus {
 
 		// Get the base URL to start
 		$url        = esc_url( VarnishPurger::the_home_url() );
-		$varnishurl = get_option( 'vhp_varnish_url', $url );
+		$varnishurl = get_site_option( 'vhp_varnish_url', $url );
 
 		// Is this a good URL?
 		$valid_url = VarnishDebug::is_url_valid( $varnishurl );
@@ -276,7 +276,7 @@ class VarnishStatus {
 			if ( VHP_VARNISH_IP != false ) {
 				$varniship = VHP_VARNISH_IP;
 			} else {
-				$varniship = get_option( 'vhp_varnish_ip' );
+				$varniship = get_site_option( 'vhp_varnish_ip' );
 			}
 			?>
 			
@@ -341,7 +341,7 @@ class VarnishStatus {
 	 */
 	function check_caching_callback() {
 		$url        = esc_url( VarnishPurger::the_home_url() );
-		$varnishurl = get_option( 'vhp_varnish_url', $url );
+		$varnishurl = get_site_option( 'vhp_varnish_url', $url );
 		?><input type="text" id="vhp_varnish_url" name="vhp_varnish_url" value="<?php echo $varnishurl; ?>" size="50" /><?php
 	}
 

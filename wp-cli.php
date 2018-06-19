@@ -130,7 +130,7 @@ if ( !class_exists( 'WP_CLI_Varnish_Command' ) ) {
 				$state  = ( $result )? __( 'activated', 'varnish-http-purge' ) : __( 'deactivated', 'varnish-http-purge' );
 				WP_CLI::success( sprintf( __( 'Varnish HTTP Purge development mode has been %s.', 'varnish-http-purge' ), $state ) );
 			}
-		}
+		} // End devmode
 	
 		/**
 		 * Runs a debug check of the site to see if there are any known 
@@ -191,57 +191,57 @@ if ( !class_exists( 'WP_CLI_Varnish_Command' ) ) {
 						WP_CLI::error( __( 'An unknown error has occurred.', 'varnish-http-purge' ) );
 						break;
 				}
-			} else {
-				$varnishurl = get_option( 'vhp_varnish_url', $url );
+			}
+			$varnishurl = get_option( 'vhp_varnish_url', $url );
 	
-				// Get the response and headers
-				$remote_get = VarnishDebug::remote_get( $varnishurl );
-				$headers    = wp_remote_retrieve_headers( $remote_get );
+			// Get the response and headers
+			$remote_get = VarnishDebug::remote_get( $varnishurl );
+			$headers    = wp_remote_retrieve_headers( $remote_get );
 
-				if ( WP_CLI\Utils\get_flag_value( $assoc_args, 'include-headers' ) ) {
-					WP_CLI::log( 'Headers:' );
-					foreach ( $headers as $key => $value ) {
-						if ( is_array( $value ) ) {
-							$value = implode( ', ', $value );
-						}
-						WP_CLI::log( " - {$key}: {$value}" );
+			if ( WP_CLI\Utils\get_flag_value( $assoc_args, 'include-headers' ) ) {
+				WP_CLI::log( 'Headers:' );
+				foreach ( $headers as $key => $value ) {
+					if ( is_array( $value ) ) {
+						$value = implode( ', ', $value );
 					}
-				}
-
-				// Preflight checklist
-				$preflight = VarnishDebug::preflight( $remote_get );
-		
-				// Check for Remote IP
-				$remote_ip = VarnishDebug::remote_ip( $headers );
-
-				// Get the Varnish IP
-				if ( VHP_VARNISH_IP != false ) {
-					$varniship = VHP_VARNISH_IP;
-				} else {
-					$varniship = get_option('vhp_varnish_ip');
-				}
-
-				if ( $preflight['preflight'] == false ) {
-					WP_CLI::error( $preflight['message'] );
-				} else {
-					$results = VarnishDebug::get_all_the_results( $headers, $remote_ip, $varniship );
-	
-					// Generate array
-					foreach ( $results as $type => $content ) { 
-						$items[] = array(
-							'name'    => $type,
-							'status'  => ucwords( $content['icon'] ),
-							'message' => $content['message'],
-						);
-					}
-
-					$format = ( isset( $assoc_args['format'] ) )? $assoc_args['format'] : 'table';
-
-					// Output the data
-					WP_CLI\Utils\format_items( $format, $items, array( 'name', 'status', 'message' ) );
+					WP_CLI::log( " - {$key}: {$value}" );
 				}
 			}
-		}
+
+			// Preflight checklist
+			$preflight = VarnishDebug::preflight( $remote_get );
+	
+			// Check for Remote IP
+			$remote_ip = VarnishDebug::remote_ip( $headers );
+
+			// Get the Varnish IP
+			if ( VHP_VARNISH_IP != false ) {
+				$varniship = VHP_VARNISH_IP;
+			} else {
+				$varniship = get_option('vhp_varnish_ip');
+			}
+
+			if ( $preflight['preflight'] == false ) {
+				WP_CLI::error( $preflight['message'] );
+			} else {
+				$results = VarnishDebug::get_all_the_results( $headers, $remote_ip, $varniship );
+
+				// Generate array
+				foreach ( $results as $type => $content ) { 
+					$items[] = array(
+						'name'    => $type,
+						'status'  => ucwords( $content['icon'] ),
+						'message' => $content['message'],
+					);
+				}
+
+				$format = ( isset( $assoc_args['format'] ) )? $assoc_args['format'] : 'table';
+
+				// Output the data
+				WP_CLI\Utils\format_items( $format, $items, array( 'name', 'status', 'message' ) );
+			}
+		} // End Debug
+
 	}
 }
 

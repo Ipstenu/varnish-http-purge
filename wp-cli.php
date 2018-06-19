@@ -93,7 +93,26 @@ if ( !class_exists( 'WP_CLI_Varnish_Command' ) ) {
 		/**
 		 * Runs a debug check of the site to see if there are any known 
 		 * issues that would stop Varnish from caching.
-		 * 
+		 *
+		 * ## OPTIONS
+		 *
+		 * [<url>]
+		 * : Specify a URL for testing against. Default is the home URL.
+		 *
+		 * [--include-headers]
+		 * : Include headers in debug check output.
+		 *
+		 * [--format=<format>]
+		 * : Render output in a particular format.
+		 * ---
+		 * default: table
+		 * options:
+		 *   - table
+		 *   - csv
+		 *   - json
+		 *   - yaml
+		 * ---
+		 *
 		 * ## EXAMPLES
 		 * 
 		 *		wp varnish debug
@@ -134,6 +153,16 @@ if ( !class_exists( 'WP_CLI_Varnish_Command' ) ) {
 				// Get the response and headers
 				$remote_get = VarnishDebug::remote_get( $varnishurl );
 				$headers    = wp_remote_retrieve_headers( $remote_get );
+
+				if ( WP_CLI\Utils\get_flag_value( $assoc_args, 'include-headers' ) ) {
+					WP_CLI::log( 'Headers:' );
+					foreach ( $headers as $key => $value ) {
+						if ( is_array( $value ) ) {
+							$value = implode( ', ', $value );
+						}
+						WP_CLI::log( " - {$key}: {$value}" );
+					}
+				}
 
 				// Preflight checklist
 				$preflight = VarnishDebug::preflight( $remote_get );

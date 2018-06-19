@@ -108,7 +108,11 @@ class VarnishDebug {
 
 		// Lazy run twice to make sure we get a primed cache page
 		$response1 = wp_remote_get( $url, $args );
-		sleep( 3 );
+
+		// Because the 'Age' header is an important check,
+		// wait a second before fetching again.
+		sleep( 1 );
+
 		$response2 = wp_remote_get( $url, $args );
 
 		return $response2;
@@ -556,8 +560,13 @@ class VarnishDebug {
 			}
 		}
 
+		// If no questionable themes are found, let the user know
+		// with a success message.
 		if ( empty( $return ) ) {
-			$return[ 'Theme Check' ] = array( 'icon' => 'awesome', 'message' => __( 'No known theme conflicts detected.', 'varnish-http-purge' ) );
+			$return[ 'Theme Success' ] = array(
+				'icon'    => 'good',
+				'message' => 'No themes were found on the Varnish conflicts list.',
+			);
 		}
 
 		return $return;
@@ -608,8 +617,13 @@ class VarnishDebug {
 			}
 		}
 
+		// If no questionable plugins are found, let the user know
+		// with a success message.
 		if ( empty( $return ) ) {
-			$return[ 'Plugin Check' ] = array( 'icon' => 'awesome', 'message' => __( 'No known plugin conflicts detected.', 'varnish-http-purge' ) );
+			$return[ 'Plugin Success' ] = array(
+				'icon'    => 'good',
+				'message' => 'No active plugins were found on the Varnish conflicts list.',
+			);
 		}
 
 		return $return;

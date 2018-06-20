@@ -278,7 +278,7 @@ class VarnishDebug {
 		if ( $remote_ip == false && !empty( $varniship ) ) {
 			$return = array( 
 				'icon'    => 'warning',
-				'message' => __( 'You have a Varnish IP address set but a proxy (like Cloudflare or Sucuri) has not been detected. This is mostly harmless, but if you have issues with your cache not emptying when you make a post, you may need to remove your Varnish IP. Please check with your webhost or server admin before doing so.', 'varnish-http-purge' ),
+				'message' => sprintf( __( 'Your Varnish IP address is set to %s but a proxy (like Cloudflare or Sucuri) has not been detected. This is mostly harmless, but if you have issues with your cache not emptying when you make a post, you may need to remove your Varnish IP. Please check with your webhost or server admin before doing so.', 'varnish-http-purge' ), $varniship ),
 			);
 		} elseif ( $remote_ip !== false && $remote_ip !== $varniship ) {
 			$return = array( 
@@ -577,6 +577,9 @@ class VarnishDebug {
 		$request = wp_remote_get( 'https://varnish-http-purge.objects-us-east-1.dream.io/themes.json' );
 
 		if( is_wp_error( $request ) ) {
+			if ( WP_DEBUG ) {
+				$return[ 'Theme Check' ] = array( 'icon' => 'warning', 'message' => __( 'Error: Theme data cannot be loaded.', 'varnish-http-purge' ) );
+			}
 			return $return; // Bail early
 		}
 
@@ -585,7 +588,7 @@ class VarnishDebug {
 
 		if( empty( $themes ) ) {
 			if ( WP_DEBUG ) {
-				$return[ 'Theme Check' ] = array( 'icon' => 'warning', 'message' => __( 'Error: Theme data cannot be loaded.', 'varnish-http-purge' ) );
+				$return[ 'Theme Check' ] = array( 'icon' => 'warning', 'message' => __( 'Error: Theme data was empty.', 'varnish-http-purge' ) );
 			}
 			return $return; // Bail early
 		}
@@ -655,6 +658,9 @@ class VarnishDebug {
 		$plugins = json_decode( $body );
 
 		if( empty( $plugins ) ) {
+			if ( WP_DEBUG ) {
+				$return[ 'Plugin Check' ] = array( 'icon' => 'warning', 'message' => __( 'Error: Plugin data was empty.', 'varnish-http-purge' ) );
+			}
 			return $return; // Bail early
 		}
 

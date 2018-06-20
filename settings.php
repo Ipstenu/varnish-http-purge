@@ -251,7 +251,7 @@ class VarnishStatus {
 			'awesome' => '<span class="dashicons dashicons-heart" style="color:#46B450;"></span>',
 			'good'    => '<span class="dashicons dashicons-thumbs-up" style="color:#00A0D2;"></span>',
 			'warning' => '<span class="dashicons dashicons-warning" style="color:#FFB900"></span>',
-			'awkward' => '<span class="dashicons dashicons-flag" style="color:#826EB4;">',
+			'notice'  => '<span class="dashicons dashicons-flag" style="color:#826EB4;">',
 			'bad'     => '<span class="dashicons dashicons-thumbs-down" style="color:#DC3232;"></span>',
 		);
 

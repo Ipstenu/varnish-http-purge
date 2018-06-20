@@ -251,7 +251,7 @@ class VarnishDebug {
 			$return['icon']    = 'bad';
 			$return['message'] = __( 'Your site is not responding. If this happens again, please contact your webhost.', 'varnish-http-purge' );
 		} elseif ( !$cacheheaders_set ) {
-			$return['icon']    = 'awkward';
+			$return['icon']    = 'notice';
 			$return['message'] = __( 'We were unable find a caching service active for this domain. This may occur if you use a proxy service (such as CloudFlare or Sucuri) or if you\'re in the middle of a DNS move.', 'varnish-http-purge' );
 		} elseif ( !$not_cachable && ( $x_cachable || $x_varnish ) ) {
 			$return['icon']    = 'awesome';
@@ -335,7 +335,7 @@ class VarnishDebug {
 			// HHVM: Note, WP is dropping support so ...
 			if ( isset( $headers['X-Powered-By'] ) && strpos( $headers['X-Powered-By'] ,'HHVM') !== false ) {
 				$return['HHVM'] = array( 
-					'icon'    => 'awkward',
+					'icon'    => 'notice',
 					'message' => __( 'You are running HHVM instead of PHP. While that is compatible with Varnish, you should consider PHP 7. WordPress will cease support for HHVM in 2018.', 'varnish-http-purge' ),
 				);
 			}
@@ -430,7 +430,7 @@ class VarnishDebug {
 				$all_cookies = array_merge( $all_cookies, $set_cookie );
 			}
 			$cookie_message        = sprintf ( __( 'The following cookies have been set by your website: %s', 'varnish-http-purge' ), implode( ', ', $all_cookies ) );
-			$return['All Cookies'] = array( 'icon' => 'awkward', 'message' => $cookie_message );
+			$return['All Cookies'] = array( 'icon' => 'notice', 'message' => $cookie_message );
 	
 			// Let's check our known bad cookies
 			$request = wp_remote_get( 'https://varnish-http-purge.objects-us-east-1.dream.io/cookies.json' );
@@ -593,10 +593,19 @@ class VarnishDebug {
 		// Check all the themes. If one of the questionable ones are active, warn
 		foreach ( $themes as $theme => $info ) {
 			$my_theme = wp_get_theme( $theme );
-			$active   = ( $theme == get_template() )? __( '(Active)', 'varnish-http-purge') : __( '(Inactive)', 'varnish-http-purge');
-			$message  = $info->message . ' ' . $active;
-			$warning  = $info->type;
 			if ( $my_theme->exists() ) {
+				$active   = ( $theme == get_template() )? true : false;
+				$message  = $info->message . ' (';
+				$warning  = $info->type;
+	
+				if ( $active ) {
+					$message .= __( 'Active', 'varnish-http-purge');
+				} else {
+					$message .= __( 'Inactive', 'varnish-http-purge');
+					$warning  = 'notice';
+				}
+				$message .= ')';
+
 				$return[ 'Theme: ' . ucfirst( $theme ) ] = array( 'icon' => $warning, 'message' => $message );
 			}
 		}
@@ -653,7 +662,7 @@ class VarnishDebug {
 		foreach ( $plugins as $plugin => $info ) {
 			if( file_exists( plugin_dir_path( __DIR__ ) . $info->path ) ) {
 				$message = $messages[ $info->reason ];
-				$warning = 'awkward';
+				$warning = 'notice';
 				$status  = __( 'Inactive', 'varnish-http-purge' );
 
 				// If the plugin is inactive, change the warning
@@ -691,7 +700,7 @@ class VarnishDebug {
 		// Preface with Debugging Warning
 		if ( self::devmode_check() ) {
 			$output['Development Mode'] = array( 
-				'icon'    => 'awkward',
+				'icon'    => 'notice',
 				'message' => __( 'NOTICE: Caching is disabled while Development Mode is active.', 'varnish-http-purge' ),
 			);
 		}

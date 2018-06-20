@@ -160,7 +160,7 @@ class VarnishDebug {
 			$message  .= $response->get_error_message();
 		} elseif ( wp_remote_retrieve_response_code( $response ) == '404' ) {
 			$preflight = false;
-			$message   = __( 'This URL is a 404. Please check your typing and try again.', 'varnish-http-purge' );
+			$message   = __( 'This URL does not resolve properly. Either it\'s was not found or it redirects incorrectly.', 'varnish-http-purge' );
 		}
 
 		$return = array( 
@@ -201,6 +201,8 @@ class VarnishDebug {
 	 */
 	static function varnish_results( $headers = '' ) {
 
+		$return = array();
+
 		// If we have headers:
 		if ( $headers == '' ) {
 			$kronk = false;
@@ -212,9 +214,7 @@ class VarnishDebug {
 			$x_varnish  = ( isset( $headers['X-Varnish'] ) )? true : false;
 			$x_via      = ( is_numeric( strpos( $headers['Via'], 'arnish' ) ) )? true : false;
 			$x_nginx    = ( isset( $headers['server'] ) && strpos( $headers['server'], 'nginx') !== false )? true : false;
-
 			$x_age      = ( isset( $headers['Age'] ) && $headers['Age'] > 0 )?  true : false;
-
 			$x_cache    = ( isset( $headers['x-cache-status'] ) && strpos( $headers['x-cache-status'], 'HIT') !== false )? true : false;
 			$x_p_cache  = ( isset( $headers['X-Proxy-Cache'] ) && strpos( $headers['X-Proxy-Cache'], 'HIT') !== false )? true : false;
 
@@ -230,26 +230,29 @@ class VarnishDebug {
 			$cacheheaders_set = ( isset( $headers['X-Cacheable'] ) || isset( $headers['X-Varnish'] ) || isset( $headers['X-Cache'] ) || $x_via )? true : false;
 
 			// Which service are we?
-			$cache_service = ' ';
+			$cache_service    = false;
 			if ( $x_varnish && $x_nginx ) {
-				$cache_service = ' Nginx ';
+				$cache_service = __('Nginx', 'varnish-http-purge' );
 			} elseif ( $x_varnish && !$x_nginx ) {
-				$cache_service = ' Varnish ';
+				$cache_service = __( 'Varnish', 'varnish-http-purge' );
 			}
 
-			// Set the default message:
-			$return = array( 
-				'icon'    => 'good',
-				'message' => __( 'Your' . $cache_service . 'caching service appears to be running properly.', 'varnish-http-purge' ),
-			);
+			// Determine the default message
+			if ( $cache_service != false )  {
+				$return['icon']    = 'good';
+				$return['message'] = __( 'Your ' . $cache_service . ' caching service appears to be running properly.', 'varnish-http-purge' );
+			}
 		}
 
-		if ( !$kronk ) {
+		if ( !$cache_service ) {
 			$return['icon']    = 'bad';
-			$return['message'] = __( 'Something went very wrong with this request. Please contact your webhost if it happens again.', 'varnish-http-purge' );
+			$return['message'] = __( 'No known cache service has been detected on your site.', 'varnish-http-purge' );
+		} elseif ( !$kronk ) {
+			$return['icon']    = 'bad';
+			$return['message'] = __( 'Your site is not responding. If this happens again, please contact your webhost.', 'varnish-http-purge' );
 		} elseif ( !$cacheheaders_set ) {
-			$return['icon']    = 'warning';
-			$return['message'] = __( 'We were unable find a caching service active for this domain. This can occur if you use a proxy service (such as CloudFlare or Sucuri) in front of your domain, or if you\'re in the middle of a DNS move.', 'varnish-http-purge' );
+			$return['icon']    = 'awkward';
+			$return['message'] = __( 'We were unable find a caching service active for this domain. This may occur if you use a proxy service (such as CloudFlare or Sucuri) or if you\'re in the middle of a DNS move.', 'varnish-http-purge' );
 		} elseif ( !$not_cachable && ( $x_cachable || $x_varnish ) ) {
 			$return['icon']    = 'awesome';
 		} else {
@@ -272,10 +275,10 @@ class VarnishDebug {
 		// Set the defaults
 		$return = false;
 
-		if ( $remote_ip == false && !empty( $varniship) ) {
+		if ( $remote_ip == false && !empty( $varniship ) ) {
 			$return = array( 
 				'icon'    => 'warning',
-				'message' => __( 'You have a Varnish IP address set but a proxy like Cloudflare or Sucuri has not been detected. This is mostly harmless, but if you have issues with your cache not emptying when you make a post, you may need to remove your Varnish IP. Please check with your webhost or server admin before doing so.', 'varnish-http-purge' ),
+				'message' => __( 'You have a Varnish IP address set but a proxy (like Cloudflare or Sucuri) has not been detected. This is mostly harmless, but if you have issues with your cache not emptying when you make a post, you may need to remove your Varnish IP. Please check with your webhost or server admin before doing so.', 'varnish-http-purge' ),
 			);
 		} elseif ( $remote_ip !== false && $remote_ip !== $varniship ) {
 			$return = array( 
@@ -407,43 +410,57 @@ class VarnishDebug {
 		$return = $almost = array();
 
 		// Early check. If there are no cookies, skip!
-		if ( !isset( $headers['Set-Cookie'] ) ) return $return;
-
-		// We have at least one cookie, so let's set this now:
-		$return['Cookies Active'] = array(
-			'icon'    => 'warning',
-			'message' => __( 'Cookies have been detected. Unless your caching service is configured properly for the specific cookies, it may not cache properly. Please contact your webhost or administrator with information about the cookies found.', 'varnish-http-purge' ),
-		);
-
-		// Call the cookies!
-		$request = wp_remote_get( 'https://varnish-http-purge.objects-us-east-1.dream.io/cookies.json' );
-
-		if( is_wp_error( $request ) ) return $return; // Bail if we can't hit the server
-
-		$body    = wp_remote_retrieve_body( $request );
-		$cookies = json_decode( $body );
-
-		if( empty( $cookies ) ) {
-			if ( WP_DEBUG ) {
-				$return[ 'cookie-error' ] = array( 'icon' => 'warning', 'message' => __( 'Error: Cookie data cannot be loaded.', 'varnish-http-purge' ) );
+		if ( !isset( $headers['Set-Cookie'] ) ) {
+			$return['No Cookies'] = array(
+				'icon'    => 'awesome',
+				'message' => __( 'No active cookies have been detected on your site. You may safely ignore any warnings about cookies set by plugins or themes, as your server has properly accounted for them.', 'varnish-http-purge' ),
+			);
+		} else {
+			// We have at least one cookie, so let's set this now:
+			$return['Cookies Found'] = array(
+				'icon'    => 'warning',
+				'message' => __( 'Cookies have been detected. Unless your caching service is configured properly for the specific cookies, it may not cache properly. Please contact your webhost or administrator with information about the cookies found.', 'varnish-http-purge' ),
+			);
+	
+			// list ALL cookies
+			preg_match_all( '/^Set-Cookie:\s*([^;]*)/mi', $headers, $matches );
+			$all_cookies = array();
+			foreach( $matches[1] as $item ) {
+				parse_str( $item, $set_cookie );
+				$all_cookies = array_merge( $all_cookies, $set_cookie );
 			}
-
-			return $return; // Bail if the data was empty for some reason
-		}
-
-		foreach ( $cookies as $cookie => $info ) {
-			$has_cookie = false;
-
-			// If cookies are an array, scan the whole thing. Otherwise, we can use strpos.
-			if ( is_array( $headers['Set-Cookie'] ) ) {
-				if ( in_array( $info->cookie, $headers['Set-Cookie'], true ) ) $has_cookie = true;
-			} else {
-				$strpos = strpos( $headers['Set-Cookie'], $info->cookie );
-				if ( $strpos !== false ) $has_cookie = true;
+			$cookie_message        = sprintf ( __( 'The following cookies have been set by your website: %s', 'varnish-http-purge' ), implode( ', ', $all_cookies ) );
+			$return['All Cookies'] = array( 'icon' => 'awkward', 'message' => $cookie_message );
+	
+			// Let's check our known bad cookies
+			$request = wp_remote_get( 'https://varnish-http-purge.objects-us-east-1.dream.io/cookies.json' );
+	
+			if( is_wp_error( $request ) ) return $return; // Bail if we can't hit the server
+	
+			$body    = wp_remote_retrieve_body( $request );
+			$cookies = json_decode( $body );
+	
+			if( empty( $cookies ) ) {
+				if ( WP_DEBUG ) {
+					$return[ 'cookie-error' ] = array( 'icon' => 'warning', 'message' => __( 'Error: Cookie data cannot be loaded.', 'varnish-http-purge' ) );
+				}
+				return $return; // Bail if the data was empty for some reason
 			}
-
-			if ( $has_cookie ) {
-				$return[ 'Cookie: ' . $cookie ] = array( 'icon' => $info->type, 'message' => $info->message );
+	
+			foreach ( $cookies as $cookie => $info ) {
+				$has_cookie = false;
+	
+				// If cookies are an array, scan the whole thing. Otherwise, we can use strpos.
+				if ( is_array( $headers['Set-Cookie'] ) ) {
+					if ( in_array( $info->cookie, $headers['Set-Cookie'], true ) ) $has_cookie = true;
+				} else {
+					$strpos = strpos( $headers['Set-Cookie'], $info->cookie );
+					if ( $strpos !== false ) $has_cookie = true;
+				}
+	
+				if ( $has_cookie ) {
+					$return[ 'Cookie: ' . $cookie ] = array( 'icon' => $info->type, 'message' => $info->message );
+				}
 			}
 		}
 
@@ -473,7 +490,7 @@ class VarnishDebug {
 			}
 
 			// No-Cache Set
-			if ( $no_cache !== false ) {
+			if ( $no_cache ) {
 				$return['no_cache'] = array(
 					'icon'    => 'bad',
 					'message' => __( 'The header Cache-Control is returning "no-cache", which means visitors will never get cached pages.', 'varnish-http-purge' ),
@@ -481,7 +498,7 @@ class VarnishDebug {
 			}
 
 			// Max-Age is 0
-			if ( $max_age !== false ) {
+			if ( $max_age ) {
 				$return['max_age'] = array(
 					'icon'    => 'bad',
 					'message' => __( 'The header Cache-Control is returning "max-age=0", which means a page can be no older than 0 seconds before it needs to regenerate the cache.', 'varnish-http-purge' ),
@@ -493,18 +510,18 @@ class VarnishDebug {
 		if ( !isset( $headers['Age'] ) ) {
 			$return['Age Headers'] = array(
 				'icon'    => 'bad',
-				'message' => __( 'Your domain does not report an "Age" header, which means we can\'t tell if the page is actually serving from cache.', 'varnish-http-purge' ),
+				'message' => __( 'Your domain does not report an "Age" header, making it impossible to determine if the page is actually serving from cache.', 'varnish-http-purge' ),
 			);
 		} elseif( ( $headers['Age'] <= 0 || $headers['Age'] == 0 ) && (bool)strtotime( $headers['Age'] ) == false ) {
-			$age_header = (int)$headers['Age'];
+			$age_header = (int)$headers['Age']; // a number from 0 to infinity
 			$return['Age Headers'] = array(
 				'icon'    => 'warning',
-				'message' => __( 'The "Age" header is set to less than 1 second which means the page was generated without caching. This can occur when a page is visited for the first time, or if caching was just emptied. Please check again; if the header remains 0 then either the URL is intentionally excluded from caching, or a theme or plugin is sending cache headers or cookies that instruct your server not to cache.', 'varnish-http-purge' ),
+				'message' => sprintf( __( 'The "Age" header is returning %s, which means it is not properly caching. Either this URL is intentionally excluded from caching, or a theme or plugin is instructing WordPress not to cache.', 'varnish-http-purge' ), $age_header ),
 			);
 		} elseif ( (bool)strtotime( $headers['Age'] ) && time() <= strtotime( $headers['Age'] ) ) {
 			$return['Age Headers'] = array(
 				'icon'    => 'bad',
-				'message' => __( 'The "Age" header is set to an invalid time. Either you checked right when the cache was clearned for that url or your server is not serving cached content for that url. Please check again, and if it happens again then a theme or plugin is requesting the URL not be cached.', 'varnish-http-purge' ),
+				'message' => __( 'The "Age" header is set to an invalid time, which will result in incorrect caching.', 'varnish-http-purge' ),
 			);
 		} else {
 			$return['Age Headers'] = array(
@@ -517,7 +534,7 @@ class VarnishDebug {
 		if ( isset( $headers['Pragma'] ) && strpos( $headers['Pragma'] ,'no-cache') !== false ) {
 			$return['Pragma Headers'] = array(
 				'icon'    => 'bad',
-				'message' =>  __( 'A plugin or theme is setting the header Pragma to "no-cache" which means visitors will never get cached pages.', 'varnish-http-purge' ),
+				'message' =>  __( 'The header Pragma is set to to "no-cache" which means visitors will never get cached content.', 'varnish-http-purge' ),
 			);
 		}
 
@@ -525,7 +542,7 @@ class VarnishDebug {
 		if ( isset( $headers['X-Cache-Status'] ) && strpos( $headers['X-Cache-Status'] ,'MISS') !== false ) {
 			$return['X-Cache Satus'] = array(
 				'icon'    => 'bad',
-				'message' =>  __( 'X-Cache missed, which means it was not able to serve this page as cached. This may be resolved by re-running the scan. If not, then a plugin or theme is forcing this setting.', 'varnish-http-purge' ),
+				'message' =>  __( 'X-Cache missed, which means your site was not able to serve this page as cached.', 'varnish-http-purge' ),
 			);
 		}
 
@@ -539,7 +556,7 @@ class VarnishDebug {
 			} else {
 				$return['Mod Pagespeed'] = array(
 					'icon'    => 'bad',
-					'message' =>  __( 'Mod Pagespeed is active but it looks like your caching headers may not be right. This may be a false negative if other parts of your site are overwriting headers. Fix all other errors listed, then come back to this. If you are still having errors, you will need to look into using .htaccess or Nginx to override the Pagespeed headers.', 'varnish-http-purge' ),
+					'message' =>  __( 'Mod Pagespeed is active but your caching headers may not be right. This may be a false negative if other parts of your site are overwriting headers. Fix all other errors listed, then come back to this. If you are still having errors, you will need to look into using .htaccess or Nginx to override the Pagespeed headers.', 'varnish-http-purge' ),
 				);
 			}
 		}
@@ -563,8 +580,8 @@ class VarnishDebug {
 			return $return; // Bail early
 		}
 
-		$body    = wp_remote_retrieve_body( $request );
-		$themes  = json_decode( $body );
+		$body   = wp_remote_retrieve_body( $request );
+		$themes = json_decode( $body );
 
 		if( empty( $themes ) ) {
 			if ( WP_DEBUG ) {
@@ -589,7 +606,7 @@ class VarnishDebug {
 		if ( empty( $return ) ) {
 			$return[ 'Theme Success' ] = array(
 				'icon'    => 'good',
-				'message' => 'No themes were found on the Varnish conflicts list.',
+				'message' => __( 'No themes were found on the known conflicts list.', 'varnish-http-purge' ),
 			);
 		}
 
@@ -610,14 +627,14 @@ class VarnishDebug {
 			'incompatible' => __( 'This plugin has unexpected results with caching, making not function properly.', 'varnish-http-purge' ),
 			'translation'  => __( 'Translation plugins that use cookies and/or sessions prevent most server side caching from running properly.', 'varnish-http-purge' ),
 			'sessions'     => __( 'This plugin uses sessions, which conflicts with server side caching.', 'varnish-http-purge' ),
-			'cookies'      => __( 'This plugin uses cookies, which prevents server side caching.', 'varnish-http-purge' ),
+			'cookies'      => __( 'This plugin uses cookies, which may prevent server side caching.', 'varnish-http-purge' ),
 			'cache'        => __( 'This type of caching plugin does not work well with server side caching.', 'varnish-http-purge' ),
 			'ancient'      => __( 'This plugin is not up to date with WordPress best practices and breaks caching.', 'varnish-http-purge' ),
 			'removed'      => __( 'This plugin was removed from WordPress.org and we do not recommend it\'s use.', 'varnish-http-purge' ),
+			'maybe'        => __( 'This plugin is usually fine, but may be configured in a way that breaks caching. Please resolve all other errors. If this is the only one left, and caching is running, you may safely ignore this message.', 'varnish-http-purge' ),
 		);
+
 		$request = wp_remote_get( 'https://varnish-http-purge.objects-us-east-1.dream.io/plugins.json' );
-
-
 		if( is_wp_error( $request ) ) {
 			if ( WP_DEBUG ) {
 				$return[ 'Plugin Check' ] = array( 'icon' => 'warning', 'message' => __( 'Error: Plugin data cannot be loaded.', 'varnish-http-purge' ) );
@@ -634,10 +651,18 @@ class VarnishDebug {
 
 		// Check all the plugins. If one of the questionable ones are active, warn
 		foreach ( $plugins as $plugin => $info ) {
-			if ( is_plugin_active( $info->path ) ) {
-				$message  = $messages[ $info->reason ];
-				$warning  = $info->type;
-				$return[ 'Plugin: ' . ucfirst( $plugin ) ] = array( 'icon' => $warning, 'message' => $message );
+			if( file_exists( plugin_dir_path( __DIR__ ) . $info->path ) ) {
+				$message = $messages[ $info->reason ];
+				$warning = 'awkward';
+				$status  = __( 'Inactive', 'varnish-http-purge' );
+
+				// If the plugin is inactive, change the warning
+				if ( is_plugin_active( $info->path ) ) {
+					$warning = $info->type;
+					$status  = __( 'Active', 'varnish-http-purge' );
+				}
+				
+				$return[ 'Plugin: ' . ucfirst( $plugin ) ] = array( 'icon' => $warning, 'message' => $message . ' (' . $status . ')' );
 			}
 		}
 
@@ -646,7 +671,7 @@ class VarnishDebug {
 		if ( empty( $return ) ) {
 			$return[ 'Plugin Success' ] = array(
 				'icon'    => 'good',
-				'message' => 'No active plugins were found on the Varnish conflicts list.',
+				'message' => __( 'No installed plugins were found on the known conflicts list.', 'varnish-http-purge' ),
 			);
 		}
 

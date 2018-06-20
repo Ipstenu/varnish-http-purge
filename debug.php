@@ -608,7 +608,7 @@ class VarnishDebug {
 		if ( empty( $return ) ) {
 			$return[ 'Theme Success' ] = array(
 				'icon'    => 'good',
-				'message' => __( 'No themes were found on the known conflicts list.', 'varnish-http-purge' ),
+				'message' => __( 'No installed themes were found on the known conflicts list.', 'varnish-http-purge' ),
 			);
 		}
 

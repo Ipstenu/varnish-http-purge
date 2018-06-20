@@ -421,17 +421,7 @@ class VarnishDebug {
 				'icon'    => 'warning',
 				'message' => __( 'Cookies have been detected. Unless your caching service is configured properly for the specific cookies, it may not cache properly. Please contact your webhost or administrator with information about the cookies found.', 'varnish-http-purge' ),
 			);
-	
-			// list ALL cookies
-			preg_match_all( '/^Set-Cookie:\s*([^;]*)/mi', $headers, $matches );
-			$all_cookies = array();
-			foreach( $matches[1] as $item ) {
-				parse_str( $item, $set_cookie );
-				$all_cookies = array_merge( $all_cookies, $set_cookie );
-			}
-			$cookie_message        = sprintf ( __( 'The following cookies have been set by your website: %s', 'varnish-http-purge' ), implode( ', ', $all_cookies ) );
-			$return['All Cookies'] = array( 'icon' => 'notice', 'message' => $cookie_message );
-	
+
 			// Let's check our known bad cookies
 			$request = wp_remote_get( 'https://varnish-http-purge.objects-us-east-1.dream.io/cookies.json' );
 	
@@ -449,7 +439,7 @@ class VarnishDebug {
 	
 			foreach ( $cookies as $cookie => $info ) {
 				$has_cookie = false;
-	
+
 				// If cookies are an array, scan the whole thing. Otherwise, we can use strpos.
 				if ( is_array( $headers['Set-Cookie'] ) ) {
 					if ( in_array( $info->cookie, $headers['Set-Cookie'], true ) ) $has_cookie = true;

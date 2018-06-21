@@ -209,32 +209,45 @@ class VarnishDebug {
 		} else {
 			$kronk = true;
 
-			// Check if the headers are set AND if the values are valid
+			// Get some basic truthy/falsy from the headers
+
+			// Headers used by both
+			$x_varnish   = ( isset( $headers['X-Varnish'] ) )? true : false;
+			$x_date      = ( isset( $headers['Date'] ) && strtotime( $headers['Date'] ) !== false )? true : false;
+			$x_age       = ( isset( $headers['Age'] ) )? true : false;
+
+			// Is this Nginx or not?
+			$x_nginx     = ( isset( $headers['server'] ) && ( strpos( $headers['server'], 'nginx') !== false || strpos( $headers['server'], 'openresty') !== false ) )? true : false;
+
+			// Headers used by Nginx
+			$x_varn_hit  = ( $x_varnish && strpos( $headers['X-Varnish'] ,'HIT' ) !== false )? true : false;
+			$x_age_nginx = ( $x_age && $x_date && strtotime( $headers['Age'] ) < strtotime( $headers['Date'] ) )? true : false;
+			$x_pragma   = ( isset( $headers['Pragma'] ) && strpos( $headers['Pragma'] ,'no-cache') == false )? true : false;
+
+			// Headers used ONLY by Apache/Varnish
 			$x_cachable = ( isset( $headers['X-Cacheable'] ) && strpos( $headers['X-Cacheable'], 'YES') !== false )? true : false;
-			$x_varnish  = ( isset( $headers['X-Varnish'] ) )? true : false;
+			$x_age_vapc = ( $x_age && $headers['Age'] > 0 )? true : false;
+
+			// Optional Headers
 			$x_via      = ( is_numeric( strpos( $headers['Via'], 'arnish' ) ) )? true : false;
-			$x_nginx    = ( isset( $headers['server'] ) && strpos( $headers['server'], 'nginx') !== false )? true : false;
-			$x_age      = ( isset( $headers['Age'] ) && $headers['Age'] > 0 )?  true : false;
 			$x_cache    = ( isset( $headers['x-cache-status'] ) && strpos( $headers['x-cache-status'], 'HIT') !== false )? true : false;
 			$x_p_cache  = ( isset( $headers['X-Proxy-Cache'] ) && strpos( $headers['X-Proxy-Cache'], 'HIT') !== false )? true : false;
 
-			// If this is TRUE it's NOT Cachable
-			$not_cachable     = ( 
-					( isset( $headers['X-Cacheable'] ) && strpos( $headers['X-Cacheable'] ,'NO') !== false ) || 
-					( isset( $headers['Pragma'] ) && strpos( $headers['Pragma'] ,'no-cache') !== false ) || 
-					( isset( $headers['X-Proxy-Cache'] ) && strpos( $headers['X-Proxy-Cache'] ,'HIT') !== false ) || 
-					!$x_age 
-				)? true : false;
-
 			// Are cache HEADERS set?
-			$cacheheaders_set = ( isset( $headers['X-Cacheable'] ) || isset( $headers['X-Varnish'] ) || isset( $headers['X-Cache'] ) || $x_via )? true : false;
+			$cacheheaders_set = ( isset( $headers['X-Cacheable'] ) || $x_varnish || isset( $headers['X-Cache'] ) || $x_via )? true : false;
+
+			// Is Cacheable: TRUE is cachable
+			$is_cachable    = ( $x_varnish && $x_age )? true : false;
+			$still_cachable = true;
 
 			// Which service are we?
-			$cache_service    = false;
+			$cache_service = false;
 			if ( $x_varnish && $x_nginx ) {
-				$cache_service = __('Nginx', 'varnish-http-purge' );
+				$cache_service  = __('Nginx', 'varnish-http-purge' );
+				$still_cachable = ( $is_cachable && $x_pragma && $x_age_nginx && $x_varn_hit )? true : false;
 			} elseif ( $x_varnish && !$x_nginx ) {
 				$cache_service = __( 'Varnish', 'varnish-http-purge' );
+				$still_cachable = ( $is_cachable && $x_cachable && $x_age_vapc )? true : false;
 			}
 
 			// Determine the default message
@@ -253,11 +266,11 @@ class VarnishDebug {
 		} elseif ( !$cacheheaders_set ) {
 			$return['icon']    = 'notice';
 			$return['message'] = __( 'We were unable find a caching service active for this domain. This may occur if you use a proxy service (such as CloudFlare or Sucuri) or if you\'re in the middle of a DNS move.', 'varnish-http-purge' );
-		} elseif ( !$not_cachable && ( $x_cachable || $x_varnish ) ) {
+		} elseif ( $is_cachable && $still_cachable ) {
 			$return['icon']    = 'awesome';
 		} else {
 			$return['icon']    = 'warning';
-			$return['message'] = __( 'A caching service is running but is unable to cache your site.', 'varnish-http-purge' );
+			$return['message'] = sprintf( __( '%s caching service is running but is unable to cache your site.', 'varnish-http-purge' ), $cache_service );
 		}
 
 		return $return;
@@ -515,7 +528,7 @@ class VarnishDebug {
 			);
 		} else {
 			$return['Age Headers'] = array(
-				'icon'    => 'good',
+				'icon'    => 'awesome',
 				'message' => __( 'Your site is returning proper "Age" headers.', 'varnish-http-purge' ),
 			);
 		}
@@ -606,7 +619,7 @@ class VarnishDebug {
 		// If no questionable themes are found, let the user know
 		// with a success message.
 		if ( empty( $return ) ) {
-			$return[ 'Theme Success' ] = array(
+			$return[ 'Theme Check' ] = array(
 				'icon'    => 'good',
 				'message' => __( 'No installed themes were found on the known conflicts list.', 'varnish-http-purge' ),
 			);
@@ -674,7 +687,7 @@ class VarnishDebug {
 		// If no questionable plugins are found, let the user know
 		// with a success message.
 		if ( empty( $return ) ) {
-			$return[ 'Plugin Success' ] = array(
+			$return[ 'Plugin Check' ] = array(
 				'icon'    => 'good',
 				'message' => __( 'No installed plugins were found on the known conflicts list.', 'varnish-http-purge' ),
 			);

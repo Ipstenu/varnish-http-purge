@@ -144,8 +144,8 @@ if ( !class_exists( 'WP_CLI_Varnish_Command' ) ) {
 		 * [--include-headers]
 		 * : Include headers in debug check output.
 		 *
-		 * [--include-cookies]
-		 * : Include raw cookie list in debug check output.
+		 * [--include-grep]
+		 * : Also grep active theme and plugin directories for common issues.
 		 *
 		 * [--format=<format>]
 		 * : Render output in a particular format.
@@ -173,6 +173,34 @@ if ( !class_exists( 'WP_CLI_Varnish_Command' ) ) {
 
 			if ( empty( $url ) ) {
 				$url = esc_url( $this->varnish_purge->the_home_url() );;
+			}
+
+			if ( WP_CLI\Utils\get_flag_value( $assoc_args, 'include-grep' ) ) {
+				$pattern = '(PHPSESSID|session_start|start_session|$cookie|setCookie)';
+				WP_CLI::log( 'Grepping for: ' . $pattern );
+				WP_CLI::log( '' );
+				$paths = array(
+					get_template_directory(),
+					get_stylesheet_directory(),
+				);
+				foreach ( wp_get_active_and_valid_plugins() as $plugin_path ) {
+					// We don't care about our own plugin.
+					if ( false !== stripos( $plugin_path, 'varnish-http-purge/varnish-http-purge.php' ) ) {
+						continue;
+					}
+					$paths[] = dirname( $plugin_path );
+				}
+				$paths = array_unique( $paths );
+				foreach ( $paths as $path ) {
+					$cmd = sprintf(
+						"grep -RE '%s' %s",
+						$pattern,
+						escapeshellarg( $path )
+					);
+					passthru( $cmd );
+				}
+				WP_CLI::log( '' );
+				WP_CLI::log( 'Grep complete.' );
 			}
 
 			// Include the debug code

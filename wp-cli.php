@@ -120,7 +120,7 @@ if ( !class_exists( 'WP_CLI_Varnish_Command' ) ) {
 			if ( empty( $args[0] ) ) {
 				// No params, echo state
 				$state  = ( $devmode['active'] )? __( 'activated', 'varnish-http-purge' ) : __( 'deactivated', 'varnish-http-purge' );
-				WP_CLI::success( sprintf( __( 'Varnish HTTP Purge development mode is currently %s.', 'varnish-http-purge' ), $state ) );
+				WP_CLI::log( sprintf( __( 'Varnish HTTP Purge development mode is currently %s.', 'varnish-http-purge' ), $state ) );
 			} elseif ( !in_array( $args[0], $valid_modes ) ) {
 				// Invalid Params, warn
 				WP_CLI::error( sprintf( __( '%s is not a valid subcommand for varnish development mode.', 'varnish-http-purge'), sanitize_text_field( $args[0] ) ) );
@@ -143,6 +143,9 @@ if ( !class_exists( 'WP_CLI_Varnish_Command' ) ) {
 		 *
 		 * [--include-headers]
 		 * : Include headers in debug check output.
+		 *
+		 * [--include-cookies]
+		 * : Include raw cookie list in debug check output.
 		 *
 		 * [--format=<format>]
 		 * : Render output in a particular format.

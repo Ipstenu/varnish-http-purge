@@ -619,7 +619,7 @@ class VarnishDebug {
 		// If no questionable themes are found, let the user know
 		// with a success message.
 		if ( empty( $return ) ) {
-			$return[ 'Theme Success' ] = array(
+			$return[ 'Theme Check' ] = array(
 				'icon'    => 'good',
 				'message' => __( 'No installed themes were found on the known conflicts list.', 'varnish-http-purge' ),
 			);
@@ -687,7 +687,7 @@ class VarnishDebug {
 		// If no questionable plugins are found, let the user know
 		// with a success message.
 		if ( empty( $return ) ) {
-			$return[ 'Plugin Success' ] = array(
+			$return[ 'Plugin Check' ] = array(
 				'icon'    => 'good',
 				'message' => __( 'No installed plugins were found on the known conflicts list.', 'varnish-http-purge' ),
 			);

@@ -77,7 +77,7 @@
 * Update readme with list of filters.
 * Added wp-cli commands to flush specific URLs and wildcards
 * Requires wp-cli 0.25+ to work [3315](https://github.com/wp-cli/wp-cli/issues/3315) for WP 4.6+
-* Update `purgePost()` to validate page_for_posts ([Props JeremyClarke](https://github.com/Ipstenu/varnish-http-purge/pull/20))
+* Update `purge_post()` to validate page_for_posts ([Props JeremyClarke](https://github.com/Ipstenu/varnish-http-purge/pull/20))
 * Add check for AMP ([Props JeremyClarke](https://wordpress.org/support/topic/varnish-http-purge-doesnt-update-amp-urls-on-post-update/))
 * Purge 'default' AMP URL as well
 * Cleanup on Uninstall

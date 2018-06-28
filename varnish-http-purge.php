@@ -630,7 +630,7 @@ class VarnishPurger {
 		$listofurls = array();
 
 		// Verify we have a permalink and that we're a valid post status and a not an invalid post type.
-		if ( get_permalink( $post_id ) === true && in_array( $this_post_status, $valid_post_status, true ) && ! in_array( $this_post_type, $invalid_post_type, true ) ) {
+		if ( get_permalink( $post_id ) == true && in_array( $this_post_status, $valid_post_status, true ) && ! in_array( $this_post_type, $invalid_post_type, true ) ) {
 
 			// Post URL.
 			array_push( $listofurls, get_permalink( $post_id ) );

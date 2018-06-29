@@ -228,7 +228,7 @@ class VarnishPurger {
 			$time    = human_time_diff( current_time( 'timestamp' ), $devmode['expire'] );
 			// translators: %1$s is the time until dev mode expires.
 			// translators: %2$s is a link to the Varnish settings pages.
-			$message = sprintf( __( 'Varnish HTTP Purge Development Mode is active for %1$s. You can disable this at the <a href="%2$s">Varnish Settings Page</a>.', 'varnish-http-purge' ), $time, esc_url( admin_url( 'admin.php?page=varnish-status' ) ) );
+			$message = sprintf( __( 'Varnish HTTP Purge Development Mode is active for %1$s. You can disable this at the <a href="%2$s">Varnish Settings Page</a>.', 'varnish-http-purge' ), $time, esc_url( admin_url( 'admin.php?page=varnish-page' ) ) );
 		}
 		echo '<div class="notice notice-warning"><p>' . $message . '</p></div>';
 	}

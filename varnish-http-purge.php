@@ -173,7 +173,13 @@ class VarnishPurger {
 		// Success: Admin notice when purging.
 		if ( ( isset( $_GET['vhp_flush_all'] ) && check_admin_referer( 'vhp-flush-all' ) ) ||
 			( isset( $_GET['vhp_flush_do'] ) && check_admin_referer( 'vhp-flush-do' ) ) ) {
-				add_action( 'admin_notices', array( $this, 'purge_message' ) );
+				if ( 'devmode' === $_GET['vhp_flush_do'] ) {
+					$toggle = ( VarnishDebug::devmode_check() )? 'deactivate' : 'activate';
+					VarnishDebug::devmode_toggle( $toggle );
+					add_action( 'admin_notices', array( $this, 'admin_message_devmode' ) );
+				} else {
+					add_action( 'admin_notices', array( $this, 'admin_message_purge' ) );
+				}
 		}
 
 		// Add Admin Bar.
@@ -186,10 +192,21 @@ class VarnishPurger {
 	 * Purge Message
 	 * Informs of a succcessful purge
 	 *
-	 * @since 2.0
+	 * @since 4.6
 	 */
-	public function purge_message() {
+	public function admin_message_purge() {
 		echo '<div id="message" class="notice notice-success fade is-dismissible"><p><strong>' . esc_html__( 'Varnish cache emptied!', 'varnish-http-purge' ) . '</strong></p></div>';
+	}
+
+	/**
+	 * Devmode Message
+	 * Informs of a toggle in Devmode
+	 *
+	 * @since 4.6
+	 */
+	public function admin_message_devmode() {
+		$message = ( VarnishDebug::devmode_check() )? __( 'Development Mode activated for 24 hours.', 'varnish-http-purge' ) : __( 'Development Mode deactivated.', 'varnish-http-purge' );
+		echo '<div id="message" class="notice notice-success fade is-dismissible"><p><strong>' .$message . '</strong></p></div>';
 	}
 
 	/**
@@ -266,14 +283,17 @@ class VarnishPurger {
 	public function varnish_rightnow_adminbar( $admin_bar ) {
 		global $wp;
 
-		$can_purge = false;
+		$can_purge    = false;
+		$cache_active = ( VarnishDebug::devmode_check() )? __( 'Inactive', 'varnish-http-purge' ) : __( 'Active', 'varnish-http-purge' );
+		// translators: %s is the state of cache.
+		$cache_titled = sprintf( __( 'Cache (%s)', 'varnish-http-purge' ), $cache_active );
 
 		if ( ( ! is_admin() && get_post() !== false && current_user_can( 'edit_published_posts' ) ) || current_user_can( 'activate_plugins' ) ) {
 			// Main Array.
 			$args      = array(
 				array(
 					'id'    => 'purge-varnish-cache',
-					'title' => '<span class="ab-icon"></span><span class="ab-label">' . __( 'Empty Cache', 'varnish-http-purge' ) . '</span>',
+					'title' => '<span class="ab-icon"></span><span class="ab-label">' . $cache_titled . '</span>',
 					'meta'  => array(
 						'class' => 'varnish-http-purge',
 					),
@@ -295,21 +315,34 @@ class VarnishPurger {
 			$args[] = array(
 				'parent' => 'purge-varnish-cache',
 				'id'     => 'purge-varnish-cache-all',
-				'title'  => __( 'Entire Cache (All Pages)', 'varnish-http-purge' ),
+				'title'  => __( 'Purge Cache (All Pages)', 'varnish-http-purge' ),
 				'href'   => wp_nonce_url( add_query_arg( 'vhp_flush_do', 'all' ), 'vhp-flush-do' ),
 				'meta'   => array(
-					'title' => __( 'Entire Cache (All Pages)', 'varnish-http-purge' ),
+					'title' => __( 'Purge Cache (All Pages)', 'varnish-http-purge' ),
 				),
 			);
+
+			// Populate enable/disable cache button.
+			$purge_devmode_title = ( VarnishDebug::devmode_check() )? __( 'Restart Cache', 'varnish-http-purge' ) : __( 'Pause Cache (24h)', 'varnish-http-purge' );
+			$args[] = array(
+				'parent' => 'purge-varnish-cache',
+				'id'     => 'purge-varnish-cache-devmode',
+				'title'  => $purge_devmode_title,
+				'href'   => wp_nonce_url( add_query_arg( 'vhp_flush_do', 'devmode' ), 'vhp-flush-do' ),
+				'meta'   => array(
+					'title' =>  $purge_devmode_title,
+				),
+			);
+
 			// If a memcached file is found, we can do this too.
 			if ( file_exists( WP_CONTENT_DIR . '/object-cache.php' ) ) {
 				$args[] = array(
 					'parent' => 'purge-varnish-cache',
 					'id'     => 'purge-varnish-cache-db',
-					'title'  => __( 'Database Cache', 'varnish-http-purge' ),
+					'title'  => __( 'Purge Database Cache', 'varnish-http-purge' ),
 					'href'   => wp_nonce_url( add_query_arg( 'vhp_flush_do', 'object' ), 'vhp-flush-do' ),
 					'meta'   => array(
-						'title' => __( 'Database Cache', 'varnish-http-purge' ),
+						'title' => __( 'Purge Database Cache', 'varnish-http-purge' ),
 					),
 				);
 			}
@@ -321,10 +354,10 @@ class VarnishPurger {
 			$args[]   = array(
 				'parent' => 'purge-varnish-cache',
 				'id'     => 'purge-varnish-cache-this',
-				'title'  => __( 'This Page\'s Cache', 'varnish-http-purge' ),
+				'title'  => __( 'Purge Cache (This Page)', 'varnish-http-purge' ),
 				'href'   => wp_nonce_url( add_query_arg( 'vhp_flush_do', $page_url . '/' ), 'vhp-flush-do' ),
 				'meta'   => array(
-					'title' => __( 'This Page\'s Cache', 'varnish-http-purge' ),
+					'title' => __( 'Purge Cache (This Page)', 'varnish-http-purge' ),
 				),
 			);
 		}
@@ -466,7 +499,7 @@ class VarnishPurger {
 	 * @param array $url - The url to be purged.
 	 * @access protected
 	 */
-	public function purge_url( $url ) {
+	static public function purge_url( $url ) {
 		$p = wp_parse_url( wp_unslash( $url ) );
 
 		// Bail early if there's no host since some plugins are weird.

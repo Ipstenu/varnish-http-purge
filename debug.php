@@ -36,15 +36,15 @@ class VarnishDebug {
 	 */
 	public static function devmode_check() {
 		$return  = false;
-		$devmode = get_site_option( 'vhp_varnish_devmode', VarnishPurger::$devmode );
+		$newmode = get_site_option( 'vhp_varnish_devmode', VarnishPurger::$devmode );
 
 		if ( VHP_DEVMODE ) {
 			$return = true;
-		} elseif ( isset( $devmode['active'] ) && $devmode['active'] ) {
+		} elseif ( isset( $newmode['active'] ) && $newmode['active'] ) {
 			// if expire is less that NOW, it's over.
-			if ( $devmode['expire'] <= current_time( 'timestamp' ) ) {
-				$devmode['active'] = false;
-				update_site_option( 'vhp_varnish_devmode', $devmode );
+			if ( $newmode['expire'] <= current_time( 'timestamp' ) ) {
+				$newmode['active'] = false;
+				update_site_option( 'vhp_varnish_devmode', $newmode );
 			} else {
 				$return = true;
 			}
@@ -61,27 +61,27 @@ class VarnishDebug {
 	 * @return true|false
 	 */
 	public static function devmode_toggle( $state = 'deactivate' ) {
-		$devmode = get_site_option( 'vhp_varnish_devmode', VarnishPurger::$devmode );
+		$newmode = get_site_option( 'vhp_varnish_devmode', VarnishPurger::$devmode );
 
 		// Weirdly this doesn't actually matter.
-		$devmode['expire'] = current_time( 'timestamp' ) + DAY_IN_SECONDS;
+		$newmode['expire'] = current_time( 'timestamp' ) + DAY_IN_SECONDS;
 
 		switch ( sanitize_text_field( $state ) ) {
 			case 'activate':
-				$devmode['active'] = true;
+				$newmode['active'] = true;
 				break;
 			case 'toggle':
-				$devmode['active'] = ( $devmode['active'] ) ? false : true;
+				$newmode['active'] = ( self::devmode_check() ) ? false : true;
 				break;
 			case 'deactivate':
 			default:
-				$devmode['active'] = false;
+				$newmode['active'] = false;
 				break;
 		}
 
-		update_site_option( 'vhp_varnish_devmode', $devmode );
+		update_site_option( 'vhp_varnish_devmode', $newmode );
 
-		return $devmode['active'];
+		return $newmode['active'];
 	}
 
 	/**

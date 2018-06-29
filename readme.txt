@@ -101,21 +101,25 @@ Yes! [Full documentation can be found on Custom Filters in the wiki](https://git
 
 = Can I turn off caching? =
 
-There are two ways to disable caching:
+The plugin itself does not perform caching, but you can use development mode to have WordPress tell Varnish not to serve cached content. In order to do this, you must enter development mode. There are three ways to do this:
 
-1. Add `define( 'VHP_DEVMODE', true );` to your `wp-config.php` file 
+1. Chose 'Pause Cache (24hrs)' from the Cache dropdown menu in your toolbar
 
-2. Go to Varnish -> Settings and enable development mode for 24 hours at a time
+2. Go to Varnish -> Settings and enable development mode
 
-Personally I recommend you _only_ use the define if you're developing on a separate site for an extended period of time. If you put that on your production site, you will slow your site down and lose all the benefits of caching in the first place.
+3. Add `define( 'VHP_DEVMODE', true );` to your `wp-config.php` file 
 
-= Why don't I have access to turn off caching? =
+The first two options will enable development mode for 24 hours. If you're working on long term development, you can should use the define.
+
+It is _not_ recommended you use development mode on production sites for extended periods of time, as it _will_ will slow your site down and lose all the benefits of caching in the first place.
+
+= Why don't I have access to development mode? =
 
 Due to the damage this can cause a site, access is limited to admins only. In the case of a multisite network, only <em>Network Admins</em> can disable caching.
 
-= Why are some pages still cached when I disable caching? =
+= Why do I still see cached content in development mode? =
 
-The plugin isn't doing the caching so your server will actually continue to cache content. That means files that exist outside of WordPress (like CSS or images) will still be cached and _may_ serve cached content. The plugin does its best to add a No Cache parameter to javascript and CSS, however if a theme or plugin _doesn't_ use proper WordPress enqueues, then their content will be shown cached.
+Remember, the plugin isn't doing the caching itself. While development mode is on, your server will actually continue to cache content but WordPress will tell it not to use the cached content. That means files that exist outside of WordPress (like CSS or images) will still be cached and _may_ serve cached content. The plugin does its best to add a No Cache parameter to javascript and CSS, however if a theme or plugin _doesn't_ use proper WordPress enqueues, then their content will be shown cached.
 
 = How can I tell if everything's caching? =
 
@@ -189,12 +193,14 @@ This plugin is installed by default for _all_ DreamPress installs on DreamHost, 
 * June 2018
 * Moved Varnish to it's own menu (with the carrot)
 * Add option to enable development for 24 hours (for super-admins only)
-* Change debug mode to development mode and greatly improve
+* Change debug mode to development mode and greatly improved overall
+* Translation improvements
 * Add new action hook for after a full purge (props @futtta)
 * Change check for age-header to not require a second run (props @danielbachhuber)
 * Confirm plugin and theme blacklist check (props @danielbachhuber)
-* WP-CLI: add option to show all header output (props @danielbachhuber)
-* WP-CLI: add command to change devmode state
+* WP-CLI: add debug option to show all header output (props @danielbachhuber)
+* WP-CLI: add debug option to grep content for known issues (props @danielbachhuber)
+* WP-CLI: add new command to change devmode state
 
 = 4.5.2 =
 

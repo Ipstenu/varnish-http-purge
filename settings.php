@@ -87,7 +87,7 @@ class VarnishStatus {
 	public function options_settings_devmode() {
 		?>
 		<p><a name="#configuredevmode"></a><?php esc_html_e( 'In Development Mode, WordPress will prevent visitors from seeing cached content on your site. You can enable this for 24 hours, after which it will automatically disable itself. This will make your site run slower, so please use with caution.', 'varnish-http-purge' ); ?></p>
-		<p><?php esc_html_e( 'If you need to activate development mode for extended periods of time, you can add <code>define( \'VHP_DEVMODE\', true );</code> in your wp-config file.', 'varnish-http-purge' ); ?></p>
+		<p><?php echo __( 'If you need to activate development mode for extended periods of time, you can add <code>define( \'VHP_DEVMODE\', true );</code> in your wp-config file.', 'varnish-http-purge' ); ?></p>
 		<?php
 	}
 
@@ -137,7 +137,7 @@ class VarnishStatus {
 		} else {
 			$output['active'] = ( isset( $input['active'] ) || $input['active'] ) ? true : false;
 			$output['expire'] = ( isset( $input['expire'] ) && is_int( $input['expire'] ) ) ? $input['expire'] : $expire;
-			$set_message      = ( $output['active'] ) ? __( 'Development Mode Activated', 'varnish-http-purge' ) : __( 'Development Mode Dectivated', 'varnish-http-purge' );
+			$set_message      = ( $output['active'] ) ? __( 'Development Mode activated for 24 hours', 'varnish-http-purge' ) : __( 'Development Mode dectivated', 'varnish-http-purge' );
 			$set_type         = 'updated';
 		}
 

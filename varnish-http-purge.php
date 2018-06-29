@@ -774,6 +774,31 @@ class VarnishPurger {
 		$this->purge_urls = apply_filters( 'vhp_purge_urls', $this->purge_urls, $post_id );
 	}
 
+	// @codingStandardsIgnoreStart
+	
+	/*
+	 * These have all been name changed to proper names, but just in case...
+	 */
+	public function getRegisterEvents() {
+		get_register_events();
+	}
+	public function getNoIDEvents() {
+		get_no_id_events();
+	}
+	public function executePurge() {
+		execute_purge();
+	}
+	public function purgeNoID( $post_id ) {
+		execute_purge_no_id( $post_id );
+	}
+	public function purgeURL( $url ) {
+		purge_url( $url );
+	}
+	public function purgePost( $post_id ) {
+		purge_post( $post_id );
+	}
+	// @codingStandardsIgnoreEnd
+
 }
 
 /**

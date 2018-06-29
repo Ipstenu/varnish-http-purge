@@ -227,11 +227,12 @@ This plugin is installed by default for _all_ DreamPress installs on DreamHost, 
 == Screenshots ==
 
 1. Purge button on Right Now (Dashboard Admin)
-2. Purge button on Toolbar
-3. Scanner results
-4. Change Varnish IP address
-5. Activate Dev Mode
-6. Dev Mode Warning (24 hour notice)
+2. Toolbar menu (with cache enabled)
+3. Toolbar menu (with cache disabled)
+4. Scanner results
+5. Change Varnish IP address
+6. Activate Dev Mode
+7. Dev Mode Warning (24 hour notice)
 
 == Upgrade Notice ==
 

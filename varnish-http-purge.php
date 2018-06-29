@@ -322,18 +322,6 @@ class VarnishPurger {
 				),
 			);
 
-			// Populate enable/disable cache button.
-			$purge_devmode_title = ( VarnishDebug::devmode_check() )? __( 'Restart Cache', 'varnish-http-purge' ) : __( 'Pause Cache (24h)', 'varnish-http-purge' );
-			$args[] = array(
-				'parent' => 'purge-varnish-cache',
-				'id'     => 'purge-varnish-cache-devmode',
-				'title'  => $purge_devmode_title,
-				'href'   => wp_nonce_url( add_query_arg( 'vhp_flush_do', 'devmode' ), 'vhp-flush-do' ),
-				'meta'   => array(
-					'title' =>  $purge_devmode_title,
-				),
-			);
-
 			// If a memcached file is found, we can do this too.
 			if ( file_exists( WP_CONTENT_DIR . '/object-cache.php' ) ) {
 				$args[] = array(
@@ -346,18 +334,30 @@ class VarnishPurger {
 					),
 				);
 			}
-		}
 
-		// If we're on a front end page and the current user can edit published posts, then they can do this.
-		if ( ! is_admin() && get_post() !== false && current_user_can( 'edit_published_posts' ) ) {
-			$page_url = esc_url( home_url( $wp->request ) );
-			$args[]   = array(
+			// If we're on a front end page and the current user can edit published posts, then they can do this.
+			if ( ! is_admin() && get_post() !== false && current_user_can( 'edit_published_posts' ) ) {
+				$page_url = esc_url( home_url( $wp->request ) );
+				$args[]   = array(
+					'parent' => 'purge-varnish-cache',
+					'id'     => 'purge-varnish-cache-this',
+					'title'  => __( 'Purge Cache (This Page)', 'varnish-http-purge' ),
+					'href'   => wp_nonce_url( add_query_arg( 'vhp_flush_do', $page_url . '/' ), 'vhp-flush-do' ),
+					'meta'   => array(
+						'title' => __( 'Purge Cache (This Page)', 'varnish-http-purge' ),
+					),
+				);
+			}
+	
+			// Populate enable/disable cache button.
+			$purge_devmode_title = ( VarnishDebug::devmode_check() )? __( 'Restart Cache', 'varnish-http-purge' ) : __( 'Pause Cache (24h)', 'varnish-http-purge' );
+			$args[] = array(
 				'parent' => 'purge-varnish-cache',
-				'id'     => 'purge-varnish-cache-this',
-				'title'  => __( 'Purge Cache (This Page)', 'varnish-http-purge' ),
-				'href'   => wp_nonce_url( add_query_arg( 'vhp_flush_do', $page_url . '/' ), 'vhp-flush-do' ),
+				'id'     => 'purge-varnish-cache-devmode',
+				'title'  => $purge_devmode_title,
+				'href'   => wp_nonce_url( add_query_arg( 'vhp_flush_do', 'devmode' ), 'vhp-flush-do' ),
 				'meta'   => array(
-					'title' => __( 'Purge Cache (This Page)', 'varnish-http-purge' ),
+					'title' =>  $purge_devmode_title,
 				),
 			);
 		}

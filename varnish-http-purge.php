@@ -269,8 +269,10 @@ class VarnishPurger {
 	 * @since 4.5.0
 	 */
 	public function custom_css() {
-		wp_register_style( 'varnish_http_purge', plugins_url( 'style.css', __FILE__ ), false, '4.6.0' );
-		wp_enqueue_style( 'varnish_http_purge' );
+		if ( is_user_logged_in() ) {
+			wp_register_style( 'varnish_http_purge', plugins_url( 'style.css', __FILE__ ), false, '4.6.0' );
+			wp_enqueue_style( 'varnish_http_purge' );
+		}
 	}
 
 	/**

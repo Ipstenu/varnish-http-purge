@@ -205,7 +205,7 @@ class VarnishPurger {
 	 * @since 4.6
 	 */
 	public function admin_message_devmode() {
-		$message = ( VarnishDebug::devmode_check() )? __( 'Development Mode activated for 24 hours.', 'varnish-http-purge' ) : __( 'Development Mode deactivated.', 'varnish-http-purge' );
+		$message = ( VarnishDebug::devmode_check() )? __( 'Development Mode activated for the next 24 hours.', 'varnish-http-purge' ) : __( 'Development Mode deactivated.', 'varnish-http-purge' );
 		echo '<div id="message" class="notice notice-success fade is-dismissible"><p><strong>' .$message . '</strong></p></div>';
 	}
 
@@ -239,13 +239,13 @@ class VarnishPurger {
 	 */
 	public function devmode_is_active_notice() {
 		if ( VHP_DEVMODE ) {
-			$message = __( 'Varnish HTTP Purge Development Mode is active because it has been defined in wp-config. You will need to remove that in order to allow visitors to see cached data.', 'varnish-http-purge' );
+			$message = __( 'Varnish HTTP Purge Development Mode is active because it has been defined in wp-config.', 'varnish-http-purge' );
 		} else {
 			$devmode = get_site_option( 'vhp_varnish_devmode', VarnishPurger::$devmode );
 			$time    = human_time_diff( current_time( 'timestamp' ), $devmode['expire'] );
 			// translators: %1$s is the time until dev mode expires.
 			// translators: %2$s is a link to the Varnish settings pages.
-			$message = sprintf( __( 'Varnish HTTP Purge Development Mode is active for %1$s. You can disable this at the <a href="%2$s">Varnish Settings Page</a>.', 'varnish-http-purge' ), $time, esc_url( admin_url( 'admin.php?page=varnish-page' ) ) );
+			$message = sprintf( __( 'Varnish HTTP Purge Development Mode is active for the next %1$s. You can disable this at the <a href="%2$s">Varnish Settings Page</a>.', 'varnish-http-purge' ), $time, esc_url( admin_url( 'admin.php?page=varnish-page' ) ) );
 		}
 		echo '<div class="notice notice-warning"><p>' . $message . '</p></div>';
 	}

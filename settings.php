@@ -137,7 +137,7 @@ class VarnishStatus {
 		} else {
 			$output['active'] = ( isset( $input['active'] ) || $input['active'] ) ? true : false;
 			$output['expire'] = ( isset( $input['expire'] ) && is_int( $input['expire'] ) ) ? $input['expire'] : $expire;
-			$set_message      = ( $output['active'] ) ? __( 'Development Mode activated for 24 hours', 'varnish-http-purge' ) : __( 'Development Mode dectivated', 'varnish-http-purge' );
+			$set_message      = ( $output['active'] ) ? __( 'Development Mode activated for the next 24 hours', 'varnish-http-purge' ) : __( 'Development Mode dectivated', 'varnish-http-purge' );
 			$set_type         = 'updated';
 		}
 

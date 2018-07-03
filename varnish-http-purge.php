@@ -381,12 +381,12 @@ class VarnishPurger {
 	 * @param string $icon_color - What color to use.
 	 * @return string
 	 */
-	public static function get_icon_svg( $icon_color, $base64 = true ) {
+	public static function get_icon_svg( $base64 = true, $icon_color = false ) {
 		global $_wp_admin_css_colors;
 
-		$fill = ( isset( $icon_color ) )? sanitize_hex_color( $icon_color ) : '#82878c';
+		$fill = ( false !== $icon_color  )? sanitize_hex_color( $icon_color ) : '#82878c';
 
-		if ( is_admin() && ! isset( $icon_color ) ) {
+		if ( is_admin() && false === $icon_color ) {
 			$admin_colors  = json_decode( json_encode( $_wp_admin_css_colors ), true ) ;
 			$current_color = get_user_option( 'admin_color' );
 			$fill          = $admin_colors[$current_color]['icon_colors']['base'];

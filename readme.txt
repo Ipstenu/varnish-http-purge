@@ -191,7 +191,7 @@ This plugin is installed by default for _all_ DreamPress installs on DreamHost, 
 = 4.6.0 = 
 
 * June 2018
-* Moved Varnish to it's own menu (with the carrot)
+* Moved Varnish to it's own menu with a new custom icon (props Olesya)
 * Add option to enable development for 24 hours (for super-admins only)
 * Change debug mode to development mode and greatly improved overall
 * Translation improvements

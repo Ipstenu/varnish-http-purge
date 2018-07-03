@@ -270,7 +270,7 @@ class VarnishPurger {
 	 */
 	public function custom_css() {
 		if ( is_user_logged_in() ) {
-			wp_register_style( 'varnish_http_purge', plugins_url( 'style.css', __FILE__ ), false, '4.6.0' );
+			wp_register_style( 'varnish_http_purge', plugins_url( 'assets/style.css', __FILE__ ), false, '4.6.0' );
 			wp_enqueue_style( 'varnish_http_purge' );
 		}
 	}
@@ -295,7 +295,7 @@ class VarnishPurger {
 			$args      = array(
 				array(
 					'id'    => 'purge-varnish-cache',
-					'title' => '<span class="ab-icon"></span><span class="ab-label">' . $cache_titled . '</span>',
+					'title' => '<span class="ab-icon" style="background-image: url(' . self::get_icon_svg() . ') !important;"></span><span class="ab-label">' . $cache_titled . '</span>',
 					'meta'  => array(
 						'class' => 'varnish-http-purge',
 					),
@@ -372,6 +372,39 @@ class VarnishPurger {
 	}
 
 	/**
+	 * Get the icon as SVG.
+	 *
+	 * Forked from Yoast SEO
+	 *
+	 * @access public
+	 * @param bool $base64 (default: true) - Use SVG, true/false?
+	 * @param string $fill (default '#82878c') - What color to use.
+	 * @return string
+	 */
+	public static function get_icon_svg( $base64 = true, $fill = '#FFF' ) {
+		global $_wp_admin_css_colors;
+
+		$fill = sanitize_hex_color( $fill );
+
+		if ( is_admin() && '#FFF' === $fill ) {
+			$admin_colors  = json_decode( json_encode( $_wp_admin_css_colors ), true ) ;
+			$current_color = get_user_option( 'admin_color' );
+			$fill = $admin_colors[$current_color]['icon_colors']['base'];
+		} elseif ( !is_admin() ) {
+			$fill = '#82878c';
+		}
+
+		// Flat
+		$svg = '<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="100%" height="100%" style="fill:' . $fill . '" viewBox="0 0 36.2 34.39" role="img" aria-hidden="true" focusable="false"><g id="Layer_2" data-name="Layer 2"><g id="Layer_1-2" data-name="Layer 1"><path fill="' . $fill . '" d="M24.41,0H4L0,18.39H12.16v2a2,2,0,0,0,4.08,0v-2H24.1a8.8,8.8,0,0,1,4.09-1Z"/><path fill="' . $fill . '" d="M21.5,20.4H18.24a4,4,0,0,1-8.08,0v0H.2v8.68H19.61a9.15,9.15,0,0,1-.41-2.68A9,9,0,0,1,21.5,20.4Z"/><path fill="' . $fill . '" d="M28.7,33.85a7,7,0,1,1,7-7A7,7,0,0,1,28.7,33.85Zm-1.61-5.36h5V25.28H30.31v-3H27.09Z"/><path fill="' . $fill . '" d="M28.7,20.46a6.43,6.43,0,1,1-6.43,6.43,6.43,6.43,0,0,1,6.43-6.43M26.56,29h6.09V24.74H30.84V21.8H26.56V29m2.14-9.64a7.5,7.5,0,1,0,7.5,7.5,7.51,7.51,0,0,0-7.5-7.5ZM27.63,28V22.87h2.14v2.95h1.81V28Z"/></g></g></svg>';
+
+		if ( $base64 ) {
+			return 'data:image/svg+xml;base64,' . base64_encode( $svg );
+		}
+
+		return $svg;
+	}
+
+	/**
 	 * Varnish Right Now Information
 	 * This information is put on the Dashboard 'Right now' widget
 	 *
@@ -383,7 +416,7 @@ class VarnishPurger {
 		$intro    = sprintf( __( '<a href="%1$s">Varnish HTTP Purge</a> automatically deletes your cached posts when published or updated. When making major site changes, such as with a new theme, plugins, or widgets, you may need to manually empty the cache.', 'varnish-http-purge' ), 'http://wordpress.org/plugins/varnish-http-purge/' );
 		$url      = wp_nonce_url( add_query_arg( 'vhp_flush_do', 'all' ), 'vhp-flush-do' );
 		$button   = __( 'Press the button below to force it to empty your entire Varnish cache.', 'varnish-http-purge' );
-		$button  .= '</p><p><span class="button"><span class="dashicons dashicons-carrot varnish-http-purge"></span> <a href="' . $url . '"><strong>';
+		$button  .= '</p><p><span class="button"><span class="dashicons varnish-http-purge" style="background-image: url(' . self::get_icon_svg( true, '#F56E28' ) . ') !important;"></span> <a href="' . $url . '"><strong>';
 		$button  .= __( 'Empty Cache', 'varnish-http-purge' );
 		$button  .= '</strong></a></span>';
 		$nobutton = __( 'You do not have permission to empty the Varnish cache for the whole site. Please contact your administrator.', 'varnish-http-purge' );
@@ -810,7 +843,6 @@ class VarnishPurger {
 	}
 
 	// @codingStandardsIgnoreStart
-	
 	/*
 	 * These have all been name changed to proper names, but just in case...
 	 */

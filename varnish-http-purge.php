@@ -378,20 +378,18 @@ class VarnishPurger {
 	 *
 	 * @access public
 	 * @param bool $base64 (default: true) - Use SVG, true/false?
-	 * @param string $fill (default '#82878c') - What color to use.
+	 * @param string $icon_color - What color to use.
 	 * @return string
 	 */
-	public static function get_icon_svg( $base64 = true, $fill = '#FFF' ) {
+	public static function get_icon_svg( $icon_color, $base64 = true ) {
 		global $_wp_admin_css_colors;
 
-		$fill = sanitize_hex_color( $fill );
+		$fill = ( isset( $icon_color ) )? sanitize_hex_color( $icon_color ) : '#82878c';
 
-		if ( is_admin() && '#FFF' === $fill ) {
+		if ( is_admin() && ! isset( $icon_color ) ) {
 			$admin_colors  = json_decode( json_encode( $_wp_admin_css_colors ), true ) ;
 			$current_color = get_user_option( 'admin_color' );
-			$fill = $admin_colors[$current_color]['icon_colors']['base'];
-		} elseif ( !is_admin() ) {
-			$fill = '#82878c';
+			$fill          = $admin_colors[$current_color]['icon_colors']['base'];
 		}
 
 		// Flat

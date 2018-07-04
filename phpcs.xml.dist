@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<ruleset name="Varnish HTTP Purge Coding Standards">
+    <description>A custom ruleset to take in account both WordPress and Plugin standards.</description>
+    <rule ref="WordPress-Extra">
+        <exclude name="WordPress.Files.FileName.InvalidClassFileName" />
+        <exclude name="WordPress.Files.FileName.NotHyphenatedLowercase" />
+        <exclude name="WordPress.WP.DiscouragedFunctions.wp_reset_query_wp_reset_query" />
+        <exclude name="WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode" />
+        <exclude name="WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents" />
+    </rule>
+
+</ruleset>

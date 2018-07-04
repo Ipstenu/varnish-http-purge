@@ -173,13 +173,13 @@ class VarnishPurger {
 		// Success: Admin notice when purging.
 		if ( ( isset( $_GET['vhp_flush_all'] ) && check_admin_referer( 'vhp-flush-all' ) ) ||
 			( isset( $_GET['vhp_flush_do'] ) && check_admin_referer( 'vhp-flush-do' ) ) ) {
-				if ( 'devmode' === $_GET['vhp_flush_do'] ) {
-					$toggle = ( VarnishDebug::devmode_check() )? 'deactivate' : 'activate';
-					VarnishDebug::devmode_toggle( $toggle );
-					add_action( 'admin_notices', array( $this, 'admin_message_devmode' ) );
-				} else {
-					add_action( 'admin_notices', array( $this, 'admin_message_purge' ) );
-				}
+			if ( 'devmode' === $_GET['vhp_flush_do'] ) {
+				$toggle = ( VarnishDebug::devmode_check() ) ? 'deactivate' : 'activate';
+				VarnishDebug::devmode_toggle( $toggle );
+				add_action( 'admin_notices', array( $this, 'admin_message_devmode' ) );
+			} else {
+				add_action( 'admin_notices', array( $this, 'admin_message_purge' ) );
+			}
 		}
 
 		// Add Admin Bar.
@@ -205,8 +205,8 @@ class VarnishPurger {
 	 * @since 4.6
 	 */
 	public function admin_message_devmode() {
-		$message = ( VarnishDebug::devmode_check() )? __( 'Development Mode activated for the next 24 hours.', 'varnish-http-purge' ) : __( 'Development Mode deactivated.', 'varnish-http-purge' );
-		echo '<div id="message" class="notice notice-success fade is-dismissible"><p><strong>' .$message . '</strong></p></div>';
+		$message = ( VarnishDebug::devmode_check() ) ? __( 'Development Mode activated for the next 24 hours.', 'varnish-http-purge' ) : __( 'Development Mode deactivated.', 'varnish-http-purge' );
+		echo '<div id="message" class="notice notice-success fade is-dismissible"><p><strong>' . $message . '</strong></p></div>';
 	}
 
 	/**
@@ -241,7 +241,7 @@ class VarnishPurger {
 		if ( VHP_DEVMODE ) {
 			$message = __( 'Varnish HTTP Purge Development Mode is active because it has been defined in wp-config.', 'varnish-http-purge' );
 		} else {
-			$devmode = get_site_option( 'vhp_varnish_devmode', VarnishPurger::$devmode );
+			$devmode = get_site_option( 'vhp_varnish_devmode', self::$devmode );
 			$time    = human_time_diff( current_time( 'timestamp' ), $devmode['expire'] );
 			// translators: %1$s is the time until dev mode expires.
 			// translators: %2$s is a link to the Varnish settings pages.
@@ -286,7 +286,7 @@ class VarnishPurger {
 		global $wp;
 
 		$can_purge    = false;
-		$cache_active = ( VarnishDebug::devmode_check() )? __( 'Inactive', 'varnish-http-purge' ) : __( 'Active', 'varnish-http-purge' );
+		$cache_active = ( VarnishDebug::devmode_check() ) ? __( 'Inactive', 'varnish-http-purge' ) : __( 'Active', 'varnish-http-purge' );
 		// translators: %s is the state of cache.
 		$cache_titled = sprintf( __( 'Cache (%s)', 'varnish-http-purge' ), $cache_active );
 
@@ -350,16 +350,16 @@ class VarnishPurger {
 					),
 				);
 			}
-	
+
 			// Populate enable/disable cache button.
-			$purge_devmode_title = ( VarnishDebug::devmode_check() )? __( 'Restart Cache', 'varnish-http-purge' ) : __( 'Pause Cache (24h)', 'varnish-http-purge' );
-			$args[] = array(
+			$purge_devmode_title = ( VarnishDebug::devmode_check() ) ? __( 'Restart Cache', 'varnish-http-purge' ) : __( 'Pause Cache (24h)', 'varnish-http-purge' );
+			$args[]              = array(
 				'parent' => 'purge-varnish-cache',
 				'id'     => 'purge-varnish-cache-devmode',
 				'title'  => $purge_devmode_title,
 				'href'   => wp_nonce_url( add_query_arg( 'vhp_flush_do', 'devmode' ), 'vhp-flush-do' ),
 				'meta'   => array(
-					'title' =>  $purge_devmode_title,
+					'title' => $purge_devmode_title,
 				),
 			);
 		}
@@ -384,12 +384,12 @@ class VarnishPurger {
 	public static function get_icon_svg( $base64 = true, $icon_color = false ) {
 		global $_wp_admin_css_colors;
 
-		$fill = ( false !== $icon_color  )? sanitize_hex_color( $icon_color ) : '#82878c';
+		$fill = ( false !== $icon_color ) ? sanitize_hex_color( $icon_color ) : '#82878c';
 
 		if ( is_admin() && false === $icon_color ) {
-			$admin_colors  = json_decode( json_encode( $_wp_admin_css_colors ), true ) ;
+			$admin_colors  = json_decode( wp_json_encode( $_wp_admin_css_colors ), true );
 			$current_color = get_user_option( 'admin_color' );
-			$fill          = $admin_colors[$current_color]['icon_colors']['base'];
+			$fill          = $admin_colors[ $current_color ]['icon_colors']['base'];
 		}
 
 		// Flat
@@ -532,7 +532,7 @@ class VarnishPurger {
 	 * @param array $url - The url to be purged.
 	 * @access protected
 	 */
-	static public function purge_url( $url ) {
+	public static function purge_url( $url ) {
 		$p = wp_parse_url( wp_unslash( $url ) );
 
 		// Bail early if there's no host since some plugins are weird.
@@ -696,7 +696,7 @@ class VarnishPurger {
 		$listofurls = array();
 
 		// Verify we have a permalink and that we're a valid post status and a not an invalid post type.
-		if ( get_permalink( $post_id ) == true && in_array( $this_post_status, $valid_post_status, true ) && ! in_array( $this_post_type, $invalid_post_type, true ) ) {
+		if ( get_permalink( $post_id ) === true && in_array( $this_post_status, $valid_post_status, true ) && ! in_array( $this_post_type, $invalid_post_type, true ) ) {
 
 			// Post URL.
 			array_push( $listofurls, get_permalink( $post_id ) );

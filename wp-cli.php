@@ -112,7 +112,7 @@ if ( ! class_exists( 'WP_CLI_Varnish_Command' ) ) {
 
 			$this->varnish_purge->purge_url( $url . $pregex );
 
-			if ( WP_DEBUG == true ) {
+			if ( WP_DEBUG === true ) {
 				// translators: %1$s is the URL being flushed.
 				// translators: %2$s are the params being flushed.
 				WP_CLI::log( sprintf( __( 'Varnish HTTP Purge is flushing the URL %1$s with params %2$s.', 'varnish-http-purge' ), $url, $pregex ) );
@@ -152,7 +152,7 @@ if ( ! class_exists( 'WP_CLI_Varnish_Command' ) ) {
 				$state = ( $devmode['active'] ) ? __( 'activated', 'varnish-http-purge' ) : __( 'deactivated', 'varnish-http-purge' );
 				// translators: %s is the state of dev mode.
 				WP_CLI::log( sprintf( __( 'Varnish HTTP Purge development mode is currently %s.', 'varnish-http-purge' ), $state ) );
-			} elseif ( ! in_array( $args[0], $valid_modes ) ) {
+			} elseif ( ! in_array( $args[0], $valid_modes, true ) ) {
 				// Invalid Params, warn.
 				// translators: %s is the bad command.
 				WP_CLI::error( sprintf( __( '%s is not a valid subcommand for varnish development mode.', 'varnish-http-purge' ), sanitize_text_field( $args[0] ) ) );

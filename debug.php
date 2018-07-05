@@ -1,19 +1,19 @@
 <?php
 /**
-	Debug Code
-
-	@package varnish-http-purge
-
-	Copyright 2016-2018 Mika Epstein (email: ipstenu@halfelf.org)
-
-	This file is part of Varnish HTTP Purge, a plugin for WordPress.
-
-	Varnish HTTP Purge is free software: you can redistribute it and/or modify
-	it under the terms of the Apache License 2.0 license.
-
-	Varnish HTTP Purge is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * Debug Code
+ *
+ * @package varnish-http-purge
+ *
+ * Copyright 2016-2018 Mika Epstein (email: ipstenu@halfelf.org)
+ *
+ * This file is part of Varnish HTTP Purge, a plugin for WordPress.
+ *
+ * Varnish HTTP Purge is free software: you can redistribute it and/or modify
+ * it under the terms of the Apache License 2.0 license.
+ *
+ * Varnish HTTP Purge is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -288,7 +288,7 @@ class VarnishDebug {
 			}
 
 			// Determine the default message.
-			if ( $cache_service !== false ) {
+			if ( false !== $cache_service ) {
 				// translators: %1 is the type of caching service detected (i.e. nginx or varnish).
 				$return['message'] = sprintf( __( 'Your %1 caching service appears to be running properly.', 'varnish-http-purge' ), $cache_service );
 				$return['icon']    = 'good';
@@ -331,13 +331,13 @@ class VarnishDebug {
 	public static function remote_ip_results( $remote_ip, $varniship ) {
 		$return = false;
 
-		if ( $remote_ip === false && ! empty( $varniship ) ) {
+		if ( false === $remote_ip && ! empty( $varniship ) ) {
 			$return = array(
 				// translators: %s is an IP address.
 				'message' => sprintf( __( 'Your Varnish IP address is set to %s but a proxy (like Cloudflare or Sucuri) has not been detected. This is mostly harmless, but if you have issues with your cache not emptying when you make a post, you may need to remove your Varnish IP. Please check with your webhost or server admin before doing so.', 'varnish-http-purge' ), $varniship ),
 				'icon'    => 'warning',
 			);
-		} elseif ( $remote_ip !== false && $remote_ip !== $varniship ) {
+		} elseif ( false !== $remote_ip && $remote_ip !== $varniship ) {
 			$return = array(
 				'icon'    => 'warning',
 				'message' => __( 'You\'re using a custom Varnish IP that doesn\'t appear to match your server IP address. If you\'re using multiple caching servers or IPv6, this is fine. Please make sure you\'ve properly configured it according to your webhost\'s specifications.', 'varnish-http-purge' ),
@@ -370,7 +370,7 @@ class VarnishDebug {
 
 		if ( isset( $headers['Server'] ) ) {
 			// Apache.
-			if ( strpos( $headers['Server'], 'Apache' ) !== false && strpos( $headers['Server'], 'cloudflare' ) == false ) {
+			if ( strpos( $headers['Server'], 'Apache' ) !== false && strpos( $headers['Server'], 'cloudflare' ) === false ) {
 				$return['Apache'] = array(
 					'icon'    => 'awesome',
 					'message' => __( 'Your server is running Apache.', 'varnish-http-purge' ),
@@ -378,7 +378,7 @@ class VarnishDebug {
 			}
 
 			// nginx.
-			if ( strpos( $headers['Server'], 'nginx' ) !== false && strpos( $headers['Server'], 'cloudflare' ) == false ) {
+			if ( strpos( $headers['Server'], 'nginx' ) !== false && strpos( $headers['Server'], 'cloudflare' ) === false ) {
 				$return['Nginx'] = array(
 					'icon'    => 'awesome',
 					'message' => __( 'Your server is running Nginx.', 'varnish-http-purge' ),
@@ -517,7 +517,7 @@ class VarnishDebug {
 					}
 				} else {
 					$strpos = strpos( $headers['Set-Cookie'], $info->cookie );
-					if ( $strpos !== false ) {
+					if ( false !== $strpos ) {
 						$has_cookie = true;
 					}
 				}
@@ -584,7 +584,7 @@ class VarnishDebug {
 				'icon'    => 'bad',
 				'message' => __( 'Your domain does not report an "Age" header, making it impossible to determine if the page is actually serving from cache.', 'varnish-http-purge' ),
 			);
-		} elseif ( ( $headers['Age'] <= 0 || $headers['Age'] === 0 ) && (bool) strtotime( $headers['Age'] ) == false ) {
+		} elseif ( ( $headers['Age'] <= 0 || 0 === $headers['Age'] ) && (bool) strtotime( $headers['Age'] ) === false ) {
 			$age_header            = (int) $headers['Age']; // a number from 0 to infinity.
 			$return['Age Headers'] = array(
 				// translators: %s is a number indicating how many seconds old the content is.

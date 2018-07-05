@@ -1,20 +1,20 @@
 <?php
 /**
-
-	Settings Code
-
-	@package varnish-http-purge
-
-	Copyright 2016-2018 Mika Epstein (email: ipstenu@halfelf.org)
-
-	This file is part of Varnish HTTP Purge, a plugin for WordPress.
-
-	Varnish HTTP Purge is free software: you can redistribute it and/or modify
-	it under the terms of the Apache License 2.0 license.
-
-	Varnish HTTP Purge is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ *
+ * Settings Code
+ *
+ * @package varnish-http-purge
+ *
+ * Copyright 2016-2018 Mika Epstein (email: ipstenu@halfelf.org)
+ *
+ * This file is part of Varnish HTTP Purge, a plugin for WordPress.
+ *
+ * Varnish HTTP Purge is free software: you can redistribute it and/or modify
+ * it under the terms of the Apache License 2.0 license.
+ *
+ * Varnish HTTP Purge is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -87,7 +87,7 @@ class VarnishStatus {
 	public function options_settings_devmode() {
 		?>
 		<p><a name="#configuredevmode"></a><?php esc_html_e( 'In Development Mode, WordPress will prevent visitors from seeing cached content on your site. You can enable this for 24 hours, after which it will automatically disable itself. This will make your site run slower, so please use with caution.', 'varnish-http-purge' ); ?></p>
-		<p><?php echo __( 'If you need to activate development mode for extended periods of time, you can add <code>define( \'VHP_DEVMODE\', true );</code> in your wp-config file.', 'varnish-http-purge' ); ?></p>
+		<p><?php echo wp_kses_post ( __( 'If you need to activate development mode for extended periods of time, you can add <code>define( \'VHP_DEVMODE\', true );</code> in your wp-config file.', 'varnish-http-purge' ) ); ?></p>
 		<?php
 	}
 

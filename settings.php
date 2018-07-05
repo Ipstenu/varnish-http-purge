@@ -87,7 +87,7 @@ class VarnishStatus {
 	public function options_settings_devmode() {
 		?>
 		<p><a name="#configuredevmode"></a><?php esc_html_e( 'In Development Mode, WordPress will prevent visitors from seeing cached content on your site. You can enable this for 24 hours, after which it will automatically disable itself. This will make your site run slower, so please use with caution.', 'varnish-http-purge' ); ?></p>
-		<p><?php echo wp_kses_post ( __( 'If you need to activate development mode for extended periods of time, you can add <code>define( \'VHP_DEVMODE\', true );</code> in your wp-config file.', 'varnish-http-purge' ) ); ?></p>
+		<p><?php echo wp_kses_post( __( 'If you need to activate development mode for extended periods of time, you can add <code>define( \'VHP_DEVMODE\', true );</code> in your wp-config file.', 'varnish-http-purge' ) ); ?></p>
 		<?php
 	}
 
@@ -241,7 +241,7 @@ class VarnishStatus {
 		<p>
 		<?php
 			// translators: %s is a link to the readme for the detection service.
-			printf( __( '<strong>This check uses <a href="%s">a remote service hosted on DreamObjects</a></strong>. The service used only for providing up to date compatibility checks on plugins and themes that may conflict with running a server based cache (such as Varnish or Nginx). No personally identifying information regarding persons running this check, nor the plugins and themes in use on this site will be transmitted. The bare minimum of usage information is collected, concerning only IPs and domains making requests of the service. If you do not wish to use this service, please do not use this service.', 'varnish-http-purge' ), 'https://varnish-http-purge.objects-us-east-1.dream.io/readme.txt' );
+			printf( wp_kses_post( __( '<strong>This check uses <a href="%s">a remote service hosted on DreamObjects</a></strong>. The service used only for providing up to date compatibility checks on plugins and themes that may conflict with running a server based cache (such as Varnish or Nginx). No personally identifying information regarding persons running this check, nor the plugins and themes in use on this site will be transmitted. The bare minimum of usage information is collected, concerning only IPs and domains making requests of the service. If you do not wish to use this service, please do not use this service.', 'varnish-http-purge' ) ), 'https://varnish-http-purge.objects-us-east-1.dream.io/readme.txt' );
 		?>
 		</p>
 		<?php
@@ -301,8 +301,8 @@ class VarnishStatus {
 			if ( ! $preflight['preflight'] ) {
 				?>
 				<tr>
-					<td width="40px"><?php echo $icons['bad']; ?></td>
-					<td><?php echo $preflight['message']; ?></td>
+					<td width="40px"><?php echo wp_kses_post( $icons['bad'] ); ?></td>
+					<td><?php echo wp_kses_post( $preflight['message'] ); ?></td>
 				</tr>
 				<?php
 			} else {
@@ -313,9 +313,9 @@ class VarnishStatus {
 					if ( $item && is_array( $item ) ) {
 						?>
 							<tr>
-								<td width="20px"><?php echo $icons[ $item['icon'] ]; ?></td>
-								<td width="180px"><strong><?php echo $subject; ?></strong></td>
-								<td><?php echo $item['message']; ?></td>
+								<td width="20px"><?php echo wp_kses_post( $icons[ $item['icon'] ] ); ?></td>
+								<td width="180px"><strong><?php echo wp_kses_post( $subject ); ?></strong></td>
+								<td><?php echo wp_kses_post( $item['message'] ); ?></td>
 							</tr>
 							<?php
 					}
@@ -331,7 +331,7 @@ class VarnishStatus {
 				<table class="wp-list-table widefat fixed posts">
 					<?php
 					if ( ! empty( $headers[0] ) ) {
-						echo '<tr><td width="200px">&nbsp;</td><td>' . $headers[0] . '</td></tr>';
+						echo '<tr><td width="200px">&nbsp;</td><td>' . wp_kses_post( $headers[0] ) . '</td></tr>';
 					}
 					foreach ( $headers as $header => $key ) {
 						if ( '0' !== $header ) {
@@ -340,7 +340,7 @@ class VarnishStatus {
 							} else {
 								$content = wp_kses_post( $key );
 							}
-							echo '<tr><td width="200px" style="text-align:right;">' . ucfirst( $header ) . ':</td><td>' . $content . '</td></tr>';
+							echo '<tr><td width="200px" style="text-align:right;">' . wp_kses_post( ucfirst( $header ) ) . ':</td><td>' . wp_kses_post( $content ) . '</td></tr>';
 						}
 					}
 					?>

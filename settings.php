@@ -325,16 +325,16 @@ class VarnishStatus {
 			</table>
 
 			<?php
-			if ( $preflight['preflight'] !== false ) {
-			?>
-				<h4><?php _e( 'Technical Details', 'varnish-http-purge'  ); ?></h4>
+			if ( false !== $preflight['preflight'] ) {
+				?>
+				<h4><?php esc_html_e( 'Technical Details', 'varnish-http-purge' ); ?></h4>
 				<table class="wp-list-table widefat fixed posts">
 					<?php
 					if ( ! empty( $headers[0] ) ) {
 						echo '<tr><td width="200px">&nbsp;</td><td>' . $headers[0] . '</td></tr>';
 					}
 					foreach ( $headers as $header => $key ) {
-						if ( $header !== '0' ) {
+						if ( '0' !== $header ) {
 							if ( is_array( $key ) ) {
 								$content = print_r( $key, true );
 							} else {
@@ -345,7 +345,7 @@ class VarnishStatus {
 					}
 					?>
 				</table>
-			<?php
+				<?php
 			}
 		}
 	}

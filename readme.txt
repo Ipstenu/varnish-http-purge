@@ -41,7 +41,7 @@ On a multisite network using subfolders, only <strong>network admins</strong> ca
 
 If you're working on a site and need to turn off caching in one of two ways:
 
-1. Add `define( 'VHP_DEVMODE', true );` to your `wp-config.php` file 
+1. Add `define( 'VHP_DEVMODE', true );` to your `wp-config.php` file
 2. Go to Varnish -> Settings and enable debug mode for 24 hours at a time
 
 That will break cache on page loads. It is _not_ recommended for production!
@@ -107,7 +107,7 @@ The plugin itself does not perform caching, but you can use development mode to 
 
 2. Go to Varnish -> Settings and enable development mode
 
-3. Add `define( 'VHP_DEVMODE', true );` to your `wp-config.php` file 
+3. Add `define( 'VHP_DEVMODE', true );` to your `wp-config.php` file
 
 The first two options will enable development mode for 24 hours. If you're working on long term development, you can should use the define.
 
@@ -188,9 +188,9 @@ This plugin is installed by default for _all_ DreamPress installs on DreamHost, 
 
 == Changelog ==
 
-= 4.6.0 = 
+= 4.6.0 =
 
-* June 2018
+* July 2018
 * Moved Varnish to it's own menu with a new custom icon (props Olesya)
 * Add option to enable development for 24 hours (for super-admins only)
 * Change debug mode to development mode and greatly improved overall
@@ -214,7 +214,7 @@ This plugin is installed by default for _all_ DreamPress installs on DreamHost, 
 * Add carrot icon to collapsed (mobile) toolbar
 * Better button hiding
 * Fixed a stupid argument issue with flushing memcached and I should have known better but oh well
-* FAQ update re nginx 
+* FAQ update re nginx
 
 = 4.5.0 =
 

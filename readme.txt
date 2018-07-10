@@ -3,7 +3,7 @@ Contributors: Ipstenu, mikeschroder, techpriester, danielbachhuber
 Tags: varnish, purge, cache
 Requires at least: 4.7
 Tested up to: 4.9
-Stable tag: 4.6.0
+Stable tag: 4.6.1
 Requires PHP: 5.6
 
 Automatically empty Varnish Cache when content on your site is modified.

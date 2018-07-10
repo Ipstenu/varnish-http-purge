@@ -3,7 +3,7 @@
  * Plugin Name: Varnish HTTP Purge
  * Plugin URI: https://halfelf.org/plugins/varnish-http-purge/
  * Description: Automatically empty cached pages when content on your site is modified.
- * Version: 4.6.0
+ * Version: 4.6.1
  * Author: Mika Epstein
  * Author URI: https://halfelf.org/
  * License: http://www.apache.org/licenses/LICENSE-2.0
@@ -269,7 +269,7 @@ class VarnishPurger {
 	 */
 	public function custom_css() {
 		if ( is_user_logged_in() ) {
-			wp_register_style( 'varnish_http_purge', plugins_url( 'style.css', __FILE__ ), false, '4.6.0' );
+			wp_register_style( 'varnish_http_purge', plugins_url( 'style.css', __FILE__ ), false, '4.6.1' );
 			wp_enqueue_style( 'varnish_http_purge' );
 		}
 	}
@@ -532,7 +532,7 @@ class VarnishPurger {
 	 * @access protected
 	 */
 	public static function purge_url( $url ) {
-		$p = wp_parse_url( wp_unslash( $url ) );
+		$p = wp_parse_url( $url );
 
 		// Bail early if there's no host since some plugins are weird.
 		if ( ! isset( $p['host'] ) ) {
@@ -573,7 +573,7 @@ class VarnishPurger {
 		$schema = apply_filters( 'varnish_http_purge_schema', 'http://' );
 
 		// If we made varniship, let it sail.
-		if ( isset( $varniship ) && ! is_null( $varniship ) ) {
+		if ( isset( $varniship ) && ! empty( $varniship ) ) {
 			$host = $varniship;
 		} else {
 			$host = $p['host'];
@@ -695,7 +695,7 @@ class VarnishPurger {
 		$listofurls = array();
 
 		// Verify we have a permalink and that we're a valid post status and a not an invalid post type.
-		if ( true === get_permalink( $post_id ) && in_array( $this_post_status, $valid_post_status, true ) && ! in_array( $this_post_type, $invalid_post_type, true ) ) {
+		if ( false !== get_permalink( $post_id ) && in_array( $this_post_status, $valid_post_status, true ) && ! in_array( $this_post_type, $invalid_post_type, true ) ) {
 
 			// Post URL.
 			array_push( $listofurls, get_permalink( $post_id ) );

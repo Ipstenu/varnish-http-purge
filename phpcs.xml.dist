@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<ruleset name="Varnish HTTP Purge Coding Standards">
+    <description>A custom ruleset to take in account both WordPress and DreamHost standards.</description>
+    <rule ref="WordPress-Extra">
+        <exclude name="WordPress.Files.FileName.InvalidClassFileName" />
+        <exclude name="WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode" />
+    </rule>
+</ruleset>

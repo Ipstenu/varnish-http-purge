@@ -1,18 +1,25 @@
 /* Add Orange Carrot Dashicon */
-#wpadminbar #wp-admin-bar-purge-varnish-cache .ab-icon:before {
-	content: '\f511'; 
-	top: 4px;
-	/*color: #F56E28;*/
+#wpadminbar #wp-admin-bar-purge-varnish-cache .ab-icon {
+	float: left;
+	width: 26px;
+	height: 30px;
+	background-repeat: no-repeat;
+	background-position: 0 8px;
+	background-size: 20px;
 }
 
 /* Add Orange Carrot to Button */
-span.dashicons.dashicons-carrot.varnish-http-purge {
-	color: #F56E28;
+span.dashicons.varnish-http-purge {
 	vertical-align: middle;
 }
 
 @media screen and (max-width: 782px) {
-	#wpadminbar li#wp-admin-bar-purge-varnish-cache{
+	#wpadminbar #wp-admin-bar-purge-varnish-cache .ab-icon,
+	#wpadminbar li#wp-admin-bar-purge-varnish-cache {
+		margin-left: 5px;
 		display: block!important;
+		background-size: 36px;
+		height: 46px;
+		width: 52px;
 	}
 }

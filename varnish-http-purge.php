@@ -216,7 +216,7 @@ class VarnishPurger {
 	 */
 	public function require_pretty_permalinks_notice() {
 		// translators: The URL should link to the permalinks page.
-		echo "<div id='message' class='error'><p>" . sprintf( esc_html__( 'Varnish HTTP Purge requires you to use custom permalinks. Please go to the <a href="%1$s">Permalinks Options Page</a> to configure them.', 'varnish-http-purge' ), esc_url( admin_url( 'options-permalink.php' ) ) ) . '</p></div>';
+		echo wp_kses_post( '<div id="message" class="error"><p>' . sprintf( __( 'Varnish HTTP Purge requires you to use custom permalinks. Please go to the <a href="%1$s">Permalinks Options Page</a> to configure them.', 'varnish-http-purge' ), esc_url( admin_url( 'options-permalink.php' ) ) ) . '</p></div>' );
 	}
 
 	/**

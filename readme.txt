@@ -188,6 +188,11 @@ This plugin is installed by default for _all_ DreamPress installs on DreamHost, 
 
 == Changelog ==
 
+= 4.6.1 =
+
+* July 2018
+* Fixes a couple of logical errors in `purge_url()` method.
+
 = 4.6.0 =
 
 * July 2018

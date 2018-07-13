@@ -3,7 +3,7 @@
  * Plugin Name: Varnish HTTP Purge
  * Plugin URI: https://halfelf.org/plugins/varnish-http-purge/
  * Description: Automatically empty cached pages when content on your site is modified.
- * Version: 4.6.1
+ * Version: 4.6.2
  * Author: Mika Epstein
  * Author URI: https://halfelf.org/
  * License: http://www.apache.org/licenses/LICENSE-2.0
@@ -242,9 +242,14 @@ class VarnishPurger {
 		} else {
 			$devmode = get_site_option( 'vhp_varnish_devmode', self::$devmode );
 			$time    = human_time_diff( current_time( 'timestamp' ), $devmode['expire'] );
-			// translators: %1$s is the time until dev mode expires.
-			// translators: %2$s is a link to the Varnish settings pages.
-			$message = sprintf( __( 'Varnish HTTP Purge Development Mode is active for the next %1$s. You can disable this at the <a href="%2$s">Varnish Settings Page</a>.', 'varnish-http-purge' ), $time, esc_url( admin_url( 'admin.php?page=varnish-page' ) ) );
+			if ( ! is_multisite() ) {
+				// translators: %1$s is the time until dev mode expires.
+				// translators: %2$s is a link to the Varnish settings pages.
+				$message = sprintf( __( 'Varnish HTTP Purge Development Mode is active for the next %1$s. You can disable this at the <a href="%2$s">Varnish Settings Page</a>.', 'varnish-http-purge' ), $time, esc_url( admin_url( 'admin.php?page=varnish-page' ) ) );
+			} else {
+				// translators: %1$s is the time until dev mode expires.
+				$message = sprintf( __( 'Varnish HTTP Purge Development Mode is active for the next %1$s.', 'varnish-http-purge' ), $time );
+			}
 		}
 		echo '<div class="notice notice-warning"><p>' . wp_kses_post( $message ) . '</p></div>';
 	}
@@ -879,7 +884,10 @@ if ( defined( 'WP_CLI' ) && WP_CLI ) {
  *
  * @since 4.0
  */
-require_once 'settings.php';
+// The settings PAGES aren't needed on the network admin page
+if ( ! is_network_admin() ) {
+	require_once 'settings.php';
+}
 require_once 'debug.php';
 
 $purger = new VarnishPurger();

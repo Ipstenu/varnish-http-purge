@@ -66,17 +66,15 @@ class VarnishStatus {
 	 * @since 4.0.2
 	 */
 	public function register_settings() {
-		if ( ! is_multisite() || current_user_can( 'manage_network' ) ) {
-			// Development Mode Settings.
-			register_setting( 'vhp-settings-devmode', 'vhp_varnish_devmode', array( &$this, 'settings_devmode_sanitize' ) );
-			add_settings_section( 'vhp-settings-devmode-section', __( 'Development Mode Settings', 'varnish-http-purge' ), array( &$this, 'options_settings_devmode' ), 'varnish-devmode-settings' );
-			add_settings_field( 'varnish_devmode', __( 'Development Mode', 'varnish-http-purge' ), array( &$this, 'settings_devmode_callback' ), 'varnish-devmode-settings', 'vhp-settings-devmode-section' );
+		// Development Mode Settings.
+		register_setting( 'vhp-settings-devmode', 'vhp_varnish_devmode', array( &$this, 'settings_devmode_sanitize' ) );
+		add_settings_section( 'vhp-settings-devmode-section', __( 'Development Mode Settings', 'varnish-http-purge' ), array( &$this, 'options_settings_devmode' ), 'varnish-devmode-settings' );
+		add_settings_field( 'varnish_devmode', __( 'Development Mode', 'varnish-http-purge' ), array( &$this, 'settings_devmode_callback' ), 'varnish-devmode-settings', 'vhp-settings-devmode-section' );
 
-			// IP Settings.
-			register_setting( 'vhp-settings-ip', 'vhp_varnish_ip', array( &$this, 'settings_ip_sanitize' ) );
-			add_settings_section( 'vhp-settings-ip-section', __( 'Configure Custom IP', 'varnish-http-purge' ), array( &$this, 'options_settings_ip' ), 'varnish-ip-settings' );
-			add_settings_field( 'varnish_ip', __( 'Set Custom IP', 'varnish-http-purge' ), array( &$this, 'settings_ip_callback' ), 'varnish-ip-settings', 'vhp-settings-ip-section' );
-		}
+		// IP Settings.
+		register_setting( 'vhp-settings-ip', 'vhp_varnish_ip', array( &$this, 'settings_ip_sanitize' ) );
+		add_settings_section( 'vhp-settings-ip-section', __( 'Configure Custom IP', 'varnish-http-purge' ), array( &$this, 'options_settings_ip' ), 'varnish-ip-settings' );
+		add_settings_field( 'varnish_ip', __( 'Set Custom IP', 'varnish-http-purge' ), array( &$this, 'settings_ip_callback' ), 'varnish-ip-settings', 'vhp-settings-ip-section' );
 	}
 
 	/**
@@ -417,7 +415,7 @@ class VarnishStatus {
 			<p><?php esc_html_e( 'Varnish HTTP Purge can empty the cache for different server based caching systems, including Varnish and nginx. For most users, there should be no configuration necessary as the plugin is intended to work silently, behind the scenes.', 'varnish-http-purge' ); ?></p>
 
 			<?php
-			if ( ! is_multisite() || current_user_can( 'manage_network' ) ) {
+			if ( ! is_multisite() ) {
 				?>
 				<form action="options.php" method="POST" >
 				<?php
@@ -437,11 +435,10 @@ class VarnishStatus {
 				<?php
 			} else {
 				?>
-				<p><?php esc_html_e( 'Your account does not have access to configure settings. Please contact your site administrator.', 'varnish-http-purge' ); ?></p>
+				<p><?php esc_html_e( 'Editing these settings via the Dashboard is disabled on Multisite as incorrect edits can prevent your network from loading entirely. You can toggle debug mode globally using the admin toolbar option, and you should define your Varnish IP directly into your wp-config file for best results.', 'varnish-http-purge' ); ?></p>
 				<?php
 			}
 			?>
-
 		</div>
 		<?php
 	}

@@ -158,6 +158,7 @@ class VarnishStatus {
 		<p><a name="#configureip"></a><?php esc_html_e( 'There are cases when a custom Varnish IP Address will need to be set, in order to tell the plugin to empty the cache in a specific location. If you\'re using a CDN like Cloudflare or a Firewall Proxy like Sucuri, you will want to set this.', 'varnish-http-purge' ); ?></p>
 		<p><?php esc_html_e( 'Your Varnish IP is the IP address of the server where your caching service (i.e. Varnish or Nginx) is installed. It must be one of the IPs used by your cache service. If you use multiple IPs, or have customized your ACLs, you\'ll need to pick one that doesn\'t conflict with your other settings. For example, if you have Varnish listening on a public and private IP, pick the private. On the other hand, if you told Varnish to listen on 0.0.0.0 (i.e. "listen on every interface you can") you would need to check what IP you set your purge ACL to allow (commonly 127.0.0.1 aka localhost), and use that (i.e. 127.0.0.1).', 'varnish-http-purge' ); ?></p>
 		<p><?php esc_html_e( 'If your webhost set the service up for you, as is the case with DreamPress or WP Engine, ask them for the specifics if they don\'t have it documented. I\'ve listed the ones I know about here, however you should still check with them if you\'re not sure.', 'varnish-http-purge' ); ?></p>
+				<p><?php esc_html_e( 'You can use multiple IPs by separating them with a semicolon (;). If you do so, all IPs will be sent purge requests. Useful if you\'re using round robin DNS entries with Cloudflare, for example.', 'varnish-http-purge' ); ?></p>
 		<p><strong><?php esc_html_e( 'If you aren\'t sure what to do, contact your webhost or server admin before making any changes.', 'varnish-http-purge' ); ?></strong></p>
 		<ul>
 			<li><?php esc_html_e( 'DreamHost - Go into the Panel and click on the DNS settings for the domain. The entry for <em>resolve-to.domain</em> (if set) will be your cache server. If it\'s not set, then you don\'t need to worry about this at all. Example:', 'varnish-http-purge' ); ?> <code>resolve-to.www A 208.97.157.172</code></li>
@@ -207,6 +208,22 @@ class VarnishStatus {
 
 		if ( empty( $input ) ) {
 			return; // do nothing.
+		} elseif ( strpos( $input, ';' ) ) {
+			$ips = explode( ';', $input );
+			$valid = true;
+
+			foreach($ips as $ip) {
+				if ( !filter_var( $ip, FILTER_VALIDATE_IP ) ) {
+					$valid = false;
+					break;
+				}
+			}
+
+			if ($valid) {
+				$set_message = 'IPs Updated.';
+				$set_type    = 'updated';
+				$output      = $input;
+			}
 		} elseif ( filter_var( $input, FILTER_VALIDATE_IP ) ) {
 			$set_message = 'IP Updated.';
 			$set_type    = 'updated';

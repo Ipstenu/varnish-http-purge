@@ -849,22 +849,22 @@ class VarnishPurger {
 	 * These have all been name changed to proper names, but just in case...
 	 */
 	public function getRegisterEvents() {
-		get_register_events();
+		self::get_register_events();
 	}
 	public function getNoIDEvents() {
-		get_no_id_events();
+		self::get_no_id_events();
 	}
 	public function executePurge() {
-		execute_purge();
+		self::execute_purge();
 	}
 	public function purgeNoID( $post_id ) {
-		execute_purge_no_id( $post_id );
+		self::execute_purge_no_id( $post_id );
 	}
 	public function purgeURL( $url ) {
-		purge_url( $url );
+		self::purge_url( $url );
 	}
 	public function purgePost( $post_id ) {
-		purge_post( $post_id );
+		self::purge_post( $post_id );
 	}
 	// @codingStandardsIgnoreEnd
 

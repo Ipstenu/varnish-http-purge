@@ -3,7 +3,7 @@ Contributors: Ipstenu, mikeschroder, techpriester, danielbachhuber
 Tags: varnish, purge, cache
 Requires at least: 4.7
 Tested up to: 4.9
-Stable tag: 4.6.2
+Stable tag: 4.6.3
 Requires PHP: 5.6
 
 Automatically empty Varnish Cache when content on your site is modified.
@@ -188,6 +188,11 @@ This plugin is installed by default for _all_ DreamPress installs on DreamHost, 
 
 == Changelog ==
 
+= 4.6.3 =
+
+* August 2018
+* Deprecated function support
+
 = 4.6.2 =
 
 * July 2018
@@ -212,28 +217,6 @@ This plugin is installed by default for _all_ DreamPress installs on DreamHost, 
 * WP-CLI: add debug option to show all header output (props @danielbachhuber)
 * WP-CLI: add debug option to grep content for known issues (props @danielbachhuber)
 * WP-CLI: add new command to change devmode state
-
-= 4.5.2 =
-
-* June 2018
-* Bug Fix: Prevent error for non-admins
-
-= 4.5.1 =
-
-* June 2018
-* Due to contention (devs hate it, users like it) the empty cache button colour on the toolbar is removed, and replaced with a carrot icon (I did not make it orange, but I wanted to)
-* Add carrot icon to collapsed (mobile) toolbar
-* Better button hiding
-* Fixed a stupid argument issue with flushing memcached and I should have known better but oh well
-* FAQ update re nginx
-
-= 4.5.0 =
-
-* May 2018
-* Remote storage of problem plugins/themes
-* Prevent auto-loading of scan for improved disclosure and compliance
-* Changed colour of the purge button for improved visibility
-* Support for nginx proxy headers
 
 == Screenshots ==
 

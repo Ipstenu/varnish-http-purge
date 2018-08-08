@@ -229,11 +229,13 @@ if ( ! class_exists( 'WP_CLI_Varnish_Command' ) ) {
 				$paths = array_unique( $paths );
 				foreach ( $paths as $path ) {
 					$cmd = sprintf(
-						"grep -RE '%s' %s",
+						// Greps for matches and removes ABSPATH from filepath.
+						"grep --include=*.php -RE '%s' %s | cut -d '/' -f %d-",
 						$pattern,
-						escapeshellarg( $path )
+						escapeshellarg( $path ),
+						substr_count( ABSPATH, '/' ) + 1
 					);
-					passthru( $cmd );
+					system( $cmd );
 				}
 				WP_CLI::log( '' );
 				WP_CLI::log( __( 'Grep complete. If no data was output, you\'re good!', 'varnish-http-purge' ) );

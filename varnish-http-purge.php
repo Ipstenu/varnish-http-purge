@@ -343,7 +343,7 @@ class VarnishPurger {
 
 			// If we're on a front end page and the current user can edit published posts, then they can do this.
 			if ( ! is_admin() && get_post() !== false && current_user_can( 'edit_published_posts' ) ) {
-				$page_url = esc_url( home_url( $wp->request ) );
+				$page_url = esc_url( str_replace( home_url(), $this->the_home_url(), home_url( $wp->request ) ) );
 				$args[]   = array(
 					'parent' => 'purge-varnish-cache',
 					'id'     => 'purge-varnish-cache-this',

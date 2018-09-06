@@ -3,7 +3,7 @@
  * Plugin Name: Varnish HTTP Purge
  * Plugin URI: https://halfelf.org/plugins/varnish-http-purge/
  * Description: Automatically empty cached pages when content on your site is modified.
- * Version: 4.6.3
+ * Version: 4.7.0
  * Author: Mika Epstein
  * Author URI: https://halfelf.org/
  * License: http://www.apache.org/licenses/LICENSE-2.0
@@ -692,9 +692,11 @@ class VarnishPurger {
 		/**
 		 * Determine the route for the rest API
 		 * This will need to be revisted if WP updates the version.
-		 * Future me: Consider an array? 4.7-4.9 use v2, and then adapt from there?
+		 * Future me: Consider an array? 4.7-?? use v2, and then adapt from there?
 		 */
-		$rest_api_route = 'wp/v2';
+		if ( version_compare( get_bloginfo( 'version' ), '4.7', '>=' ) ) {
+			$rest_api_route = 'wp/v2';
+		}
 
 		// array to collect all our URLs.
 		$listofurls = array();
@@ -710,27 +712,33 @@ class VarnishPurger {
 			 * We only want to do this if the rest_base exists
 			 * But we apparently have to force it for posts and pages (seriously?)
 			 */
-			$post_type_object = get_post_type_object( $post_id );
-			$rest_permalink   = false;
-			if ( isset( $post_type_object->rest_base ) ) {
-				$rest_permalink = get_rest_url() . $rest_api_route . '/' . $post_type_object->rest_base . '/' . $post_id . '/';
-			} elseif ( 'post' === $this_post_type ) {
-				$rest_permalink = get_rest_url() . $rest_api_route . '/posts/' . $post_id . '/';
-			} elseif ( 'page' === $this_post_type ) {
-				$rest_permalink = get_rest_url() . $rest_api_route . '/pages/' . $post_id . '/';
+			if ( isset( $rest_api_route ) ) {
+				$post_type_object = get_post_type_object( $post_id );
+				$rest_permalink   = false;
+				if ( isset( $post_type_object->rest_base ) ) {
+					$rest_permalink = get_rest_url() . $rest_api_route . '/' . $post_type_object->rest_base . '/' . $post_id . '/';
+				} elseif ( 'post' === $this_post_type ) {
+					$rest_permalink = get_rest_url() . $rest_api_route . '/posts/' . $post_id . '/';
+				} elseif ( 'page' === $this_post_type ) {
+					$rest_permalink = get_rest_url() . $rest_api_route . '/pages/' . $post_id . '/';
+				}
 			}
 
 			if ( $rest_permalink ) {
 				array_push( $listofurls, $rest_permalink );
 			}
 
-			// Add in AMP permalink if Automattic's AMP is installed.
+			// Add in AMP permalink for offical WP AMP plugin:
+			// https://wordpress.org/plugins/amp/
 			if ( function_exists( 'amp_get_permalink' ) ) {
 				array_push( $listofurls, amp_get_permalink( $post_id ) );
 			}
 
-			// Regular AMP url for posts.
-			array_push( $listofurls, get_permalink( $post_id ) . 'amp/' );
+			// Regular AMP url for posts if ant of the following are active:
+			// https://wordpress.org/plugins/accelerated-mobile-pages/
+			if ( defined( 'AMPFORWP_AMP_QUERY_VAR' ) ) {
+				array_push( $listofurls, get_permalink( $post_id ) . 'amp/' );
+			}
 
 			// Also clean URL for trashed post.
 			if ( 'trash' === $this_post_status ) {
@@ -743,16 +751,13 @@ class VarnishPurger {
 			$categories = get_the_category( $post_id );
 			if ( $categories ) {
 				foreach ( $categories as $cat ) {
-					$category_base = get_site_option( 'category_base' );
-					if ( '' === $category_base ) {
-						$category_base = '/category/';
-					}
 					array_push( $listofurls,
 						get_category_link( $cat->term_id ),
 						get_rest_url() . $rest_api_route . '/categories/' . $cat->term_id . '/'
 					);
 				}
 			}
+
 			// Tag purge based on Donnacha's work in WP Super Cache.
 			$tags = get_the_tags( $post_id );
 			if ( $tags ) {
@@ -784,13 +789,27 @@ class VarnishPurger {
 				}
 			}
 
-			// Author URLs.
-			$author_id = get_post_field( 'post_author', $post_id );
-			array_push( $listofurls,
-				get_author_posts_url( $author_id ),
-				get_author_feed_link( $author_id ),
-				get_rest_url() . $rest_api_route . '/users/' . $author_id . '/'
-			);
+			// If the post is a post, we have more things to flush
+			// Pages and Woo Things don't need all this.
+			if ( $this_post_type && 'post' === $this_post_type ) {
+				// Author URLs:
+				$author_id = get_post_field( 'post_author', $post_id );
+				array_push( $listofurls,
+					get_author_posts_url( $author_id ),
+					get_author_feed_link( $author_id ),
+					get_rest_url() . $rest_api_route . '/users/' . $author_id . '/'
+				);
+
+				// Feeds:
+				array_push( $listofurls,
+					get_bloginfo_rss( 'rdf_url' ),
+					get_bloginfo_rss( 'rss_url' ),
+					get_bloginfo_rss( 'rss2_url' ),
+					get_bloginfo_rss( 'atom_url' ),
+					get_bloginfo_rss( 'comments_rss2_url' ),
+					get_post_comments_feed_link( $post_id )
+				);
+			}
 
 			// Archives and their feeds.
 			if ( $this_post_type && ! in_array( $this_post_type, $noarchive_post_type, true ) ) {
@@ -800,16 +819,6 @@ class VarnishPurger {
 					// Need to add in JSON?
 				);
 			}
-
-			// More feeds.
-			array_push( $listofurls,
-				get_bloginfo_rss( 'rdf_url' ),
-				get_bloginfo_rss( 'rss_url' ),
-				get_bloginfo_rss( 'rss2_url' ),
-				get_bloginfo_rss( 'atom_url' ),
-				get_bloginfo_rss( 'comments_rss2_url' ),
-				get_post_comments_feed_link( $post_id )
-			);
 
 			// Home Pages and (if used) posts page.
 			array_push( $listofurls,
@@ -827,10 +836,17 @@ class VarnishPurger {
 			return;
 		}
 
-		// Now flush all the URLs we've collected provided the array isn't empty.
-		// And make sure each URL only gets purged once, eh?
+		// If the array isn't empty, proceed.
 		if ( ! empty( $listofurls ) ) {
+			// Strip off query variables
+			foreach ( $listofurls as $url ) {
+				$url = strtok( $url, '?' );
+			}
+
+			// Make sure each URL only gets purged once, eh?
 			$purgeurls = array_unique( $listofurls, SORT_REGULAR );
+
+			// Flush all the URLs
 			foreach ( $purgeurls as $url ) {
 				array_push( $this->purge_urls, $url );
 			}

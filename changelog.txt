@@ -1,12 +1,42 @@
 ## CHANGELOG
 
+= 4.6.3 =
+
+* August 2018
+* Deprecated function support
+
+= 4.6.2 =
+
+* July 2018
+* Fixing some translation output.
+* Multisite fixes for settings pages.
+
+= 4.6.1 =
+
+* July 2018
+* Fix situation where purging wasn't (props @carlalexander)
+
+= 4.6.0 =
+
+* July 2018
+* Moved Varnish to it's own menu with a new custom icon (props Olesya)
+* Add option to enable development for 24 hours (for super-admins only)
+* Change debug mode to development mode and greatly improved overall
+* Translation improvements
+* Add new action hook for after a full purge (props @futtta)
+* Change check for age-header to not require a second run (props @danielbachhuber)
+* Confirm plugin and theme blacklist check (props @danielbachhuber)
+* WP-CLI: add debug option to show all header output (props @danielbachhuber)
+* WP-CLI: add debug option to grep content for known issues (props @danielbachhuber)
+* WP-CLI: add new command to change devmode state
+
 === 4.5.1 ===
 * June 2018
 * Due to contention (devs hate it, users like it) the empty cache button colour on the toolbar is removed, and replaced with a carrot icon (I did not make it orange, but I wanted to)
 * Add carrot icon to collapsed (mobile) toolbar
 * Better button hiding
 * Fixed a stupid argument issue with flushing memcached and I should have known better but oh well
-* FAQ update re nginx 
+* FAQ update re nginx
 
 === 4.5.0 ===
 * May 2018

@@ -3,7 +3,7 @@ Contributors: Ipstenu, mikeschroder, techpriester, danielbachhuber
 Tags: varnish, purge, cache
 Requires at least: 4.7
 Tested up to: 4.9
-Stable tag: 4.7.0
+Stable tag: 4.6.4
 Requires PHP: 5.6
 
 Automatically empty Varnish Cache when content on your site is modified.
@@ -188,12 +188,41 @@ This plugin is installed by default for _all_ DreamPress installs on DreamHost, 
 
 == Changelog ==
 
-= 4.7.0 =
+= 4.6.4 =
 
 * September 2018
-* WooCommerce related improvements
-* Prevent URLs from being flushed more than once per update
+* Remove query variables from URLs to prevent URLs from being flushed more than once per update
 * More selective loading of AMP urls
+
+= 4.6.3 =
+
+* August 2018
+* Deprecated function support
+
+= 4.6.2 =
+
+* July 2018
+* Fixing some translation output.
+* Multisite fixes for settings pages.
+
+= 4.6.1 =
+
+* July 2018
+* Fix situation where purging wasn't (props @carlalexander)
+
+= 4.6.0 =
+
+* July 2018
+* Moved Varnish to it's own menu with a new custom icon (props Olesya)
+* Add option to enable development for 24 hours (for super-admins only)
+* Change debug mode to development mode and greatly improved overall
+* Translation improvements
+* Add new action hook for after a full purge (props @futtta)
+* Change check for age-header to not require a second run (props @danielbachhuber)
+* Confirm plugin and theme blacklist check (props @danielbachhuber)
+* WP-CLI: add debug option to show all header output (props @danielbachhuber)
+* WP-CLI: add debug option to grep content for known issues (props @danielbachhuber)
+* WP-CLI: add new command to change devmode state
 
 == Screenshots ==
 

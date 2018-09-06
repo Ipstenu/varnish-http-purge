@@ -3,7 +3,7 @@
  * Plugin Name: Varnish HTTP Purge
  * Plugin URI: https://halfelf.org/plugins/varnish-http-purge/
  * Description: Automatically empty cached pages when content on your site is modified.
- * Version: 4.7.0
+ * Version: 4.6.4
  * Author: Mika Epstein
  * Author URI: https://halfelf.org/
  * License: http://www.apache.org/licenses/LICENSE-2.0
@@ -30,6 +30,12 @@
  * @since 2.0
  */
 class VarnishPurger {
+
+	/**
+	 * Version Number
+	 * @var string
+	 */
+	public static $version = '4.6.4';
 
 	/**
 	 * List of URLs to be purged
@@ -274,7 +280,7 @@ class VarnishPurger {
 	 */
 	public function custom_css() {
 		if ( is_user_logged_in() ) {
-			wp_register_style( 'varnish_http_purge', plugins_url( 'style.css', __FILE__ ), false, '4.6.1' );
+			wp_register_style( 'varnish_http_purge', plugins_url( 'style.css', __FILE__ ), false, self::$version );
 			wp_enqueue_style( 'varnish_http_purge' );
 		}
 	}
@@ -435,7 +441,11 @@ class VarnishPurger {
 		} else {
 			$text = $intro . ' ' . $nobutton;
 		}
-		echo '<p class="varnish-rightnow">' . wp_kses_post( $text ) . '</p>';
+		// @codingStandardsIgnoreStart
+		// This is safe to echo as it's controlled and secured above.
+		// Using wp_kses will delete the icon.
+		echo '<p class="varnish-rightnow">' . $text . '</p>';
+		// @codingStandardsIgnoreEnd
 	}
 
 	/**

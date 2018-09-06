@@ -37,6 +37,7 @@ class VarnishStatus {
 	public function __construct() {
 		add_action( 'admin_init', array( &$this, 'admin_init' ) );
 		add_action( 'admin_menu', array( &$this, 'admin_menu' ) );
+		add_filter( 'admin_footer_text', array( &$this, 'admin_footer' ), 1, 2 );
 	}
 
 	/**
@@ -239,7 +240,7 @@ class VarnishStatus {
 		<p>
 		<?php
 			// translators: %s is a link to the readme for the detection service.
-			printf( wp_kses_post( __( '<strong>This check uses <a href="%s">a remote service hosted on DreamObjects</a></strong>. The service used only for providing up to date compatibility checks on plugins and themes that may conflict with running a server based cache (such as Varnish or Nginx). No personally identifying information regarding persons running this check, nor the plugins and themes in use on this site will be transmitted. The bare minimum of usage information is collected, concerning only IPs and domains making requests of the service. If you do not wish to use this service, please do not use this service.', 'varnish-http-purge' ) ), 'https://varnish-http-purge.objects-us-east-1.dream.io/readme.txt' );
+			printf( wp_kses_post( __( '<strong>This check uses <a href="%s">a remote service hosted on DreamObjects</a></strong>. The service used only for providing up to date compatibility checks on plugins and themes that may conflict with running a server based cache (such as Varnish or Nginx). No personally identifying information regarding persons running this check, nor the plugins and themes in use on this site will be transmitted. The bare minimum of usage information is collected, concerning only IPs and domains making requests of the service. If you do not wish to use this service, please do not use this feature.', 'varnish-http-purge' ) ), 'https://varnish-http-purge.objects-us-east-1.dream.io/readme.txt' );
 		?>
 		</p>
 		<?php
@@ -465,6 +466,45 @@ class VarnishStatus {
 
 		</div>
 		<?php
+	}
+
+	/**
+	 * When user is on one of our admin pages, display footer text
+	 * that graciously asks them to rate us.
+	 *
+	 * @since 4.6.4
+	 *
+	 * @param string $text
+	 *
+	 * @return string
+	 */
+	public function admin_footer( $text ) {
+
+		global $current_screen;
+
+		if ( ! empty( $current_screen->parent_base ) && strpos( $current_screen->parent_base, 'varnish-page' ) !== false ) {
+			$review_url  = 'https://wordpress.org/support/plugin/varnish-http-purge/reviews/?filter=5#new-post';
+			$dream_url   = 'https://dreamhost.com/dreampress/';
+			$footer_text = sprintf(
+				wp_kses(
+					/* translators: $1$s - DreamHost URL; $2$s - plugin name; $3$s - WP.org review link; $4$s - WP.org review link. */
+					__( 'Brought to you <a href="%1$s" target="_blank" rel="noopener noreferrer">DreamHost</a>. Please rate %2$s <a href="%3$s" target="_blank" rel="noopener noreferrer">&#9733;&#9733;&#9733;&#9733;&#9733;</a> on <a href="%4$s" target="_blank" rel="noopener">WordPress.org</a> to help us spread the word.', 'varnish-http-purge' ),
+					array(
+						'a' => array(
+							'href'   => array(),
+							'target' => array(),
+							'rel'    => array(),
+						),
+					)
+				),
+				$dream_url,
+				'<strong>Varnish HTTP Purge</strong>',
+				$review_url,
+				$review_url
+			);
+		}
+
+		return $footer_text;
 	}
 
 }

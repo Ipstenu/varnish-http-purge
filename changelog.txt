@@ -6,7 +6,7 @@
 * Add carrot icon to collapsed (mobile) toolbar
 * Better button hiding
 * Fixed a stupid argument issue with flushing memcached and I should have known better but oh well
-* FAQ update re nginx 
+* FAQ update re nginx
 
 === 4.5.0 ===
 * May 2018

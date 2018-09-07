@@ -502,9 +502,10 @@ class VarnishStatus {
 				$review_url,
 				$review_url
 			);
+			$text = $footer_text;
 		}
 
-		return $footer_text;
+		return $text;
 	}
 
 }

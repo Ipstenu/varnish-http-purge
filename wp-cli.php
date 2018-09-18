@@ -142,9 +142,10 @@ if ( ! class_exists( 'WP_CLI_Varnish_Command' ) ) {
 			$this->varnish_purge->purge_url( $url . $pregex );
 
 			if ( WP_DEBUG === true ) {
+				$params = ( '' === $pregex ) ? 'no additional parameters' : 'the following parameters: ' . $pregex;
 				// translators: %1$s is the URL being flushed.
-				// translators: %2$s are the params being flushed.
-				WP_CLI::log( sprintf( __( 'Varnish HTTP Purge is flushing the URL %1$s with params %2$s.', 'varnish-http-purge' ), $url, $pregex ) );
+				// translators: %2$s are the parameters being flushed.
+				WP_CLI::log( sprintf( __( 'Varnish HTTP Purge is flushing the URL %1$s with %2$s', 'varnish-http-purge' ), $url, $params ) );
 			}
 
 			WP_CLI::success( __( 'Varnish HTTP Purge has flushed your cache.', 'varnish-http-purge' ) );

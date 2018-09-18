@@ -1,19 +1,19 @@
 <?php
 /**
-	WP-CLI code
-
-	@package varnish-http-purge
-
-	Copyright 2015-2018 Mika Epstein (email: ipstenu@halfelf.org)
-
-	This file is part of Varnish HTTP Purge, a plugin for WordPress.
-
-	Varnish HTTP Purge is free software: you can redistribute it and/or modify
-	it under the terms of the Apache License 2.0 license.
-
-	Varnish HTTP Purge is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * WP-CLI code
+ *
+ * @package varnish-http-purge
+ *
+ * Copyright 2015-2018 Mika Epstein (email: ipstenu@halfelf.org)
+ *
+ * This file is part of Varnish HTTP Purge, a plugin for WordPress.
+ *
+ * Varnish HTTP Purge is free software: you can redistribute it and/or modify
+ * it under the terms of the Apache License 2.0 license.
+ *
+ * Varnish HTTP Purge is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -29,6 +29,29 @@ if ( ! class_exists( 'WP_CLI_Varnish_Command' ) ) {
 
 	/**
 	 * WP CLI Commands for Varnish.
+	 *
+	 * ## EXAMPLES
+	 *
+	 * # Purge entire cache
+	 * $ wp varnish purge
+	 *
+	 * # Purge a specific URL
+	 * $ wp varnish purge http://example.com/wp-content/themes/twentyeleventy/style.css
+	 *
+	 * # Purge a specific URL and all files on that level and up
+	 * $ wp varnish purge http://example.com/wp-content/themes/twentyeleventy/ --wildcard
+	 *
+	 * # Check for any known conflicts with your site and caching
+	 * $ wp varnish debug
+	 *
+	 * # Check a specific page for conflicts
+	 * $ wp varnish debug https://example.com/this-page/
+	 *
+	 * # Include headers in debug check
+	 * $ wp varnish debug https://example.com/ --include-headers
+	 *
+	 * # Scan all files in debug check
+	 * $ wp varnish debug https://example.com/ --include-grep
 	 *
 	 * @extends WP_CLI_Command
 	 */
@@ -57,17 +80,23 @@ if ( ! class_exists( 'WP_CLI_Varnish_Command' ) ) {
 		}
 
 		/**
-		 * Forces a full Varnish Purge of the entire site (provided
-		 * regex is supported). Alternately you can fluxh the cache
-		 * for specific pages or folders (using the --wildcard param)
+		 * Empty server side cache.
+		 *
+		 * ## OPTIONS
+		 *
+		 * <url>
+		 * : delete cached content of specific URL
+		 *
+		 * [--wildcard]
+		 * : delete cached content of all subfolders
 		 *
 		 * ## EXAMPLES
 		 *
-		 *      wp varnish purge
+		 *     wp varnish purge
 		 *
-		 *      wp varnish purge http://example.com/wp-content/themes/twentyeleventy/style.css
+		 *     wp varnish purge http://example.com/wp-content/themes/twentyeleventy/style.css
 		 *
-		 *      wp varnish purge http://example.com/wp-content/themes/ --wildcard
+		 *     wp varnish purge http://example.com/wp-content/themes/ --wildcard
 		 */
 		public function purge( $args, $assoc_args ) {
 
@@ -166,8 +195,7 @@ if ( ! class_exists( 'WP_CLI_Varnish_Command' ) ) {
 		} // End devmode.
 
 		/**
-		 * Runs a debug check of the site to see if there are any known
-		 * issues that would stop Varnish from caching.
+		 * Runs a debug check to see if there are any known issues with caching.
 		 *
 		 * ## OPTIONS
 		 *

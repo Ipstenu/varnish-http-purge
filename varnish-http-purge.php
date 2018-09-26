@@ -3,7 +3,7 @@
  * Plugin Name: Varnish HTTP Purge
  * Plugin URI: https://halfelf.org/plugins/varnish-http-purge/
  * Description: Automatically empty cached pages when content on your site is modified.
- * Version: 4.6.5
+ * Version: 4.6.6
  * Author: Mika Epstein
  * Author URI: https://halfelf.org/
  * License: http://www.apache.org/licenses/LICENSE-2.0
@@ -35,7 +35,7 @@ class VarnishPurger {
 	 * Version Number
 	 * @var string
 	 */
-	public static $version = '4.6.4';
+	public static $version = '4.6.6';
 
 	/**
 	 * List of URLs to be purged
@@ -609,6 +609,12 @@ class VarnishPurger {
 			$host_headers .= ':' . $p['port'];
 		}
 
+		$parsed_url = $url;
+		// Filter URL based on the Proxy IP for nginx compatibility
+		if ( 'localhost' === $proxy_ip ) {
+			$parsed_url = str_replace( $p['host'], 'localhost', $parsed_url );
+		}
+
 		// Create path to purge.
 		$purgeme = $schema . $host . $path . $pregex;
 
@@ -631,7 +637,7 @@ class VarnishPurger {
 			'headers' => $headers,
 		) );
 
-		do_action( 'after_purge_url', $url, $purgeme, $response, $headers );
+		do_action( 'after_purge_url', $parsed_url, $purgeme, $response, $headers );
 	}
 
 	/**

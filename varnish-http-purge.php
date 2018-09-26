@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name: Varnish HTTP Purge
+ * Plugin Name: Proxy Cache Purge
  * Plugin URI: https://halfelf.org/plugins/varnish-http-purge/
  * Description: Automatically empty cached pages when content on your site is modified.
  * Version: 4.6.5
@@ -14,12 +14,12 @@
  *
  * Copyright 2016-2018 Mika Epstein (email: ipstenu@halfelf.org)
  *
- * This file is part of Varnish HTTP Purge, a plugin for WordPress.
+ * This file is part of Proxy Cache Purge, a plugin for WordPress.
  *
- * Varnish HTTP Purge is free software: you can redistribute it and/or modify
+ * Proxy Cache Purge is free software: you can redistribute it and/or modify
  * it under the terms of the Apache License 2.0 license.
  *
- * Varnish HTTP Purge is distributed in the hope that it will be useful,
+ * Proxy Cache Purge is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  */
@@ -200,7 +200,7 @@ class VarnishPurger {
 	 * @since 4.6
 	 */
 	public function admin_message_purge() {
-		echo '<div id="message" class="notice notice-success fade is-dismissible"><p><strong>' . esc_html__( 'Varnish cache emptied!', 'varnish-http-purge' ) . '</strong></p></div>';
+		echo '<div id="message" class="notice notice-success fade is-dismissible"><p><strong>' . esc_html__( 'Proxy cache emptied!', 'varnish-http-purge' ) . '</strong></p></div>';
 	}
 
 	/**
@@ -222,7 +222,7 @@ class VarnishPurger {
 	 */
 	public function require_pretty_permalinks_notice() {
 		// translators: The URL should link to the permalinks page.
-		echo wp_kses_post( '<div id="message" class="error"><p>' . sprintf( __( 'Varnish HTTP Purge requires you to use custom permalinks. Please go to the <a href="%1$s">Permalinks Options Page</a> to configure them.', 'varnish-http-purge' ), esc_url( admin_url( 'options-permalink.php' ) ) ) . '</p></div>' );
+		echo wp_kses_post( '<div id="message" class="error"><p>' . sprintf( __( 'Proxy Cache Purge requires you to use custom permalinks. Please go to the <a href="%1$s">Permalinks Options Page</a> to configure them.', 'varnish-http-purge' ), esc_url( admin_url( 'options-permalink.php' ) ) ) . '</p></div>' );
 	}
 
 	/**
@@ -233,7 +233,7 @@ class VarnishPurger {
 	 */
 	public function require_wp_version_notice() {
 		// translators: The URL should link to the update core page.
-		echo "<div id='message' class='error'><p>" . sprintf( esc_html__( 'Varnish HTTP Purge requires WordPress 4.7 or greater. Please <a href="%1$s">upgrade WordPress</a>.', 'varnish-http-purge' ), esc_url( admin_url( 'update-core.php' ) ) ) . '</p></div>';
+		echo "<div id='message' class='error'><p>" . sprintf( esc_html__( 'Proxy Cache Purge requires WordPress 4.7 or greater. Please <a href="%1$s">upgrade WordPress</a>.', 'varnish-http-purge' ), esc_url( admin_url( 'update-core.php' ) ) ) . '</p></div>';
 	}
 
 	/**
@@ -244,17 +244,17 @@ class VarnishPurger {
 	 */
 	public function devmode_is_active_notice() {
 		if ( VHP_DEVMODE ) {
-			$message = __( 'Varnish HTTP Purge Development Mode is active because it has been defined in wp-config.', 'varnish-http-purge' );
+			$message = __( 'Proxy Cache Purge Development Mode is active because it has been defined in wp-config.', 'varnish-http-purge' );
 		} else {
 			$devmode = get_site_option( 'vhp_varnish_devmode', self::$devmode );
 			$time    = human_time_diff( current_time( 'timestamp' ), $devmode['expire'] );
 			if ( ! is_multisite() ) {
 				// translators: %1$s is the time until dev mode expires.
 				// translators: %2$s is a link to the Varnish settings pages.
-				$message = sprintf( __( 'Varnish HTTP Purge Development Mode is active for the next %1$s. You can disable this at the <a href="%2$s">Varnish Settings Page</a>.', 'varnish-http-purge' ), $time, esc_url( admin_url( 'admin.php?page=varnish-page' ) ) );
+				$message = sprintf( __( 'Proxy Cache Purge Development Mode is active for the next %1$s. You can disable this at the <a href="%2$s">Proxy Settings Page</a>.', 'varnish-http-purge' ), $time, esc_url( admin_url( 'admin.php?page=varnish-page' ) ) );
 			} else {
 				// translators: %1$s is the time until dev mode expires.
-				$message = sprintf( __( 'Varnish HTTP Purge Development Mode is active for the next %1$s.', 'varnish-http-purge' ), $time );
+				$message = sprintf( __( 'Proxy Cache Purge Development Mode is active for the next %1$s.', 'varnish-http-purge' ), $time );
 			}
 		}
 		echo '<div class="notice notice-warning"><p>' . wp_kses_post( $message ) . '</p></div>';
@@ -421,13 +421,13 @@ class VarnishPurger {
 	public function varnish_rightnow() {
 		global $blog_id;
 		// translators: %1$s links to the plugin's page on WordPress.org.
-		$intro    = sprintf( __( '<a href="%1$s">Varnish HTTP Purge</a> automatically deletes your cached posts when published or updated. When making major site changes, such as with a new theme, plugins, or widgets, you may need to manually empty the cache.', 'varnish-http-purge' ), 'http://wordpress.org/plugins/varnish-http-purge/' );
+		$intro    = sprintf( __( '<a href="%1$s">Proxy Cache Purge</a> automatically deletes your cached posts when published or updated. When making major site changes, such as with a new theme, plugins, or widgets, you may need to manually empty the cache.', 'varnish-http-purge' ), 'http://wordpress.org/plugins/varnish-http-purge/' );
 		$url      = wp_nonce_url( add_query_arg( 'vhp_flush_do', 'all' ), 'vhp-flush-do' );
-		$button   = __( 'Press the button below to force it to empty your entire Varnish cache.', 'varnish-http-purge' );
+		$button   = __( 'Press the button below to force it to empty your entire Proxy cache.', 'varnish-http-purge' );
 		$button  .= '</p><p><span class="button"><span class="dashicons varnish-http-purge" style="background-image: url(' . self::get_icon_svg( true, '#F56E28' ) . ') !important;"></span> <a href="' . $url . '"><strong>';
 		$button  .= __( 'Empty Cache', 'varnish-http-purge' );
 		$button  .= '</strong></a></span>';
-		$nobutton = __( 'You do not have permission to empty the Varnish cache for the whole site. Please contact your administrator.', 'varnish-http-purge' );
+		$nobutton = __( 'You do not have permission to empty the Proxy cache for the whole site. Please contact your administrator.', 'varnish-http-purge' );
 
 		if (
 			// SingleSite - admins can always purge.

@@ -1,19 +1,19 @@
 <?php
 /**
- * WP-CLI code
- *
- * @package varnish-http-purge
- *
- * Copyright 2015-2018 Mika Epstein (email: ipstenu@halfelf.org)
- *
- * This file is part of Proxy Cache Purge, a plugin for WordPress.
- *
- * Proxy Cache Purge is free software: you can redistribute it and/or modify
- * it under the terms of the Apache License 2.0 license.
- *
- * Proxy Cache Purge is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+	WP-CLI code
+
+	@package varnish-http-purge
+
+	Copyright 2015-2018 Mika Epstein (email: ipstenu@halfelf.org)
+
+	This file is part of Varnish HTTP Purge, a plugin for WordPress.
+
+	Varnish HTTP Purge is free software: you can redistribute it and/or modify
+	it under the terms of the Apache License 2.0 license.
+
+	Varnish HTTP Purge is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -28,30 +28,7 @@ if ( ! defined( 'WP_CLI' ) ) {
 if ( ! class_exists( 'WP_CLI_Varnish_Command' ) ) {
 
 	/**
-	 * WP CLI Commands for Proxy Cache Purge (formerly Varnish HTTP Purge).
-	 *
-	 * ## EXAMPLES
-	 *
-	 * # Purge entire cache
-	 * $ wp varnish purge
-	 *
-	 * # Purge a specific URL
-	 * $ wp varnish purge http://example.com/wp-content/themes/twentyeleventy/style.css
-	 *
-	 * # Purge a specific URL and all files on that level and up
-	 * $ wp varnish purge http://example.com/wp-content/themes/twentyeleventy/ --wildcard
-	 *
-	 * # Check for any known conflicts with your site and caching
-	 * $ wp varnish debug
-	 *
-	 * # Check a specific page for conflicts
-	 * $ wp varnish debug https://example.com/this-page/
-	 *
-	 * # Include headers in debug check
-	 * $ wp varnish debug https://example.com/ --include-headers
-	 *
-	 * # Scan all files in debug check
-	 * $ wp varnish debug https://example.com/ --include-grep
+	 * WP CLI Commands for Varnish.
 	 *
 	 * @extends WP_CLI_Command
 	 */
@@ -80,15 +57,17 @@ if ( ! class_exists( 'WP_CLI_Varnish_Command' ) ) {
 		}
 
 		/**
-		 * Empty server side cache.
+		 * Forces a full Varnish Purge of the entire site (provided
+		 * regex is supported). Alternately you can fluxh the cache
+		 * for specific pages or folders (using the --wildcard param)
 		 *
 		 * ## EXAMPLES
 		 *
-		 *     wp varnish purge
+		 *      wp varnish purge
 		 *
-		 *     wp varnish purge http://example.com/wp-content/themes/twentyeleventy/style.css
+		 *      wp varnish purge http://example.com/wp-content/themes/twentyeleventy/style.css
 		 *
-		 *     wp varnish purge http://example.com/wp-content/themes/ --wildcard
+		 *      wp varnish purge http://example.com/wp-content/themes/ --wildcard
 		 */
 		public function purge( $args, $assoc_args ) {
 
@@ -97,8 +76,7 @@ if ( ! class_exists( 'WP_CLI_Varnish_Command' ) ) {
 
 			// Set the URL/path.
 			if ( ! empty( $args ) ) {
-				list( $url ) = $args;
-			}
+				list( $url ) = $args; }
 
 			// If wildcard is set, or the URL argument is empty then treat this as a full purge.
 			$pregex = '';
@@ -135,13 +113,12 @@ if ( ! class_exists( 'WP_CLI_Varnish_Command' ) ) {
 			$this->varnish_purge->purge_url( $url . $pregex );
 
 			if ( WP_DEBUG === true ) {
-				$params = ( '' === $pregex ) ? 'no additional parameters' : 'the following parameters: ' . $pregex;
 				// translators: %1$s is the URL being flushed.
-				// translators: %2$s are the parameters being flushed.
-				WP_CLI::log( sprintf( __( 'Proxy Cache Purge is flushing the URL %1$s with %2$s', 'varnish-http-purge' ), $url, $params ) );
+				// translators: %2$s are the params being flushed.
+				WP_CLI::log( sprintf( __( 'Varnish HTTP Purge is flushing the URL %1$s with params %2$s.', 'varnish-http-purge' ), $url, $pregex ) );
 			}
 
-			WP_CLI::success( __( 'Proxy Cache Purge has flushed your cache.', 'varnish-http-purge' ) );
+			WP_CLI::success( __( 'Varnish HTTP Purge has flushed your cache.', 'varnish-http-purge' ) );
 		}
 
 		/**
@@ -174,7 +151,7 @@ if ( ! class_exists( 'WP_CLI_Varnish_Command' ) ) {
 				// No params, echo state.
 				$state = ( $devmode['active'] ) ? __( 'activated', 'varnish-http-purge' ) : __( 'deactivated', 'varnish-http-purge' );
 				// translators: %s is the state of dev mode.
-				WP_CLI::log( sprintf( __( 'Proxy Cache Purge development mode is currently %s.', 'varnish-http-purge' ), $state ) );
+				WP_CLI::log( sprintf( __( 'Varnish HTTP Purge development mode is currently %s.', 'varnish-http-purge' ), $state ) );
 			} elseif ( ! in_array( $args[0], $valid_modes, true ) ) {
 				// Invalid Params, warn.
 				// translators: %s is the bad command.
@@ -184,12 +161,13 @@ if ( ! class_exists( 'WP_CLI_Varnish_Command' ) ) {
 				$result = VarnishDebug::devmode_toggle( sanitize_text_field( $args[0] ) );
 				$state  = ( $result ) ? __( 'activated', 'varnish-http-purge' ) : __( 'deactivated', 'varnish-http-purge' );
 				// translators: %s is the state of dev mode.
-				WP_CLI::success( sprintf( __( 'Proxy Cache Purge development mode has been %s.', 'varnish-http-purge' ), $state ) );
+				WP_CLI::success( sprintf( __( 'Varnish HTTP Purge development mode has been %s.', 'varnish-http-purge' ), $state ) );
 			}
 		} // End devmode.
 
 		/**
-		 * Runs a debug check to see if there are any known issues with caching.
+		 * Runs a debug check of the site to see if there are any known
+		 * issues that would stop Varnish from caching.
 		 *
 		 * ## OPTIONS
 		 *

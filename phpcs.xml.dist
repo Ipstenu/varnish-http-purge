@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<ruleset name="Proxy Cache Purge Coding Standards">
+<ruleset name="Varnish HTTP Purge Coding Standards">
     <description>A custom ruleset to take in account both WordPress and DreamHost standards.</description>
     <rule ref="WordPress-Extra">
         <exclude name="WordPress.Files.FileName.InvalidClassFileName" />

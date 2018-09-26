@@ -637,7 +637,7 @@ class VarnishPurger {
 			'headers' => $headers,
 		) );
 
-		do_action( 'after_purge_url', $url, $purgeme, $response, $headers );
+		do_action( 'after_purge_url', $parsed_url, $purgeme, $response, $headers );
 	}
 
 	/**

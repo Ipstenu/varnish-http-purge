@@ -192,51 +192,12 @@ This plugin is installed by default for _all_ DreamPress installs on DreamHost, 
 
 == Changelog ==
 
-= 4.6.6 =
+= 4.7.0 =
 * October 2018
-* WP-CLI documentation
-* Nginx compatibility (support for localhost as an IP)
-* Rebranding
+* WP-CLI: documentation
+* Bugfix: Nginx compatibility
+* Feature: Rebranding
 
-= 4.6.5 =
-* September 2018
-* Bugfix to correct footer output. :facepalm: No broken functionality.
-
-= 4.6.4 =
-
-* September 2018
-* Remove query variables from URLs to prevent URLs from being flushed more than once per update
-* More selective loading of AMP urls
-
-= 4.6.3 =
-
-* August 2018
-* Deprecated function support
-
-= 4.6.2 =
-
-* July 2018
-* Fixing some translation output.
-* Multisite fixes for settings pages.
-
-= 4.6.1 =
-
-* July 2018
-* Fix situation where purging wasn't (props @carlalexander)
-
-= 4.6.0 =
-
-* July 2018
-* Moved Varnish to it's own menu with a new custom icon (props Olesya)
-* Add option to enable development for 24 hours (for super-admins only)
-* Change debug mode to development mode and greatly improved overall
-* Translation improvements
-* Add new action hook for after a full purge (props @futtta)
-* Change check for age-header to not require a second run (props @danielbachhuber)
-* Confirm plugin and theme blacklist check (props @danielbachhuber)
-* WP-CLI: add debug option to show all header output (props @danielbachhuber)
-* WP-CLI: add debug option to grep content for known issues (props @danielbachhuber)
-* WP-CLI: add new command to change devmode state
 
 == Screenshots ==
 
@@ -244,12 +205,6 @@ This plugin is installed by default for _all_ DreamPress installs on DreamHost, 
 2. Toolbar menu (with cache enabled)
 3. Toolbar menu (with cache disabled)
 4. Scanner results
-5. Change Varnish IP address
+5. Change Proxy IP address
 6. Activate Dev Mode
 7. Dev Mode Warning (24 hour notice)
-
-== Upgrade Notice ==
-
-= 4.5.0 =
-
-As of this release, the Varnish debugger uses remote data to collect a list of cookies, plugins, and themes known to conflict with Varnish. This will reduce the need to update the plugin for informational changes only. [Public information about this service is available on DreamObjects](https://varnish-http-purge.objects-us-east-1.dream.io/readme.txt).

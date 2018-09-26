@@ -565,11 +565,11 @@ class VarnishPurger {
 
 		// Build a varniship.
 		if ( VHP_VARNISH_IP !== false ) {
-			$varniship = VHP_VARNISH_IP;
+			$proxy_ip = VHP_VARNISH_IP;
 		} else {
-			$varniship = get_site_option( 'vhp_varnish_ip' );
+			$proxy_ip = get_site_option( 'vhp_varnish_ip' );
 		}
-		$varniship = apply_filters( 'vhp_varnish_ip', $varniship );
+		$proxy_ip = apply_filters( 'vhp_varnish_ip', $proxy_ip );
 
 		// Determine the path.
 		$path = '';
@@ -588,8 +588,8 @@ class VarnishPurger {
 		$schema = apply_filters( 'varnish_http_purge_schema', 'http://' );
 
 		// If we made varniship, let it sail.
-		if ( isset( $varniship ) && ! empty( $varniship ) ) {
-			$host = $varniship;
+		if ( isset( $proxy_ip ) && ! empty( $proxy_ip ) ) {
+			$host = $proxy_ip;
 		} else {
 			$host = $p['host'];
 		}
@@ -609,6 +609,22 @@ class VarnishPurger {
 			$host_headers .= ':' . $p['port'];
 		}
 
+		/**
+		 * Filters the URL being emptied so in theory you could change
+		 * mydomain.com to myotherdomain.com if your sever allowed that.
+		 *
+		 * varnish_http_purge_url()
+		 *
+		 * @since 4.6.6
+		 */
+		$parsed_url = apply_filters( 'varnish_http_purge_url', $url );
+
+		// Filter URL based on the Proxy IP for nginx compatibility
+		// If they've changed it above, this WILL NOT change it again.
+		if ( 'localhost' === $proxy_ip ) {
+			$parsed_url = str_replace( $p['host'], 'localhost', $parsed_url );
+		}
+
 		// Create path to purge.
 		$purgeme = $schema . $host . $path . $pregex;
 
@@ -622,16 +638,22 @@ class VarnishPurger {
 		 *
 		 * @since 4.1
 		 */
-		$headers  = apply_filters( 'varnish_http_purge_headers', array(
-			'host'           => $host_headers,
-			'X-Purge-Method' => $x_purge_method,
-		) );
-		$response = wp_remote_request( $purgeme, array(
-			'method'  => 'PURGE',
-			'headers' => $headers,
-		) );
+		$headers  = apply_filters(
+			'varnish_http_purge_headers',
+			array(
+				'host'           => $host_headers,
+				'X-Purge-Method' => $x_purge_method,
+			)
+		);
+		$response = wp_remote_request(
+			$purgeme,
+			array(
+				'method'  => 'PURGE',
+				'headers' => $headers,
+			)
+		);
 
-		do_action( 'after_purge_url', $url, $purgeme, $response, $headers );
+		do_action( 'after_purge_url', $parsed_url, $purgeme, $response, $headers );
 	}
 
 	/**

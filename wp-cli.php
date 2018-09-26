@@ -82,14 +82,6 @@ if ( ! class_exists( 'WP_CLI_Varnish_Command' ) ) {
 		/**
 		 * Empty server side cache.
 		 *
-		 * ## OPTIONS
-		 *
-		 * <url>
-		 * : delete cached content of specific URL
-		 *
-		 * [--wildcard]
-		 * : delete cached content of all subfolders
-		 *
 		 * ## EXAMPLES
 		 *
 		 *     wp varnish purge
@@ -105,7 +97,8 @@ if ( ! class_exists( 'WP_CLI_Varnish_Command' ) ) {
 
 			// Set the URL/path.
 			if ( ! empty( $args ) ) {
-				list( $url ) = $args; }
+				list( $url ) = $args;
+			}
 
 			// If wildcard is set, or the URL argument is empty then treat this as a full purge.
 			$pregex = '';

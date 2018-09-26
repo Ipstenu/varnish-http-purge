@@ -35,7 +35,7 @@ class VarnishPurger {
 	 * Version Number
 	 * @var string
 	 */
-	public static $version = '4.6.4';
+	public static $version = '4.6.6';
 
 	/**
 	 * List of URLs to be purged
@@ -349,7 +349,7 @@ class VarnishPurger {
 
 			// If we're on a front end page and the current user can edit published posts, then they can do this.
 			if ( ! is_admin() && get_post() !== false && current_user_can( 'edit_published_posts' ) ) {
-				$page_url = esc_url( home_url( $wp->request ) );
+				$page_url = esc_url( $this->the_home_url() . $wp->request );
 				$args[]   = array(
 					'parent' => 'purge-varnish-cache',
 					'id'     => 'purge-varnish-cache-this',
@@ -609,18 +609,9 @@ class VarnishPurger {
 			$host_headers .= ':' . $p['port'];
 		}
 
-		/**
-		 * Filters the URL being emptied so in theory you could change
-		 * mydomain.com to myotherdomain.com if your sever allowed that.
-		 *
-		 * varnish_http_purge_url()
-		 *
-		 * @since 4.6.6
-		 */
-		$parsed_url = apply_filters( 'varnish_http_purge_url', $url );
+		$parsed_url = $url;
 
 		// Filter URL based on the Proxy IP for nginx compatibility
-		// If they've changed it above, this WILL NOT change it again.
 		if ( 'localhost' === $proxy_ip ) {
 			$parsed_url = str_replace( $p['host'], 'localhost', $parsed_url );
 		}
@@ -783,7 +774,8 @@ class VarnishPurger {
 			$categories = get_the_category( $post_id );
 			if ( $categories ) {
 				foreach ( $categories as $cat ) {
-					array_push( $listofurls,
+					array_push(
+						$listofurls,
 						get_category_link( $cat->term_id ),
 						get_rest_url() . $rest_api_route . '/categories/' . $cat->term_id . '/'
 					);
@@ -798,7 +790,8 @@ class VarnishPurger {
 					$tag_base = '/tag/';
 				}
 				foreach ( $tags as $tag ) {
-					array_push( $listofurls,
+					array_push(
+						$listofurls,
 						get_tag_link( $tag->term_id ),
 						get_rest_url() . $rest_api_route . $tag_base . $tag->term_id . '/'
 					);
@@ -812,7 +805,8 @@ class VarnishPurger {
 					if ( $features['public'] ) {
 						$terms = wp_get_post_terms( $post_id, $taxonomy );
 						foreach ( $terms as $term ) {
-							array_push( $listofurls,
+							array_push(
+								$listofurls,
 								get_term_link( $term ),
 								get_rest_url() . $rest_api_route . '/' . $term->taxonomy . '/' . $term->slug . '/'
 							);
@@ -826,14 +820,16 @@ class VarnishPurger {
 			if ( $this_post_type && 'post' === $this_post_type ) {
 				// Author URLs:
 				$author_id = get_post_field( 'post_author', $post_id );
-				array_push( $listofurls,
+				array_push(
+					$listofurls,
 					get_author_posts_url( $author_id ),
 					get_author_feed_link( $author_id ),
 					get_rest_url() . $rest_api_route . '/users/' . $author_id . '/'
 				);
 
 				// Feeds:
-				array_push( $listofurls,
+				array_push(
+					$listofurls,
 					get_bloginfo_rss( 'rdf_url' ),
 					get_bloginfo_rss( 'rss_url' ),
 					get_bloginfo_rss( 'rss2_url' ),
@@ -845,7 +841,8 @@ class VarnishPurger {
 
 			// Archives and their feeds.
 			if ( $this_post_type && ! in_array( $this_post_type, $noarchive_post_type, true ) ) {
-				array_push( $listofurls,
+				array_push(
+					$listofurls,
 					get_post_type_archive_link( get_post_type( $post_id ) ),
 					get_post_type_archive_feed_link( get_post_type( $post_id ) )
 					// Need to add in JSON?
@@ -853,7 +850,8 @@ class VarnishPurger {
 			}
 
 			// Home Pages and (if used) posts page.
-			array_push( $listofurls,
+			array_push(
+				$listofurls,
 				get_rest_url(),
 				$this->the_home_url() . '/'
 			);

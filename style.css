@@ -1,4 +1,4 @@
-/* Add Orange Carrot Dashicon */
+/* Add Dashicon */
 #wpadminbar #wp-admin-bar-purge-varnish-cache .ab-icon {
 	float: left;
 	width: 26px;
@@ -8,11 +8,12 @@
 	background-size: 20px;
 }
 
-/* Add Orange Carrot to Button */
+/* Add Style icon properly */
 span.dashicons.varnish-http-purge {
 	vertical-align: middle;
 }
 
+/* Allow display on small screen */
 @media screen and (max-width: 782px) {
 	#wpadminbar #wp-admin-bar-purge-varnish-cache .ab-icon,
 	#wpadminbar li#wp-admin-bar-purge-varnish-cache {

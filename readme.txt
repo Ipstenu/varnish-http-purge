@@ -197,7 +197,7 @@ This plugin is installed by default for _all_ DreamPress installs on DreamHost, 
 * WP-CLI: documentation
 * Bugfix: Nginx compatibility
 * Feature: Rebranding
-
+* Removal: "Right Now" button
 
 == Screenshots ==
 

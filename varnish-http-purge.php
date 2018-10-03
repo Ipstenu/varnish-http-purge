@@ -276,7 +276,7 @@ class VarnishPurger {
 	 * @since 4.5.0
 	 */
 	public function custom_css() {
-		if ( is_user_logged_in() ) {
+		if ( is_user_logged_in() && is_admin_bar_showing() ) {
 			wp_register_style( 'varnish_http_purge', plugins_url( 'style.css', __FILE__ ), false, self::$version );
 			wp_enqueue_style( 'varnish_http_purge' );
 		}

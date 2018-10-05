@@ -611,7 +611,7 @@ class VarnishPurger {
 
 		$parsed_url = $url;
 		// Filter URL based on the Proxy IP for nginx compatibility
-		if ( 'localhost' === $proxy_ip ) {
+		if ( ! empty( $proxy_ip ) && 'localhost' === $proxy_ip ) {
 			$parsed_url = str_replace( $p['host'], 'localhost', $parsed_url );
 		}
 

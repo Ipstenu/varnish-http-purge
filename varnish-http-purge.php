@@ -3,7 +3,7 @@
  * Plugin Name: Proxy Cache Purge
  * Plugin URI: https://halfelf.org/plugins/varnish-http-purge/
  * Description: Automatically empty cached pages when content on your site is modified.
- * Version: 4.7.0
+ * Version: 4.7.0-beta
  * Author: Mika Epstein
  * Author URI: https://halfelf.org/
  * License: http://www.apache.org/licenses/LICENSE-2.0
@@ -25,7 +25,7 @@
  */
 
 /**
- * Purge Varnish Class
+ * Purge Class
  *
  * @since 2.0
  */
@@ -241,13 +241,13 @@ class VarnishPurger {
 	 */
 	public function devmode_is_active_notice() {
 		if ( VHP_DEVMODE ) {
-			$message = __( 'Proxy Cache Purge Development Mode is active because it has been defined in wp-config.', 'varnish-http-purge' );
+			$message = __( 'Proxy Cache Purge Development Mode has been activated via wp-config.', 'varnish-http-purge' );
 		} else {
 			$devmode = get_site_option( 'vhp_varnish_devmode', self::$devmode );
 			$time    = human_time_diff( current_time( 'timestamp' ), $devmode['expire'] );
 			if ( ! is_multisite() ) {
 				// translators: %1$s is the time until dev mode expires.
-				// translators: %2$s is a link to the Varnish settings pages.
+				// translators: %2$s is a link to the settings pages.
 				$message = sprintf( __( 'Proxy Cache Purge Development Mode is active for the next %1$s. You can disable this at the <a href="%2$s">Proxy Settings Page</a>.', 'varnish-http-purge' ), $time, esc_url( admin_url( 'admin.php?page=varnish-page' ) ) );
 			} else {
 				// translators: %1$s is the time until dev mode expires.
@@ -283,7 +283,7 @@ class VarnishPurger {
 	}
 
 	/**
-	 * Varnish Purge Button in the Admin Bar
+	 * Purge Button in the Admin Bar
 	 *
 	 * @access public
 	 * @param mixed $admin_bar - data passed back from admin bar.
@@ -472,7 +472,7 @@ class VarnishPurger {
 
 		if ( empty( $purge_urls ) && isset( $_GET ) ) {
 			if ( isset( $_GET['vhp_flush_all'] ) && check_admin_referer( 'vhp-flush-all' ) ) {
-				// Flush Varnish Cache recursize.
+				// Flush Cache recursize.
 				$this->purge_url( $this->the_home_url() . '/?vhp-regex' );
 			} elseif ( isset( $_GET['vhp_flush_do'] ) && check_admin_referer( 'vhp-flush-do' ) ) {
 				if ( 'object' === $_GET['vhp_flush_do'] ) {
@@ -481,7 +481,7 @@ class VarnishPurger {
 						wp_cache_flush();
 					}
 				} elseif ( 'all' === $_GET['vhp_flush_do'] ) {
-					// Flush Varnish Cache recursize.
+					// Flush Cache recursize.
 					$this->purge_url( $this->the_home_url() . '/?vhp-regex' );
 				} else {
 					// Flush the URL we're on.
@@ -878,7 +878,7 @@ class VarnishPurger {
 }
 
 /**
- * Purge Varnish via WP-CLI
+ * Purge via WP-CLI
  *
  * @since 3.8
  */

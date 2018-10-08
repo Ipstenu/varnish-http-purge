@@ -285,7 +285,7 @@ if ( ! class_exists( 'WP_CLI_Varnish_Command' ) ) {
 			// Check for Remote IP.
 			$remote_ip = VarnishDebug::remote_ip( $headers );
 
-			// Get the Varnish IP.
+			// Get the IP.
 			if ( false !== VHP_VARNISH_IP ) {
 				$varniship = VHP_VARNISH_IP;
 			} else {

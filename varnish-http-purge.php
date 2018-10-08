@@ -3,7 +3,7 @@
  * Plugin Name: Varnish HTTP Purge
  * Plugin URI: https://halfelf.org/plugins/varnish-http-purge/
  * Description: Automatically empty cached pages when content on your site is modified.
- * Version: 4.6.6
+ * Version: 4.7.0
  * Author: Mika Epstein
  * Author URI: https://halfelf.org/
  * License: http://www.apache.org/licenses/LICENSE-2.0
@@ -25,7 +25,7 @@
  */
 
 /**
- * Purge Varnish Class
+ * Purge Class
  *
  * @since 2.0
  */
@@ -35,7 +35,7 @@ class VarnishPurger {
 	 * Version Number
 	 * @var string
 	 */
-	public static $version = '4.6.6';
+	public static $version = '4.7.0';
 
 	/**
 	 * List of URLs to be purged
@@ -100,9 +100,6 @@ class VarnishPurger {
 	 * @access public
 	 */
 	public function admin_init() {
-
-		// Add to 'right now'.
-		add_action( 'activity_box_end', array( $this, 'varnish_rightnow' ), 100 );
 
 		// Failure: Pre WP 4.7.
 		if ( version_compare( get_bloginfo( 'version' ), '4.7', '<=' ) ) {
@@ -244,14 +241,14 @@ class VarnishPurger {
 	 */
 	public function devmode_is_active_notice() {
 		if ( VHP_DEVMODE ) {
-			$message = __( 'Varnish HTTP Purge Development Mode is active because it has been defined in wp-config.', 'varnish-http-purge' );
+			$message = __( 'Proxy Cache Purge Development Mode has been activated via wp-config.', 'varnish-http-purge' );
 		} else {
 			$devmode = get_site_option( 'vhp_varnish_devmode', self::$devmode );
 			$time    = human_time_diff( current_time( 'timestamp' ), $devmode['expire'] );
 			if ( ! is_multisite() ) {
 				// translators: %1$s is the time until dev mode expires.
-				// translators: %2$s is a link to the Varnish settings pages.
-				$message = sprintf( __( 'Varnish HTTP Purge Development Mode is active for the next %1$s. You can disable this at the <a href="%2$s">Varnish Settings Page</a>.', 'varnish-http-purge' ), $time, esc_url( admin_url( 'admin.php?page=varnish-page' ) ) );
+				// translators: %2$s is a link to the settings pages.
+				$message = sprintf( __( 'Proxy Cache Purge Development Mode is active for the next %1$s. You can disable this at the <a href="%2$s">Proxy Settings Page</a>.', 'varnish-http-purge' ), $time, esc_url( admin_url( 'admin.php?page=varnish-page' ) ) );
 			} else {
 				// translators: %1$s is the time until dev mode expires.
 				$message = sprintf( __( 'Varnish HTTP Purge Development Mode is active for the next %1$s.', 'varnish-http-purge' ), $time );
@@ -286,7 +283,7 @@ class VarnishPurger {
 	}
 
 	/**
-	 * Varnish Purge Button in the Admin Bar
+	 * Purge Button in the Admin Bar
 	 *
 	 * @access public
 	 * @param mixed $admin_bar - data passed back from admin bar.
@@ -413,42 +410,6 @@ class VarnishPurger {
 	}
 
 	/**
-	 * Varnish Right Now Information
-	 * This information is put on the Dashboard 'Right now' widget
-	 *
-	 * @since 1.0
-	 */
-	public function varnish_rightnow() {
-		global $blog_id;
-		// translators: %1$s links to the plugin's page on WordPress.org.
-		$intro    = sprintf( __( '<a href="%1$s">Varnish HTTP Purge</a> automatically deletes your cached posts when published or updated. When making major site changes, such as with a new theme, plugins, or widgets, you may need to manually empty the cache.', 'varnish-http-purge' ), 'http://wordpress.org/plugins/varnish-http-purge/' );
-		$url      = wp_nonce_url( add_query_arg( 'vhp_flush_do', 'all' ), 'vhp-flush-do' );
-		$button   = __( 'Press the button below to force it to empty your entire Varnish cache.', 'varnish-http-purge' );
-		$button  .= '</p><p><span class="button"><span class="dashicons varnish-http-purge" style="background-image: url(' . self::get_icon_svg( true, '#F56E28' ) . ') !important;"></span> <a href="' . $url . '"><strong>';
-		$button  .= __( 'Empty Cache', 'varnish-http-purge' );
-		$button  .= '</strong></a></span>';
-		$nobutton = __( 'You do not have permission to empty the Varnish cache for the whole site. Please contact your administrator.', 'varnish-http-purge' );
-
-		if (
-			// SingleSite - admins can always purge.
-			( ! is_multisite() && current_user_can( 'activate_plugins' ) ) ||
-			// Multisite - Network Admin can always purge.
-			current_user_can( 'manage_network' ) ||
-			// Multisite - Site admins can purge UNLESS it's a subfolder install and we're on site #1.
-			( is_multisite() && current_user_can( 'activate_plugins' ) && ( SUBDOMAIN_INSTALL || ( ! SUBDOMAIN_INSTALL && ( BLOG_ID_CURRENT_SITE !== $blog_id ) ) ) )
-		) {
-			$text = $intro . ' ' . $button;
-		} else {
-			$text = $intro . ' ' . $nobutton;
-		}
-		// @codingStandardsIgnoreStart
-		// This is safe to echo as it's controlled and secured above.
-		// Using wp_kses will delete the icon.
-		echo '<p class="varnish-rightnow">' . $text . '</p>';
-		// @codingStandardsIgnoreEnd
-	}
-
-	/**
 	 * Registered Events
 	 * These are when the purge is triggered
 	 *
@@ -511,7 +472,7 @@ class VarnishPurger {
 
 		if ( empty( $purge_urls ) && isset( $_GET ) ) {
 			if ( isset( $_GET['vhp_flush_all'] ) && check_admin_referer( 'vhp-flush-all' ) ) {
-				// Flush Varnish Cache recursize.
+				// Flush Cache recursize.
 				$this->purge_url( $this->the_home_url() . '/?vhp-regex' );
 			} elseif ( isset( $_GET['vhp_flush_do'] ) && check_admin_referer( 'vhp-flush-do' ) ) {
 				if ( 'object' === $_GET['vhp_flush_do'] ) {
@@ -520,7 +481,7 @@ class VarnishPurger {
 						wp_cache_flush();
 					}
 				} elseif ( 'all' === $_GET['vhp_flush_do'] ) {
-					// Flush Varnish Cache recursize.
+					// Flush Cache recursize.
 					$this->purge_url( $this->the_home_url() . '/?vhp-regex' );
 				} else {
 					// Flush the URL we're on.
@@ -903,7 +864,7 @@ class VarnishPurger {
 }
 
 /**
- * Purge Varnish via WP-CLI
+ * Purge via WP-CLI
  *
  * @since 3.8
  */

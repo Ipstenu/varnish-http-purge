@@ -1,6 +1,50 @@
 ## CHANGELOG
 
-=== 4.5.1 ===
+= 4.6.6 =
+* September 2018
+* Bugfix to allow Nginx proxy to flush individual pages.
+
+= 4.6.5 =
+* September 2018
+* Bugfix to correct footer output. :facepalm: No broken functionality.
+
+= 4.6.4 =
+
+* September 2018
+* Remove query variables from URLs to prevent URLs from being flushed more than once per update
+* More selective loading of AMP urls
+
+= 4.6.3 =
+
+* August 2018
+* Deprecated function support
+
+= 4.6.2 =
+
+* July 2018
+* Fixing some translation output.
+* Multisite fixes for settings pages.
+
+= 4.6.1 =
+
+* July 2018
+* Fix situation where purging wasn't (props @carlalexander)
+
+= 4.6.0 =
+
+* July 2018
+* Moved Varnish to it's own menu with a new custom icon (props Olesya)
+* Add option to enable development for 24 hours (for super-admins only)
+* Change debug mode to development mode and greatly improved overall
+* Translation improvements
+* Add new action hook for after a full purge (props @futtta)
+* Change check for age-header to not require a second run (props @danielbachhuber)
+* Confirm plugin and theme blacklist check (props @danielbachhuber)
+* WP-CLI: add debug option to show all header output (props @danielbachhuber)
+* WP-CLI: add debug option to grep content for known issues (props @danielbachhuber)
+* WP-CLI: add new command to change devmode state
+
+= 4.5.1 =
 * June 2018
 * Due to contention (devs hate it, users like it) the empty cache button colour on the toolbar is removed, and replaced with a carrot icon (I did not make it orange, but I wanted to)
 * Add carrot icon to collapsed (mobile) toolbar
@@ -8,30 +52,30 @@
 * Fixed a stupid argument issue with flushing memcached and I should have known better but oh well
 * FAQ update re nginx
 
-=== 4.5.0 ===
+= 4.5.0 =
 * May 2018
 * Remote storage of problem plugins/themes
 * Prevent auto-loading of scan for improved disclosure and compliance
 * Changed colour of the purge button for improved visibility
 * Support for nginx proxy headers
 
-=== 4.4.0 ===
+= 4.4.0 =
 * March 2018
 * Improve translations
 * Massive improvements to the debugging tools
 * Allow for port to be added to host headers (props @davidbarratt)
 * WP-CLI for debugging
 
-=== 4.3.1 ===
+= 4.3.1 =
 * 10 October 2017
 * Copied a wrong line.
 
-=== 4.3.0 ===
+= 4.3.0 =
 * 10 October 2017
 * Add Varnish Flush for "this" page on front end
 * Do not flush non-public taxonomies
 
-=== 4.2.0 ===
+= 4.2.0 =
 * 30 August 2017
 * More flexible support for custom cat/tag bases
 * Added in support for custom taxonomies
@@ -39,13 +83,13 @@
 * Move right now box to be called later, preventing double calls
 * Extra check for if it's a URL, because some plugins are weird (props @danielkun)
 
-=== 4.1.1 ===
+= 4.1.1 =
 
 * JSON - fixed overzealous json assumptions from causing errors
 * WP-CLI - fixed prepending of domain on domain when using purge on a domain (props @ocean90)
 * Typos. We hate them.
 
-=== 4.1 ===
+= 4.1 =
 
 * JSON / REST API Support
 * Fix for Varnish Status Page on MAMP (props @jeremyclarke)
@@ -54,24 +98,24 @@
 * Drop support for pre 4.7 because of JSON / REST API
 * Support flushing cache for private pages
 
-=== 4.0.3 ===
+= 4.0.3 =
 * Better explanation when Cloudflare gets in the way of DNS
 * Rename flush button for people who don't speak Varnish
 
-=== 4.0.2 ===
+= 4.0.2 =
 * Support for WP-CLI commands and PHP > 5.5 (though please upgrade, props @robertpeake)
 * Better information regarding Cloudflare
 * Better failure on domains for scanner
 * Better IP detection
 * Break apart settings for faster saving
 
-=== 4.0.1 ===
+= 4.0.1 =
 * Fix typo (on -> one)
 * Correct permissions on Multisite (props @phh - resolves #27 #28)
 * Correct weird merge error (props @phh - resolves #25 #26)
 * Fix formatting in Changelog
 
-=== 4.0 ===
+= 4.0 =
 * Added Varnish Status Page - Tools -> Varnish Status (includes basic scanning etc)
 * Allow filter for `home_url()`
 * Update readme with list of filters.
@@ -82,17 +126,17 @@
 * Purge 'default' AMP URL as well
 * Cleanup on Uninstall
 
-=== 3.9.3 ===
+= 3.9.3 =
 * Update Documentation and Readme
 
-=== 3.9.2 ===
+= 3.9.2 =
 * Change purge notice so it can be dismissed.
 * Fix purging of deleted posts.
 
-=== 3.9.1 ===
+= 3.9.1 =
 * Fixing i18n which wasn't working and threw a stupid error on sites without pretty permalinks. (Props DH customer Rasmus and employee Heckman!)
 
-=== 3.9 ===
+= 3.9 =
 * Retain query params on purge
 * Do not use query part for regex purging [Credit: shaula](https://github.com/Ipstenu/varnish-http-purge/pull/18)
 * Allow Varnish IP to be filtered. [Credit: floatingio](https://wordpress.org/support/topic/supply-varnish-ip-via-filter)
@@ -100,91 +144,91 @@
 * Add filter so other plugins can add events to trigger purge when they have no post ID
 * Add compatibility with [Autoptimize](https://wordpress.org/plugins/autoptimize/) so it flushes Varnish when you flush their cache
 
-=== 3.8 ===
+= 3.8 =
 * Add varnish_http_purge_events filter to allow people to add their own events for purging. (props @norcross)
 * Add a method to grab the response from purge request and pass to the 'after_purge_url' action for debugging. (props @shaula)
 * Added wp-cli command: wp varnish purge (to purge varnish)
 * Adding some docblocks
 * Fixing i18n
 
-=== 3.7.3 ===
+= 3.7.3 =
 * Add varnish_http_purge_schema filter for changing the default schema. The default remains http (even if you set your home and/or site URL to https) because of sanity, but in order to support some edge cases, they can filter if they want. (props Drumba)
 
-=== 3.7.2 ===
+= 3.7.2 =
 * Revisions were being mishandled and purging all inappropriately. (props Cha0sgr)
 
-=== 3.7.1 ===
+= 3.7.1 =
 * Archives weren't purging. (props Ingraye)
 
-=== 3.7 ===
+= 3.7 =
 * Optimizing flushes.
 * Add filter to allow other people to hook in when 3rd party plugins are abjectly weird (props jnachtigall)
 
-=== 3.6 ===
+= 3.6 =
 * Making purge be http only, since Varnish doesn't support https. This will prevent other issues for people using SSL with Varnish (though goodness knows why...)
 * Forcing backslash on home_url. Why WP doesn't, I have no idea, but this will help sites not running regex.
 
-=== 3.5.1 ===
+= 3.5.1 =
 * Language fix
 * Using add_query_arg
 * Ignore revisions
 
-=== 3.5 ===
+= 3.5 =
 * Isset wrap for URL path and query which may not be set in rare conditions (props <a href="https://wordpress.org/support/topic/undefined-index-notices-4">hsz</a>)
 * Added in flushing for feeds (requested by <a href="https://wordpress.org/support/topic/feed-not-purged">heypete</a>)
 
-=== 3.4 ===
+= 3.4 =
 * Multisite support
 * Button in toolbar
 * Fix define message in debug mode
 * Better parsing for if you set the define in the DB or config.
 
-=== 3.3.4 ===
+= 3.3.4 =
 * Rollback. Sorry.
 
-=== 3.3.3 ===
+= 3.3.3 =
 * Per request of Jetpack team, added in a <code>wp_cache_flush()</code> call when manually purging. This should only impact server side PHP caches (APC, Memcached etc)
 
-=== 3.3.2 ===
+= 3.3.2 =
 * Varnish IP was too persnickity in PHP 5.4 (added in an 'and if not null' check - props <a href="http://wordpress.org/support/topic/patch-a-little-patch-to-purge-on-comment-posting">colinleroy</a>)
 
-=== 3.3.1 ===
+= 3.3.1 =
 * Language Pack fixing.
 
-=== 3.3 ===
+= 3.3 =
 * Quick and dirty fix for a plugin that is causing the URLs to purge <em>ALL THE TIME</em>
 
-=== 3.2 ===
+= 3.2 =
 * Correcting conflict with host's default config.
 
-=== 3.1 ===
+= 3.1 =
 * Refactoring Cleanup (otherwise known as Copy/Pasta error in variable name). (props Shredder)
 
-=== 3.0 ===
+= 3.0 =
 * Adds 'Purge Varnish' button
 * More selective purging, to account for different server setups
 * Tighened up what purges and when
 * Flushing categories and tags (per code from WP Super Cache, thanks!)
 * Clarify requirements (Varnish and Pretty Permalinks)
 
-=== 2.3 ===
+= 2.3 =
 * Purge images on deletion
 * Fix for a VarnishIP when behind proxy servers not working on all hosts (props Berler)
 
-=== 2.2.1 ===
+= 2.2.1 =
 * typo (hit . instead of / - Props John B. Manos)
 
-=== 2.2 ===
+= 2.2 =
 * Added in workaround for Varnish purge reqs going AWOL when another proxy server is in place. (props to Shredder and Berler)
 * Cache flushes when you change themes
 
-=== 2.1 ===
+= 2.1 =
 * Header Image
 
-=== 2.0 ===
+= 2.0 =
 * Commit access handed to Ipstenu
 * Changed CURL to wp_remote_request (thank you <a href="http://wordpress.org/support/topic/incompatability-with-editorial-calendar-plugin?replies=1">Kenn Wilson</a>) so we don't have to do <a href="http://wordpress.org/support/topic/plugin-varnish-http-purge-incompatibility-with-woocommerce?replies=6">CURLOPT_RETURNTRANSFER</a> Remember kids, CURL is okay, but wp_remote_request is more better.
 
-=== 1.2.0 ===
+= 1.2.0 =
 * Moved actual request execution to "shutdown" event
 * Removed GET request due to bad performance impact

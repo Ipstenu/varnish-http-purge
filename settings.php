@@ -27,7 +27,6 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @since 4.0
  */
 class VarnishStatus {
-
 	/**
 	 * Construct
 	 * Fires when class is constructed, adds init hook
@@ -99,17 +98,19 @@ class VarnishStatus {
 
 		$devmode = get_site_option( 'vhp_varnish_devmode', VarnishPurger::$devmode );
 		$active  = ( isset( $devmode['active'] ) ) ? $devmode['active'] : false;
+		$active  = ( VHP_DEVMODE ) ? true : $active;
 		$expire  = current_time( 'timestamp' ) + DAY_IN_SECONDS;
-
 		?>
 		<input type="hidden" name="vhp_varnish_devmode[expire]" value="<?php $expire; ?>" />
-		<input type="checkbox" name="vhp_varnish_devmode[active]" value="true" <?php checked( $active, true ); ?> />
+		<input type="checkbox" name="vhp_varnish_devmode[active]" value="true" <?php disabled( VHP_DEVMODE ); ?> <?php checked( $active, true ); ?> />
 		<label for="vhp_varnish_devmode['active']">
 			<?php
-			if ( $active && isset( $devmode['expire'] ) ) {
+			if ( $active && isset( $devmode['expire'] ) && ! VHP_DEVMODE ) {
 				$timestamp = date_i18n( get_site_option( 'date_format' ), $devmode['expire'] ) . ' @ ' . date_i18n( get_site_option( 'time_format' ), $devmode['expire'] );
 				// translators: %s is the time (in hours) until Development Mode expires.
 				echo sprintf( esc_html__( 'Development Mode is active until %s. It will automatically disable after that time.', 'varnish-http-purge' ), esc_html( $timestamp ) );
+			} elseif ( VHP_DEVMODE ) {
+				esc_attr_e( 'Development Mode has been activated via wp-config and cannot be deactivated here.', 'varnish-http-purge' );
 			} else {
 				esc_attr_e( 'Activate Development Mode', 'varnish-http-purge' );
 			}
@@ -507,7 +508,6 @@ class VarnishStatus {
 
 		return $text;
 	}
-
 }
 
-$varnish_status = new VarnishStatus();
+new VarnishStatus();

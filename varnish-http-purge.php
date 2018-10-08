@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name: Varnish HTTP Purge
+ * Plugin Name: Proxy Cache Purge
  * Plugin URI: https://halfelf.org/plugins/varnish-http-purge/
  * Description: Automatically empty cached pages when content on your site is modified.
  * Version: 4.7.0

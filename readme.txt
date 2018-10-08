@@ -6,7 +6,7 @@ Tested up to: 4.9
 Stable tag: 4.7.0
 Requires PHP: 5.6
 
-Automatically empty Varnish Cache when content on your site is modified.
+Automatically empty proxy cached content when your site is modified.
 
 == Description ==
 
@@ -51,7 +51,7 @@ That will break cache on page loads. It is _not_ recommended for production!
 = WP CLI =
 
 * `wp varnish purge` - Flush the entire cache
-* `wp varnish debug [<url>]` - Help for debugging how well Varnish is (or isn't) working
+* `wp varnish debug [<url>]` - Help for debugging how well your cache is (or isn't) working
 * `wp varnish devmode [<activate|deactivate|toggle>` - Change development mode state
 
 = Privacy Policy =

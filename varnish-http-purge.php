@@ -570,6 +570,12 @@ class VarnishPurger {
 			$host_headers .= ':' . $p['port'];
 		}
 
+		$parsed_url = $url;
+		// Filter URL based on the Proxy IP for nginx compatibility
+		if ( 'localhost' === $proxy_ip ) {
+			$parsed_url = str_replace( $p['host'], 'localhost', $parsed_url );
+		}
+
 		// Create path to purge.
 		$purgeme = $schema . $host . $path . $pregex;
 
@@ -592,7 +598,7 @@ class VarnishPurger {
 			'headers' => $headers,
 		) );
 
-		do_action( 'after_purge_url', $url, $purgeme, $response, $headers );
+		do_action( 'after_purge_url', $parsed_url, $purgeme, $response, $headers );
 	}
 
 	/**

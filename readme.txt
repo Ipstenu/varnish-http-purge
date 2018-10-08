@@ -1,4 +1,4 @@
-= Varnish HTTP Purge =
+= Proxy Cache Purge =
 Contributors: Ipstenu, mikeschroder, techpriester, danielbachhuber
 Tags: proxy, purge, cache, varnish, nginx
 Requires at least: 4.7

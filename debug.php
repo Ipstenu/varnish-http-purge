@@ -6,12 +6,12 @@
  *
  * Copyright 2016-2018 Mika Epstein (email: ipstenu@halfelf.org)
  *
- * This file is part of Proxy Cache Purge, a plugin for WordPress.
+ * This file is part of Varnish HTTP Purge, a plugin for WordPress.
  *
- * Proxy Cache Purge is free software: you can redistribute it and/or modify
+ * Varnish HTTP Purge is free software: you can redistribute it and/or modify
  * it under the terms of the Apache License 2.0 license.
  *
- * Proxy Cache Purge is distributed in the hope that it will be useful,
+ * Varnish HTTP Purge is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  */
@@ -340,18 +340,18 @@ class VarnishDebug {
 		} elseif ( false === $remote_ip && ! empty( $varniship ) ) {
 			$return = array(
 				// translators: %s is an IP address.
-				'message' => sprintf( __( 'Your Proxy IP address is set to %s but a proxy (like Cloudflare or Sucuri) has not been detected. This is mostly harmless, but if you have issues with your cache not emptying when you make a post, you may need to remove or alter this setting. Please check with your webhost or server admin before doing so.', 'varnish-http-purge' ), $varniship ),
+				'message' => sprintf( __( 'Your Varnish IP address is set to %s but a proxy (like Cloudflare or Sucuri) has not been detected. This is mostly harmless, but if you have issues with your cache not emptying when you make a post, you may need to remove your Varnish IP. Please check with your webhost or server admin before doing so.', 'varnish-http-purge' ), $varniship ),
 				'icon'    => 'warning',
 			);
-		} elseif ( 'localhost' !== $remote_ip && false !== $remote_ip && $remote_ip !== $varniship ) {
+		} elseif ( false !== $remote_ip && $remote_ip !== $varniship ) {
 			$return = array(
 				'icon'    => 'warning',
-				'message' => __( 'You\'re using a custom Proxy IP that doesn\'t appear to match your server IP address. If you\'re using multiple caching servers or IPv6, this is fine. Please make sure you\'ve properly configured it according to your webhost\'s specifications.', 'varnish-http-purge' ),
+				'message' => __( 'You\'re using a custom Varnish IP that doesn\'t appear to match your server IP address. If you\'re using multiple caching servers or IPv6, this is fine. Please make sure you\'ve properly configured it according to your webhost\'s specifications.', 'varnish-http-purge' ),
 			);
 		} else {
 			$return = array(
 				'icon'    => 'awesome',
-				'message' => __( 'Your Proxy IP setup looks good.', 'varnish-http-purge' ),
+				'message' => __( 'Your server IP setup looks good.', 'varnish-http-purge' ),
 			);
 		}
 
@@ -395,7 +395,7 @@ class VarnishDebug {
 			if ( strpos( $headers['Server'], 'cloudflare' ) !== false ) {
 				$return['CloudFlare'] = array(
 					'icon'    => 'warning',
-					'message' => __( 'CloudFlare has been detected. Make sure you configure WordPress properly by adding your Proxy IP and to flush the CloudFlare cache if you see inconsistencies.', 'varnish-http-purge' ),
+					'message' => __( 'CloudFlare has been detected. Make sure you configure WordPress properly by adding your Varnish IP and to flush the CloudFlare cache if you see inconsistencies.', 'varnish-http-purge' ),
 				);
 			}
 

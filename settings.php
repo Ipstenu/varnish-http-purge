@@ -7,12 +7,12 @@
  *
  * Copyright 2016-2018 Mika Epstein (email: ipstenu@halfelf.org)
  *
- * This file is part of Proxy Cache Purge, a plugin for WordPress.
+ * This file is part of Varnish HTTP Purge, a plugin for WordPress.
  *
- * Proxy Cache Purge is free software: you can redistribute it and/or modify
+ * Varnish HTTP Purge is free software: you can redistribute it and/or modify
  * it under the terms of the Apache License 2.0 license.
  *
- * Proxy Cache Purge is distributed in the hope that it will be useful,
+ * Varnish HTTP Purge is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  */
@@ -208,7 +208,7 @@ class VarnishStatus {
 		} elseif ( 'localhost' === $input || filter_var( $input, FILTER_VALIDATE_IP ) ) {
 			$set_message = 'Proxy Cache IP Updated.';
 			$set_type    = 'updated';
-			$output      = ( 'localhost' === $input ) ? 'localhost' : filter_var( $input, FILTER_VALIDATE_IP );
+			$output      = filter_var( $input, FILTER_VALIDATE_IP );
 		}
 
 		add_settings_error( 'vhp_varnish_ip', 'varnish-ip', $set_message, $set_type );
@@ -410,9 +410,9 @@ class VarnishStatus {
 		?>
 		<div class="wrap">
 			<?php settings_errors(); ?>
-			<h1><?php esc_html_e( 'Proxy Cache Purge Settings', 'varnish-http-purge' ); ?></h1>
+			<h1><?php esc_html_e( 'Varnish HTTP Purge Settings', 'varnish-http-purge' ); ?></h1>
 
-			<p><?php esc_html_e( 'Proxy Cache Purge can empty the cache for different server based caching systems, including Varnish and Nginx. For most users, there should be no configuration necessary as the plugin is intended to work silently, behind the scenes.', 'varnish-http-purge' ); ?></p>
+			<p><?php esc_html_e( 'Varnish HTTP Purge can empty the cache for different server based caching systems, including Varnish and nginx. For most users, there should be no configuration necessary as the plugin is intended to work silently, behind the scenes.', 'varnish-http-purge' ); ?></p>
 
 			<?php
 			if ( ! is_multisite() ) {
@@ -498,7 +498,7 @@ class VarnishStatus {
 					)
 				),
 				$dream_url,
-				'<strong>Proxy Cache Purge</strong>',
+				'<strong>Varnish HTTP Purge</strong>',
 				$review_url,
 				$review_url
 			);

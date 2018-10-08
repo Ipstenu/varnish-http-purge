@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name: Proxy Cache Purge
+ * Plugin Name: Varnish HTTP Purge
  * Plugin URI: https://halfelf.org/plugins/varnish-http-purge/
  * Description: Automatically empty cached pages when content on your site is modified.
  * Version: 4.7.0
@@ -14,12 +14,12 @@
  *
  * Copyright 2016-2018 Mika Epstein (email: ipstenu@halfelf.org)
  *
- * This file is part of Proxy Cache Purge, a plugin for WordPress.
+ * This file is part of Varnish HTTP Purge, a plugin for WordPress.
  *
- * Proxy Cache Purge is free software: you can redistribute it and/or modify
+ * Varnish HTTP Purge is free software: you can redistribute it and/or modify
  * it under the terms of the Apache License 2.0 license.
  *
- * Proxy Cache Purge is distributed in the hope that it will be useful,
+ * Varnish HTTP Purge is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  */
@@ -197,7 +197,7 @@ class VarnishPurger {
 	 * @since 4.6
 	 */
 	public function admin_message_purge() {
-		echo '<div id="message" class="notice notice-success fade is-dismissible"><p><strong>' . esc_html__( 'Proxy cache emptied!', 'varnish-http-purge' ) . '</strong></p></div>';
+		echo '<div id="message" class="notice notice-success fade is-dismissible"><p><strong>' . esc_html__( 'Varnish cache emptied!', 'varnish-http-purge' ) . '</strong></p></div>';
 	}
 
 	/**
@@ -219,7 +219,7 @@ class VarnishPurger {
 	 */
 	public function require_pretty_permalinks_notice() {
 		// translators: The URL should link to the permalinks page.
-		echo wp_kses_post( '<div id="message" class="error"><p>' . sprintf( __( 'Proxy Cache Purge requires you to use custom permalinks. Please go to the <a href="%1$s">Permalinks Options Page</a> to configure them.', 'varnish-http-purge' ), esc_url( admin_url( 'options-permalink.php' ) ) ) . '</p></div>' );
+		echo wp_kses_post( '<div id="message" class="error"><p>' . sprintf( __( 'Varnish HTTP Purge requires you to use custom permalinks. Please go to the <a href="%1$s">Permalinks Options Page</a> to configure them.', 'varnish-http-purge' ), esc_url( admin_url( 'options-permalink.php' ) ) ) . '</p></div>' );
 	}
 
 	/**
@@ -230,7 +230,7 @@ class VarnishPurger {
 	 */
 	public function require_wp_version_notice() {
 		// translators: The URL should link to the update core page.
-		echo "<div id='message' class='error'><p>" . sprintf( esc_html__( 'Proxy Cache Purge requires WordPress 4.7 or greater. Please <a href="%1$s">upgrade WordPress</a>.', 'varnish-http-purge' ), esc_url( admin_url( 'update-core.php' ) ) ) . '</p></div>';
+		echo "<div id='message' class='error'><p>" . sprintf( esc_html__( 'Varnish HTTP Purge requires WordPress 4.7 or greater. Please <a href="%1$s">upgrade WordPress</a>.', 'varnish-http-purge' ), esc_url( admin_url( 'update-core.php' ) ) ) . '</p></div>';
 	}
 
 	/**
@@ -251,7 +251,7 @@ class VarnishPurger {
 				$message = sprintf( __( 'Proxy Cache Purge Development Mode is active for the next %1$s. You can disable this at the <a href="%2$s">Proxy Settings Page</a>.', 'varnish-http-purge' ), $time, esc_url( admin_url( 'admin.php?page=varnish-page' ) ) );
 			} else {
 				// translators: %1$s is the time until dev mode expires.
-				$message = sprintf( __( 'Proxy Cache Purge Development Mode is active for the next %1$s.', 'varnish-http-purge' ), $time );
+				$message = sprintf( __( 'Varnish HTTP Purge Development Mode is active for the next %1$s.', 'varnish-http-purge' ), $time );
 			}
 		}
 		echo '<div class="notice notice-warning"><p>' . wp_kses_post( $message ) . '</p></div>';
@@ -346,7 +346,7 @@ class VarnishPurger {
 
 			// If we're on a front end page and the current user can edit published posts, then they can do this.
 			if ( ! is_admin() && get_post() !== false && current_user_can( 'edit_published_posts' ) ) {
-				$page_url = esc_url( $this->the_home_url() . $wp->request );
+				$page_url = esc_url( home_url( $wp->request ) );
 				$args[]   = array(
 					'parent' => 'purge-varnish-cache',
 					'id'     => 'purge-varnish-cache-this',
@@ -526,11 +526,11 @@ class VarnishPurger {
 
 		// Build a varniship.
 		if ( VHP_VARNISH_IP !== false ) {
-			$proxy_ip = VHP_VARNISH_IP;
+			$varniship = VHP_VARNISH_IP;
 		} else {
-			$proxy_ip = get_site_option( 'vhp_varnish_ip' );
+			$varniship = get_site_option( 'vhp_varnish_ip' );
 		}
-		$proxy_ip = apply_filters( 'vhp_varnish_ip', $proxy_ip );
+		$varniship = apply_filters( 'vhp_varnish_ip', $varniship );
 
 		// Determine the path.
 		$path = '';
@@ -549,8 +549,8 @@ class VarnishPurger {
 		$schema = apply_filters( 'varnish_http_purge_schema', 'http://' );
 
 		// If we made varniship, let it sail.
-		if ( isset( $proxy_ip ) && ! empty( $proxy_ip ) ) {
-			$host = $proxy_ip;
+		if ( isset( $varniship ) && ! empty( $varniship ) ) {
+			$host = $varniship;
 		} else {
 			$host = $p['host'];
 		}
@@ -570,13 +570,6 @@ class VarnishPurger {
 			$host_headers .= ':' . $p['port'];
 		}
 
-		$parsed_url = $url;
-
-		// Filter URL based on the Proxy IP for nginx compatibility
-		if ( 'localhost' === $proxy_ip ) {
-			$parsed_url = str_replace( $p['host'], 'localhost', $parsed_url );
-		}
-
 		// Create path to purge.
 		$purgeme = $schema . $host . $path . $pregex;
 
@@ -590,22 +583,16 @@ class VarnishPurger {
 		 *
 		 * @since 4.1
 		 */
-		$headers  = apply_filters(
-			'varnish_http_purge_headers',
-			array(
-				'host'           => $host_headers,
-				'X-Purge-Method' => $x_purge_method,
-			)
-		);
-		$response = wp_remote_request(
-			$purgeme,
-			array(
-				'method'  => 'PURGE',
-				'headers' => $headers,
-			)
-		);
+		$headers  = apply_filters( 'varnish_http_purge_headers', array(
+			'host'           => $host_headers,
+			'X-Purge-Method' => $x_purge_method,
+		) );
+		$response = wp_remote_request( $purgeme, array(
+			'method'  => 'PURGE',
+			'headers' => $headers,
+		) );
 
-		do_action( 'after_purge_url', $parsed_url, $purgeme, $response, $headers );
+		do_action( 'after_purge_url', $url, $purgeme, $response, $headers );
 	}
 
 	/**
@@ -735,8 +722,7 @@ class VarnishPurger {
 			$categories = get_the_category( $post_id );
 			if ( $categories ) {
 				foreach ( $categories as $cat ) {
-					array_push(
-						$listofurls,
+					array_push( $listofurls,
 						get_category_link( $cat->term_id ),
 						get_rest_url() . $rest_api_route . '/categories/' . $cat->term_id . '/'
 					);
@@ -751,8 +737,7 @@ class VarnishPurger {
 					$tag_base = '/tag/';
 				}
 				foreach ( $tags as $tag ) {
-					array_push(
-						$listofurls,
+					array_push( $listofurls,
 						get_tag_link( $tag->term_id ),
 						get_rest_url() . $rest_api_route . $tag_base . $tag->term_id . '/'
 					);
@@ -766,8 +751,7 @@ class VarnishPurger {
 					if ( $features['public'] ) {
 						$terms = wp_get_post_terms( $post_id, $taxonomy );
 						foreach ( $terms as $term ) {
-							array_push(
-								$listofurls,
+							array_push( $listofurls,
 								get_term_link( $term ),
 								get_rest_url() . $rest_api_route . '/' . $term->taxonomy . '/' . $term->slug . '/'
 							);
@@ -781,16 +765,14 @@ class VarnishPurger {
 			if ( $this_post_type && 'post' === $this_post_type ) {
 				// Author URLs:
 				$author_id = get_post_field( 'post_author', $post_id );
-				array_push(
-					$listofurls,
+				array_push( $listofurls,
 					get_author_posts_url( $author_id ),
 					get_author_feed_link( $author_id ),
 					get_rest_url() . $rest_api_route . '/users/' . $author_id . '/'
 				);
 
 				// Feeds:
-				array_push(
-					$listofurls,
+				array_push( $listofurls,
 					get_bloginfo_rss( 'rdf_url' ),
 					get_bloginfo_rss( 'rss_url' ),
 					get_bloginfo_rss( 'rss2_url' ),
@@ -802,8 +784,7 @@ class VarnishPurger {
 
 			// Archives and their feeds.
 			if ( $this_post_type && ! in_array( $this_post_type, $noarchive_post_type, true ) ) {
-				array_push(
-					$listofurls,
+				array_push( $listofurls,
 					get_post_type_archive_link( get_post_type( $post_id ) ),
 					get_post_type_archive_feed_link( get_post_type( $post_id ) )
 					// Need to add in JSON?
@@ -811,8 +792,7 @@ class VarnishPurger {
 			}
 
 			// Home Pages and (if used) posts page.
-			array_push(
-				$listofurls,
+			array_push( $listofurls,
 				get_rest_url(),
 				$this->the_home_url() . '/'
 			);

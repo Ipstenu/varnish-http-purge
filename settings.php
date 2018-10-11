@@ -4,17 +4,6 @@
  * Settings Code
  *
  * @package varnish-http-purge
- *
- * Copyright 2016-2018 Mika Epstein (email: ipstenu@halfelf.org)
- *
- * This file is part of Varnish HTTP Purge, a plugin for WordPress.
- *
- * Varnish HTTP Purge is free software: you can redistribute it and/or modify
- * it under the terms of the Apache License 2.0 license.
- *
- * Varnish HTTP Purge is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -411,9 +400,9 @@ class VarnishStatus {
 		?>
 		<div class="wrap">
 			<?php settings_errors(); ?>
-			<h1><?php esc_html_e( 'Varnish HTTP Purge Settings', 'varnish-http-purge' ); ?></h1>
+			<h1><?php esc_html_e( 'Proxy Cache Purge Settings', 'varnish-http-purge' ); ?></h1>
 
-			<p><?php esc_html_e( 'Varnish HTTP Purge can empty the cache for different server based caching systems, including Varnish and nginx. For most users, there should be no configuration necessary as the plugin is intended to work silently, behind the scenes.', 'varnish-http-purge' ); ?></p>
+			<p><?php esc_html_e( 'Proxy Cache Purge can empty the cache for different server based caching systems, including Varnish and nginx. For most users, there should be no configuration necessary as the plugin is intended to work silently, behind the scenes.', 'varnish-http-purge' ); ?></p>
 
 			<?php
 			if ( ! is_multisite() ) {
@@ -499,7 +488,7 @@ class VarnishStatus {
 					)
 				),
 				$dream_url,
-				'<strong>Varnish HTTP Purge</strong>',
+				'<strong>Proxy Cache Purge</strong>',
 				$review_url,
 				$review_url
 			);

@@ -14,12 +14,12 @@
  *
  * Copyright 2016-2018 Mika Epstein (email: ipstenu@halfelf.org)
  *
- * This file is part of Varnish HTTP Purge, a plugin for WordPress.
+ * This file is part of Proxy Cache Purge, a plugin for WordPress.
  *
- * Varnish HTTP Purge is free software: you can redistribute it and/or modify
+ * Proxy Cache Purge is free software: you can redistribute it and/or modify
  * it under the terms of the Apache License 2.0 license.
  *
- * Varnish HTTP Purge is distributed in the hope that it will be useful,
+ * Proxy Cache Purge is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  */
@@ -219,7 +219,7 @@ class VarnishPurger {
 	 */
 	public function require_pretty_permalinks_notice() {
 		// translators: The URL should link to the permalinks page.
-		echo wp_kses_post( '<div id="message" class="error"><p>' . sprintf( __( 'Varnish HTTP Purge requires you to use custom permalinks. Please go to the <a href="%1$s">Permalinks Options Page</a> to configure them.', 'varnish-http-purge' ), esc_url( admin_url( 'options-permalink.php' ) ) ) . '</p></div>' );
+		echo wp_kses_post( '<div id="message" class="error"><p>' . sprintf( __( 'Proxy Cache Purge requires you to use custom permalinks. Please go to the <a href="%1$s">Permalinks Options Page</a> to configure them.', 'varnish-http-purge' ), esc_url( admin_url( 'options-permalink.php' ) ) ) . '</p></div>' );
 	}
 
 	/**
@@ -230,7 +230,7 @@ class VarnishPurger {
 	 */
 	public function require_wp_version_notice() {
 		// translators: The URL should link to the update core page.
-		echo "<div id='message' class='error'><p>" . sprintf( esc_html__( 'Varnish HTTP Purge requires WordPress 4.7 or greater. Please <a href="%1$s">upgrade WordPress</a>.', 'varnish-http-purge' ), esc_url( admin_url( 'update-core.php' ) ) ) . '</p></div>';
+		echo "<div id='message' class='error'><p>" . sprintf( esc_html__( 'Proxy Cache Purge requires WordPress 4.7 or greater. Please <a href="%1$s">upgrade WordPress</a>.', 'varnish-http-purge' ), esc_url( admin_url( 'update-core.php' ) ) ) . '</p></div>';
 	}
 
 	/**
@@ -251,7 +251,7 @@ class VarnishPurger {
 				$message = sprintf( __( 'Proxy Cache Purge Development Mode is active for the next %1$s. You can disable this at the <a href="%2$s">Proxy Settings Page</a>.', 'varnish-http-purge' ), $time, esc_url( admin_url( 'admin.php?page=varnish-page' ) ) );
 			} else {
 				// translators: %1$s is the time until dev mode expires.
-				$message = sprintf( __( 'Varnish HTTP Purge Development Mode is active for the next %1$s.', 'varnish-http-purge' ), $time );
+				$message = sprintf( __( 'Proxy Cache Purge Development Mode is active for the next %1$s.', 'varnish-http-purge' ), $time );
 			}
 		}
 		echo '<div class="notice notice-warning"><p>' . wp_kses_post( $message ) . '</p></div>';

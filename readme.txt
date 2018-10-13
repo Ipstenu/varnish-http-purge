@@ -60,6 +60,8 @@ By default, no data is tracked. If you use the site scanner/debugging tool, your
 
 Use of this service is required for the cache checking in order to provide up to date compatibility checks on plugins and themes that may conflict with running a server based cache without needing to update the plugin every day.
 
+<em>No visitor information from your site is tracked.</em>
+
 == Installation ==
 
 No special instructions apply.
@@ -71,7 +73,7 @@ When using Nginx based proxies, your IP will likely be `localhost`.
 = Requirements =
 
 * Pretty Permalinks enabled
-* A server based proxy cache service
+* A server based proxy cache service (such as Varnish or Nginx)
 
 == Frequently Asked Questions ==
 
@@ -157,9 +159,9 @@ Your proxy IP must be one of the IPs that the service is listening on. If you us
 
 For example, if you have a Varnish based cache and it's listening on a public and private IP, you'll want to pick the private. On the other hand, if you told Varnish to listen on 0.0.0.0 (i.e. "listen on every interface you can") you would need to check what IP you set your purge ACL to allow (commonly 127.0.0.1 aka localhost), and use that (i.e. 127.0.0.1).
 
-If your webhost set up your service, check their documentation.
+If your web host set up your service, check their documentation.
 
-= What if I have multiple varnish IPs? =
+= What if I have multiple proxy cache IPs? =
 
 Multiple IPs are not supported at this time.
 
@@ -177,7 +179,8 @@ This is a question beyond the support of plugin. I do not have the resources ava
 
 * To empty any cached data, the service will need to respect the PURGE command
 * Not all cache services set up PURGE by default
-* When flushing the whole cache, the plugin sends a PURGE command of <code>/.*</code> and sets the `X-Purge-Method` header to `regex`.
+* When flushing the whole cache, the plugin sends a PURGE command of <code>/.*</code> and sets the `X-Purge-Method` header to `regex`
+* Nginx expects the IP address to be 'localhost'
 
 = How can I see what the plugin is sending to the cache service? =
 
@@ -194,7 +197,8 @@ This plugin is installed by default for _all_ DreamPress installs on DreamHost, 
 
 = 4.7.2 =
 * October 2018
-* Fix regression.
+* Fix regression with IP function
+* Restore "Right Now" activity box _only_ for people who use WP.com toolbar
 
 = 4.7.1 =
 * October 2018

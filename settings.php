@@ -1,8 +1,6 @@
 <?php
 /**
- *
  * Settings Code
- *
  * @package varnish-http-purge
  */
 

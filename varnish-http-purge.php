@@ -35,7 +35,7 @@ class VarnishPurger {
 	 * Version Number
 	 * @var string
 	 */
-	public static $version = '4.7.0';
+	public static $version = '4.7.2';
 
 	/**
 	 * List of URLs to be purged
@@ -100,6 +100,11 @@ class VarnishPurger {
 	 * @access public
 	 */
 	public function admin_init() {
+
+		// If WordPress.com Master Bar is active, show the activity box.
+		if ( is_plugin_active( 'jetpack/jetpack.php' ) && Jetpack::is_module_active( 'masterbar' ) ) {
+			add_action( 'activity_box_end', array( $this, 'varnish_rightnow' ), 100 );
+		}
 
 		// Failure: Pre WP 4.7.
 		if ( version_compare( get_bloginfo( 'version' ), '4.7', '<=' ) ) {
@@ -407,6 +412,41 @@ class VarnishPurger {
 		}
 
 		return $svg;
+	}
+
+	/**
+	 * Varnish Right Now Information
+	 * This information is put on the Dashboard 'Right now' widget
+	 *
+	 * @since 1.0
+	 */
+	public function varnish_rightnow() {
+		global $blog_id;
+		// translators: %1$s links to the plugin's page on WordPress.org.
+		$intro    = sprintf( __( '<a href="%1$s">Proxy Cache Purge</a> automatically deletes your cached posts when published or updated. When making major site changes, such as with a new theme, plugins, or widgets, you may need to manually empty the cache.', 'varnish-http-purge' ), 'http://wordpress.org/plugins/varnish-http-purge/' );
+		$url      = wp_nonce_url( add_query_arg( 'vhp_flush_do', 'all' ), 'vhp-flush-do' );
+		$button   = __( 'Press the button below to force it to empty your entire Varnish cache.', 'varnish-http-purge' );
+		$button  .= '</p><p><span class="button"><strong><a href="' . $url . '">';
+		$button  .= __( 'Empty Cache', 'varnish-http-purge' );
+		$button  .= '</a></strong></span>';
+		$nobutton = __( 'You do not have permission to empty the proxy cache for the whole site. Please contact your administrator.', 'varnish-http-purge' );
+		if (
+			// SingleSite - admins can always purge.
+			( ! is_multisite() && current_user_can( 'activate_plugins' ) ) ||
+			// Multisite - Network Admin can always purge.
+			current_user_can( 'manage_network' ) ||
+			// Multisite - Site admins can purge UNLESS it's a subfolder install and we're on site #1.
+			( is_multisite() && current_user_can( 'activate_plugins' ) && ( SUBDOMAIN_INSTALL || ( ! SUBDOMAIN_INSTALL && ( BLOG_ID_CURRENT_SITE !== $blog_id ) ) ) )
+		) {
+			$text = $intro . ' ' . $button;
+		} else {
+			$text = $intro . ' ' . $nobutton;
+		}
+		// @codingStandardsIgnoreStart
+		// This is safe to echo as it's controlled and secured above.
+		// Using wp_kses will delete the icon.
+		echo '<p class="varnish-rightnow">' . $text . '</p>';
+		// @codingStandardsIgnoreEnd
 	}
 
 	/**

@@ -35,7 +35,7 @@ class VarnishPurger {
 	 * Version Number
 	 * @var string
 	 */
-	public static $version = '4.7.0';
+	public static $version = '4.7.2';
 
 	/**
 	 * List of URLs to be purged
@@ -426,9 +426,9 @@ class VarnishPurger {
 		$intro    = sprintf( __( '<a href="%1$s">Proxy Cache Purge</a> automatically deletes your cached posts when published or updated. When making major site changes, such as with a new theme, plugins, or widgets, you may need to manually empty the cache.', 'varnish-http-purge' ), 'http://wordpress.org/plugins/varnish-http-purge/' );
 		$url      = wp_nonce_url( add_query_arg( 'vhp_flush_do', 'all' ), 'vhp-flush-do' );
 		$button   = __( 'Press the button below to force it to empty your entire Varnish cache.', 'varnish-http-purge' );
-		$button  .= '</p><p><span class="button"><span class="dashicons varnish-http-purge" style="background-image: url(' . self::get_icon_svg( true, '#F56E28' ) . ') !important;"></span> <a href="' . $url . '"><strong>';
+		$button  .= '</p><p><span class="button"><strong><a href="' . $url . '">';
 		$button  .= __( 'Empty Cache', 'varnish-http-purge' );
-		$button  .= '</strong></a></span>';
+		$button  .= '</a></strong></span>';
 		$nobutton = __( 'You do not have permission to empty the proxy cache for the whole site. Please contact your administrator.', 'varnish-http-purge' );
 		if (
 			// SingleSite - admins can always purge.

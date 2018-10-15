@@ -101,7 +101,7 @@ No. WordPress can't detect those file changes so it can't tell your cache what t
 
 = Does every WordPress plugin and theme work with a proxy cache? =
 
-No. Some of them have behaviour that causes them not to cache, either by accident or design.
+No. Some of them have behavior that causes them not to cache, either by accident or design.
 
 = I'm a developer, can I tell your cache to empty in my plugin/theme? =
 
@@ -123,7 +123,7 @@ It is _not_ recommended you use development mode on production sites for extende
 
 = Why don't I have access to development mode? =
 
-Due to the damage this can cause a site, access is limited to admins only. In the case of a multisite network, only <em>Network Admins</em> can disable caching.
+Due to the damage this can cause a site, access is limited to admins only. In the case of a multisite network, only <em>Network Admins</em> can disable caching and they must do so via `wp-config.php` for security.
 
 = Why do I still see cached content in development mode? =
 
@@ -171,7 +171,7 @@ This was built and tested on Varnish 3.x. While it is reported to work on 2.x an
 
 = Does this work with Nginx caching? =
 
-It can, if you've configured nginx caching to respect the curl PURGE request. If this doesn't work, I recommend setting your Varnish IP to `localhost` as Nginx requires a service control installed for the IP address to work.
+It can, if you've configured Nginx caching to respect the curl PURGE request. If this doesn't work, I recommend setting your Varnish IP to `localhost` as Nginx requires a service control installed for the IP address to work.
 
 = What should my cache rules be? =
 
@@ -184,7 +184,7 @@ This is a question beyond the support of plugin. I do not have the resources ava
 
 = How can I see what the plugin is sending to the cache service? =
 
-Yes _IF_ the service has an interface. Sadly Nginx doesn't. [Detailed directions can be found on the debugging section on GitHub](https://github.com/Ipstenu/varnish-http-purge/wiki#debugging). Bear in mind, these interfaces tend to be command-line only.
+Yes _IF_ the service has an interface. Sadly Nginx does not. [Detailed directions can be found on the debugging section on GitHub](https://github.com/Ipstenu/varnish-http-purge/wiki#debugging). Bear in mind, these interfaces tend to be command-line only.
 
 = Don't you work at DreamHost? Is this Official or DreamHost only? =
 
@@ -197,7 +197,7 @@ This plugin is installed by default for _all_ DreamPress installs on DreamHost, 
 
 = 4.7.2 =
 * October 2018
-* Fix regression with IP function
+* Fix regression with IP function name
 * Restore "Right Now" activity box _only_ for people who use WP.com toolbar
 
 = 4.7.1 =

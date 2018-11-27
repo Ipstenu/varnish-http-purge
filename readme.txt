@@ -95,6 +95,10 @@ Yes. Click the 'Empty Cache' button on the "Right Now" Dashboard (see the screen
 
 If you don't see a button, then your account doesn't have the appropriate permissions. Only administrators can empty the entire cache. In the case of a subfolder multisite network, only the <em>network</em> admins can empty the cache for the primary site.
 
+= What's the 'Purge Database Cache' button do? =
+
+If you see that then it means you have some kind of object cache on your site that handles database caching. If you see weird issues like a setting doesn't save, you'll want to use that to force empty your database cache. If you don't see it, don't worry.
+
 = Will the plugin delete my cache when I edit files on the server? =
 
 No. WordPress can't detect those file changes so it can't tell your cache what to do. You will need to use the Empty Cache buttons when you're done editing your code.
@@ -194,6 +198,10 @@ Yes _IF_ the service has an interface. Sadly Nginx does not. [Detailed direction
 This plugin is installed by default for _all_ DreamPress installs on DreamHost, and I maintain it for DreamHost, but it was not originally an official DreamHost plugin which means I will continue to support all users to the best of my ability.
 
 == Changelog ==
+
+= 4.7.3 =
+* December 2018
+* Documentation: Cleaning up language and spelling
 
 = 4.7.2 =
 * October 2018

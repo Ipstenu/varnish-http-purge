@@ -102,7 +102,7 @@ class VarnishPurger {
 	public function admin_init() {
 
 		// If WordPress.com Master Bar is active, show the activity box.
-		if ( is_plugin_active( 'jetpack/jetpack.php' ) && Jetpack::is_module_active( 'masterbar' ) ) {
+		if ( class_exists( 'Jetpack' ) && Jetpack::is_module_active( 'masterbar' ) ) {
 			add_action( 'activity_box_end', array( $this, 'varnish_rightnow' ), 100 );
 		}
 

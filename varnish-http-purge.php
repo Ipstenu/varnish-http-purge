@@ -3,7 +3,7 @@
  * Plugin Name: Proxy Cache Purge
  * Plugin URI: https://halfelf.org/plugins/varnish-http-purge/
  * Description: Automatically empty cached pages when content on your site is modified.
- * Version: 4.7.3
+ * Version: 4.8
  * Author: Mika Epstein
  * Author URI: https://halfelf.org/
  * License: http://www.apache.org/licenses/LICENSE-2.0
@@ -91,6 +91,8 @@ class VarnishPurger {
 		add_action( 'init', array( &$this, 'init' ) );
 		add_action( 'admin_init', array( &$this, 'admin_init' ) );
 
+		add_action( 'upgrader_process_complete', array( &$this, 'check_upgrades' ), 10, 2 );
+
 	}
 
 	/**
@@ -135,12 +137,19 @@ class VarnishPurger {
 	 * @access public
 	 */
 	public function init() {
-		global $blog_id;
+		global $blog_id, $wp_db_version;
+
+		// If the DB version we detect isn't the same as the version core thinks
+		// we will fush DB cache. This may cause double dumping in some cases but
+		// should not be harmful.
+		if ( file_exists( WP_CONTENT_DIR . '/object-cache.php' ) && get_option( 'db_version' ) !== $wp_db_version ) {
+			wp_cache_flush();
+		}
 
 		// If Dev Mode is true, kill caching.
 		if ( VarnishDebug::devmode_check() ) {
 			if ( ! is_admin() ) {
-				// Sessions to break PHP caching.
+				// Sessions used to break PHP caching.
 				if ( ! is_user_logged_in() ) {
 					// @codingStandardsIgnoreStart
 					@session_start();
@@ -193,6 +202,20 @@ class VarnishPurger {
 		add_action( 'admin_bar_menu', array( $this, 'varnish_rightnow_adminbar' ), 100 );
 		add_action( 'admin_enqueue_scripts', array( $this, 'custom_css' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'custom_css' ) );
+	}
+
+	/**
+	 * Check if core has upgraded
+	 *
+	 * @param  array $object of upgrade data
+	 * @param  array $options picked for upgrade
+	 * @return        N/A (Flushes cache)
+	 * @since 4.8
+	 */
+	public function check_upgrades( $object, $options ) {
+		if ( file_exists( WP_CONTENT_DIR . '/object-cache.php' ) && 'core' === $options['type'] ) {
+			wp_cache_flush();
+		}
 	}
 
 	/**
@@ -629,14 +652,20 @@ class VarnishPurger {
 		 *
 		 * @since 4.1
 		 */
-		$headers  = apply_filters( 'varnish_http_purge_headers', array(
-			'host'           => $host_headers,
-			'X-Purge-Method' => $x_purge_method,
-		) );
-		$response = wp_remote_request( $purgeme, array(
-			'method'  => 'PURGE',
-			'headers' => $headers,
-		) );
+		$headers  = apply_filters(
+			'varnish_http_purge_headers',
+			array(
+				'host'           => $host_headers,
+				'X-Purge-Method' => $x_purge_method,
+			)
+		);
+		$response = wp_remote_request(
+			$purgeme,
+			array(
+				'method'  => 'PURGE',
+				'headers' => $headers,
+			)
+		);
 
 		do_action( 'after_purge_url', $parsed_url, $purgeme, $response, $headers );
 	}
@@ -768,7 +797,8 @@ class VarnishPurger {
 			$categories = get_the_category( $post_id );
 			if ( $categories ) {
 				foreach ( $categories as $cat ) {
-					array_push( $listofurls,
+					array_push(
+						$listofurls,
 						get_category_link( $cat->term_id ),
 						get_rest_url() . $rest_api_route . '/categories/' . $cat->term_id . '/'
 					);
@@ -783,7 +813,8 @@ class VarnishPurger {
 					$tag_base = '/tag/';
 				}
 				foreach ( $tags as $tag ) {
-					array_push( $listofurls,
+					array_push(
+						$listofurls,
 						get_tag_link( $tag->term_id ),
 						get_rest_url() . $rest_api_route . $tag_base . $tag->term_id . '/'
 					);
@@ -797,7 +828,8 @@ class VarnishPurger {
 					if ( $features['public'] ) {
 						$terms = wp_get_post_terms( $post_id, $taxonomy );
 						foreach ( $terms as $term ) {
-							array_push( $listofurls,
+							array_push(
+								$listofurls,
 								get_term_link( $term ),
 								get_rest_url() . $rest_api_route . '/' . $term->taxonomy . '/' . $term->slug . '/'
 							);
@@ -811,14 +843,16 @@ class VarnishPurger {
 			if ( $this_post_type && 'post' === $this_post_type ) {
 				// Author URLs:
 				$author_id = get_post_field( 'post_author', $post_id );
-				array_push( $listofurls,
+				array_push(
+					$listofurls,
 					get_author_posts_url( $author_id ),
 					get_author_feed_link( $author_id ),
 					get_rest_url() . $rest_api_route . '/users/' . $author_id . '/'
 				);
 
 				// Feeds:
-				array_push( $listofurls,
+				array_push(
+					$listofurls,
 					get_bloginfo_rss( 'rdf_url' ),
 					get_bloginfo_rss( 'rss_url' ),
 					get_bloginfo_rss( 'rss2_url' ),
@@ -830,7 +864,8 @@ class VarnishPurger {
 
 			// Archives and their feeds.
 			if ( $this_post_type && ! in_array( $this_post_type, $noarchive_post_type, true ) ) {
-				array_push( $listofurls,
+				array_push(
+					$listofurls,
 					get_post_type_archive_link( get_post_type( $post_id ) ),
 					get_post_type_archive_feed_link( get_post_type( $post_id ) )
 					// Need to add in JSON?
@@ -838,7 +873,8 @@ class VarnishPurger {
 			}
 
 			// Home Pages and (if used) posts page.
-			array_push( $listofurls,
+			array_push(
+				$listofurls,
 				get_rest_url(),
 				$this->the_home_url() . '/'
 			);

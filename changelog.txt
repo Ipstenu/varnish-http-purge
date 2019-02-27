@@ -1,5 +1,26 @@
 ## CHANGELOG
 
+= 4.7.3 =
+* December 2018
+* Bugfix for Jetpack (Props @jherve)
+
+= 4.7.2 =
+* October 2018
+* Fix regression with IP function name
+* Restore "Right Now" activity box _only_ for people who use WP.com toolbar
+
+= 4.7.1 =
+* October 2018
+* Documentation: Cleaning up language and spelling
+
+= 4.7.0 =
+* October 2018
+* WP-CLI: documentation
+* Bugfix: Nginx compatibility
+* Bugfix: Only enqueue CSS on front0end if the admin bar is used (props @mathieuhays)
+* Feature: Rebranding
+* Deprecation: "Right Now" button (not needed anymore)
+
 = 4.6.6 =
 * September 2018
 * Bugfix to allow Nginx proxy to flush individual pages.

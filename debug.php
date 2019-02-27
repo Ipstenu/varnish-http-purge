@@ -267,7 +267,7 @@ class VarnishDebug {
 
 			// Which service are we?
 			$cache_service = false;
-			if ( $x_varnish && $x_nginx ) {
+			if ( $x_nginx ) {
 				$cache_service  = __( 'Nginx', 'varnish-http-purge' );
 				$still_cachable = ( $is_cachable && $x_age_nginx && $x_varn_hit && $x_pragma ) ? true : false;
 			} elseif ( $x_varnish && ! $x_nginx ) {

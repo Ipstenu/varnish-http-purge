@@ -2,8 +2,8 @@
 Contributors: Ipstenu, mikeschroder, techpriester, danielbachhuber
 Tags: proxy, purge, cache, varnish, nginx
 Requires at least: 4.7
-Tested up to: 5.0
-Stable tag: 4.7.3
+Tested up to: 5.1
+Stable tag: 4.8
 Requires PHP: 5.6
 
 Automatically empty proxy cached content when your site is modified.
@@ -195,26 +195,10 @@ This plugin is installed by default for _all_ DreamPress installs on DreamHost, 
 
 == Changelog ==
 
-= 4.7.3 =
-* December 2018
-* Bugfix for Jetpack (Props @jherve)
-
-= 4.7.2 =
-* October 2018
-* Fix regression with IP function name
-* Restore "Right Now" activity box _only_ for people who use WP.com toolbar
-
-= 4.7.1 =
-* October 2018
-* Documentation: Cleaning up language and spelling
-
-= 4.7.0 =
-* October 2018
-* WP-CLI: documentation
-* Bugfix: Nginx compatibility
-* Bugfix: Only enqueue CSS on front0end if the admin bar is used (props @mathieuhays)
-* Feature: Rebranding
-* Deprecation: "Right Now" button (not needed anymore)
+= 4.8 =
+* March 2019
+* Improve debugger
+* Clean code per standards
 
 == Screenshots ==
 

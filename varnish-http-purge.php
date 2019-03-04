@@ -91,6 +91,7 @@ class VarnishPurger {
 		add_action( 'init', array( &$this, 'init' ) );
 		add_action( 'admin_init', array( &$this, 'admin_init' ) );
 
+		// Check if there's an upgrade
 		add_action( 'upgrader_process_complete', array( &$this, 'check_upgrades' ), 10, 2 );
 
 	}
@@ -205,7 +206,9 @@ class VarnishPurger {
 	}
 
 	/**
-	 * Check if core has upgraded
+	 * Check if something has upgraded and try to flush the DB cache.
+	 * This runs for ALL upgrades (theme, plugin, and core) to account for
+	 * the complex nature that are upgrades.
 	 *
 	 * @param  array $object of upgrade data
 	 * @param  array $options picked for upgrade
@@ -213,7 +216,7 @@ class VarnishPurger {
 	 * @since 4.8
 	 */
 	public function check_upgrades( $object, $options ) {
-		if ( file_exists( WP_CONTENT_DIR . '/object-cache.php' ) && 'core' === $options['type'] ) {
+		if ( file_exists( WP_CONTENT_DIR . '/object-cache.php' ) ) {
 			wp_cache_flush();
 		}
 	}

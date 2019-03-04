@@ -16,7 +16,7 @@ One common method of caching content for websites is via the use of reverse prox
 
 A reverse proxy cache is installed in front of a server and reviews requests. If the page being requested is already cached, it delivers the cached content. Otherwise it generates the page and the cache on demand.
 
-The Proxy Cache Purge plugin sends a request to delete (aka flush) the cached data of a page or post every time it it modified. This happens when updating, publishing, commenting on, or deleting an post, and when changing themes.
+The Proxy Cache Purge plugin sends a request to delete (aka flush) the cached data of a page or post every time it's modified.
 
 = How It Works =
 
@@ -52,7 +52,7 @@ That will break cache on page loads. It is _not_ recommended for production!
 
 * `wp varnish purge` - Flush the entire cache
 * `wp varnish debug [<url>]` - Help for debugging how well your cache is (or isn't) working
-* `wp varnish devmode [<activate|deactivate|toggle>` - Change development mode state
+* `wp varnish devmode [<activate|deactivate|toggle>]` - Change development mode state
 
 = Privacy Policy =
 

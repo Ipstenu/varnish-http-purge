@@ -513,15 +513,15 @@ class VarnishPurger {
 
 		// Define registered purge events.
 		$actions = array(
-			'autoptimize_action_cachepurged',  // Compat with https://wordpress.org/plugins/autoptimize/ plugin.
-			'delete_attachment',               // Delete an attachment - includes re-uploading.
-			'deleted_post',                    // Delete a post.
-			'edit_post',                       // Edit a post - includes leaving comments.
-			'import_start',                    // When importer starts
-			'import_end',                      // When importer ends
-			'save_post',                       // Save a post.
-			'switch_theme',                    // After a theme is changed.
-			'trashed_post',                    // Empty Trashed post.
+			'autoptimize_action_cachepurged', // Compat with https://wordpress.org/plugins/autoptimize/ plugin.
+			'delete_attachment',              // Delete an attachment - includes re-uploading.
+			'deleted_post',                   // Delete a post.
+			'edit_post',                      // Edit a post - includes leaving comments.
+			'import_start',                   // When importer starts
+			'import_end',                     // When importer ends
+			'save_post',                      // Save a post.
+			'switch_theme',                   // After a theme is changed.
+			'trashed_post',                   // Empty Trashed post.
 		);
 
 		// send back the actions array, filtered.
@@ -540,10 +540,10 @@ class VarnishPurger {
 
 		// Define registered purge events.
 		$actions = array(
-			'autoptimize_action_cachepurged,',  // Compat with https://wordpress.org/plugins/autoptimize/ plugin.
-			'import_start',                    // When importer starts
-			'import_end',                      // When importer ends
-			'switch_theme',                     // After a theme is changed.
+			'autoptimize_action_cachepurged', // Compat with https://wordpress.org/plugins/autoptimize/ plugin.
+			'import_start',                   // When importer starts
+			'import_end',                     // When importer ends
+			'switch_theme',                   // After a theme is changed.
 		);
 
 		/**

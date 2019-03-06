@@ -17,7 +17,7 @@ class VarnishDebug {
 
 	/**
 	 * Devmode Check
-	 * See if Dev Mode is active
+	 * See if Dev Mode is active.
 	 *
 	 * @since 4.6.0
 	 * @returns true|false
@@ -26,17 +26,43 @@ class VarnishDebug {
 		$return  = false;
 		$newmode = get_site_option( 'vhp_varnish_devmode', VarnishPurger::$devmode );
 
+		// Make sure pause is properly flagged.
+		$is_paused = self::importer_check();
+		if ( $is_paused || ( isset( $newmode['pause'] ) && $newmode['pause'] ) ) {
+			self::devmode_toggle( 'pause' );
+		}
+
 		if ( VHP_DEVMODE ) {
+			// If the define is set, we're true.
 			$return = true;
 		} elseif ( isset( $newmode['active'] ) && $newmode['active'] ) {
-			// if expire is less that NOW, it's over.
-			if ( $newmode['expire'] <= current_time( 'timestamp' ) ) {
-				$newmode['active'] = false;
-				update_site_option( 'vhp_varnish_devmode', $newmode );
+			if ( ! $newmode['pause'] && $newmode['expire'] <= current_time( 'timestamp' ) ) {
+				// if expire is less that NOW, it's over.
+				self::devmode_toggle( 'deactivate' );
+				$return = false;
 			} else {
 				$return = true;
 			}
 		}
+
+		return $return;
+	}
+
+	/**
+	 * Check if Importer is running
+	 *
+	 * @access public
+	 * @static
+	 * @return string  true|false
+	 * @since 4.8
+	 */
+	public static function importer_check() {
+		$return = false;
+
+		if ( defined( 'WP_LOAD_IMPORTERS' ) ) {
+			$return = true;
+		}
+
 		return $return;
 	}
 
@@ -51,12 +77,15 @@ class VarnishDebug {
 	public static function devmode_toggle( $state = 'deactivate' ) {
 		$newmode = get_site_option( 'vhp_varnish_devmode', VarnishPurger::$devmode );
 
-		// Weirdly this doesn't actually matter.
 		$newmode['expire'] = current_time( 'timestamp' ) + DAY_IN_SECONDS;
 
 		switch ( sanitize_text_field( $state ) ) {
 			case 'activate':
 				$newmode['active'] = true;
+				break;
+			case 'pause':
+				$newmode['active'] = true;
+				$newmode['pause']  = true;
 				break;
 			case 'toggle':
 				$newmode['active'] = ( self::devmode_check() ) ? false : true;
@@ -65,6 +94,11 @@ class VarnishDebug {
 			default:
 				$newmode['active'] = false;
 				break;
+		}
+
+		// No matter what, when we mess with this, flush the DB caches.
+		if ( file_exists( WP_CONTENT_DIR . '/object-cache.php' ) ) {
+			wp_cache_flush();
 		}
 
 		update_site_option( 'vhp_varnish_devmode', $newmode );

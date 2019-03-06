@@ -72,6 +72,7 @@ class VarnishPurger {
 		self::$devmode = array(
 			'active' => false,
 			'expire' => current_time( 'timestamp' ),
+			'pause'  => false,
 		);
 		if ( ! get_site_option( 'vhp_varnish_devmode' ) ) {
 			update_site_option( 'vhp_varnish_devmode', self::$devmode );
@@ -90,6 +91,8 @@ class VarnishPurger {
 		// Release the hounds!
 		add_action( 'init', array( &$this, 'init' ) );
 		add_action( 'admin_init', array( &$this, 'admin_init' ) );
+		add_action( 'import_start', array( &$this, 'import_start' ) );
+		add_action( 'import_end', array( &$this, 'import_end' ) );
 
 		// Check if there's an upgrade
 		add_action( 'upgrader_process_complete', array( &$this, 'check_upgrades' ), 10, 2 );
@@ -212,13 +215,28 @@ class VarnishPurger {
 	 *
 	 * @param  array $object of upgrade data
 	 * @param  array $options picked for upgrade
-	 * @return        N/A (Flushes cache)
 	 * @since 4.8
 	 */
 	public function check_upgrades( $object, $options ) {
 		if ( file_exists( WP_CONTENT_DIR . '/object-cache.php' ) ) {
 			wp_cache_flush();
 		}
+	}
+
+	/**
+	 * Pause caching if Importer was started
+	 * @since 4.8
+	 */
+	public function import_start() {
+		VarnishDebug::devmode_toggle( 'pause' );
+	}
+
+	/**
+	 * Resume caching if Importer has ended
+	 * @since 4.8
+	 */
+	public function import_end() {
+		VarnishDebug::devmode_toggle( 'deactivate' );
 	}
 
 	/**
@@ -276,16 +294,25 @@ class VarnishPurger {
 		} else {
 			$devmode = get_site_option( 'vhp_varnish_devmode', self::$devmode );
 			$time    = human_time_diff( current_time( 'timestamp' ), $devmode['expire'] );
-			if ( ! is_multisite() ) {
-				// translators: %1$s is the time until dev mode expires.
-				// translators: %2$s is a link to the settings pages.
-				$message = sprintf( __( 'Proxy Cache Purge Development Mode is active for the next %1$s. You can disable this at the <a href="%2$s">Proxy Settings Page</a>.', 'varnish-http-purge' ), $time, esc_url( admin_url( 'admin.php?page=varnish-page' ) ) );
-			} else {
-				// translators: %1$s is the time until dev mode expires.
-				$message = sprintf( __( 'Proxy Cache Purge Development Mode is active for the next %1$s.', 'varnish-http-purge' ), $time );
+
+			if ( $devmode['pause'] ) {
+				$message = __( 'Proxy Cache Purge is paused while the WordPress importer is running.', 'varnish-http-purge' );
+			} elseif ( ! $devmode['active'] ) {
+				if ( ! is_multisite() ) {
+					// translators: %1$s is the time until dev mode expires.
+					// translators: %2$s is a link to the settings pages.
+					$message = sprintf( __( 'Proxy Cache Purge Development Mode is active for the next %1$s. You can disable this at the <a href="%2$s">Proxy Settings Page</a>.', 'varnish-http-purge' ), $time, esc_url( admin_url( 'admin.php?page=varnish-page' ) ) );
+				} else {
+					// translators: %1$s is the time until dev mode expires.
+					$message = sprintf( __( 'Proxy Cache Purge Development Mode is active for the next %1$s.', 'varnish-http-purge' ), $time );
+				}
 			}
 		}
-		echo '<div class="notice notice-warning"><p>' . wp_kses_post( $message ) . '</p></div>';
+
+		// Only echo if there's actually a message
+		if ( isset( $message ) ) {
+			echo '<div class="notice notice-warning"><p>' . wp_kses_post( $message ) . '</p></div>';
+		}
 	}
 
 	/**
@@ -486,13 +513,15 @@ class VarnishPurger {
 
 		// Define registered purge events.
 		$actions = array(
-			'switch_theme',                    // After a theme is changed.
 			'autoptimize_action_cachepurged',  // Compat with https://wordpress.org/plugins/autoptimize/ plugin.
-			'save_post',                       // Save a post.
-			'deleted_post',                    // Delete a post.
-			'trashed_post',                    // Empty Trashed post.
-			'edit_post',                       // Edit a post - includes leaving comments.
 			'delete_attachment',               // Delete an attachment - includes re-uploading.
+			'deleted_post',                    // Delete a post.
+			'edit_post',                       // Edit a post - includes leaving comments.
+			'import_start',                    // When importer starts
+			'import_end',                      // When importer ends
+			'save_post',                       // Save a post.
+			'switch_theme',                    // After a theme is changed.
+			'trashed_post',                    // Empty Trashed post.
 		);
 
 		// send back the actions array, filtered.
@@ -511,8 +540,10 @@ class VarnishPurger {
 
 		// Define registered purge events.
 		$actions = array(
-			'switch_theme',                     // After a theme is changed.
 			'autoptimize_action_cachepurged,',  // Compat with https://wordpress.org/plugins/autoptimize/ plugin.
+			'import_start',                    // When importer starts
+			'import_end',                      // When importer ends
+			'switch_theme',                     // After a theme is changed.
 		);
 
 		/**

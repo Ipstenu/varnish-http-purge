@@ -135,7 +135,7 @@ if ( ! class_exists( 'WP_CLI_Varnish_Command' ) ) {
 		 */
 		public function devmode( $args, $assoc_args ) {
 
-			$valid_modes = array( 'activate', 'deactivate', 'toggle' );
+			$valid_modes = array( 'activate', 'deactivate', 'toggle', 'pause' );
 			$devmode     = get_site_option( 'vhp_varnish_devmode', VarnishPurger::$devmode );
 
 			// Check for valid arguments.
@@ -226,7 +226,9 @@ if ( ! class_exists( 'WP_CLI_Varnish_Command' ) ) {
 						escapeshellarg( $path ),
 						substr_count( ABSPATH, '/' ) + 1
 					);
+					// @codingStandardsIgnoreStart
 					system( $cmd );
+					// @codingStandardsIgnoreEnd
 				}
 				WP_CLI::log( '' );
 				WP_CLI::log( __( 'Grep complete. If no data was output, you\'re good!', 'varnish-http-purge' ) );

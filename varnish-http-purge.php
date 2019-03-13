@@ -559,7 +559,7 @@ class VarnishPurger {
 		$pregex         = '';
 		$x_purge_method = 'default';
 
-		if ( isset( $p['query'] ) && ( 'vhp-regex' === $p['query'] ) ) {
+		if (strpos($url, '.*') !== false or ( isset( $p['query'] ) && ( 'vhp-regex' === $p['query'] ) ) ) {
 			$pregex         = '.*';
 			$x_purge_method = 'regex';
 		}

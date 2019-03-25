@@ -182,10 +182,20 @@ class VarnishDebug {
 		// Lazy run twice to make sure we get a primed cache page.
 		$response1 = wp_remote_get( $url, $args );
 
+		// If this fails, we're going to assume bad things...
+		if ( is_wp_error( $response1 ) ) {
+			return 'fail';
+		}
+
 		// Because the 'Age' header is an important check, wait a second before fetching again.
 		sleep( 1 );
 
 		$response2 = wp_remote_get( $url, $args );
+
+		// And if this fails, we again assume badly.
+		if ( is_wp_error( $response2 ) ) {
+			return 'fail';
+		}
 
 		return $response2;
 	}

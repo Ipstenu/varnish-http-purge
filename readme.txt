@@ -199,6 +199,7 @@ This plugin is installed by default for _all_ DreamPress installs on DreamHost, 
 * March 2019
 * Improve debugger
 * Clean code per standards
+* Improve callback on WP-CLI
 
 == Screenshots ==
 

@@ -260,7 +260,12 @@ if ( ! class_exists( 'WP_CLI_Varnish_Command' ) ) {
 
 			// Get the response and headers.
 			$remote_get = VarnishDebug::remote_get( $varnishurl );
-			$headers    = wp_remote_retrieve_headers( $remote_get );
+
+			if ( is_wp_error( $remote_get ) || 'fail' === $remote_get ) {
+				WP_CLI::error( __( 'Unable to retrieve data. Debug cannot be run at this time. Please run "curl -I [URL]" manually on your personal computer.', 'varnish-http-purge' ) );
+			}
+
+			$headers = wp_remote_retrieve_headers( $remote_get );
 
 			if ( WP_CLI\Utils\get_flag_value( $assoc_args, 'include-headers' ) ) {
 				WP_CLI::log( 'Headers:' );

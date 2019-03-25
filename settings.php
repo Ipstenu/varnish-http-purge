@@ -322,6 +322,7 @@ class VarnishStatus {
 					foreach ( $headers as $header => $key ) {
 						if ( '0' !== $header ) {
 							if ( is_array( $key ) ) {
+								// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_print_r
 								$content = print_r( $key, true );
 							} else {
 								$content = wp_kses_post( $key );

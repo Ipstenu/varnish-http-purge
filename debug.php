@@ -26,41 +26,16 @@ class VarnishDebug {
 		$return  = false;
 		$newmode = get_site_option( 'vhp_varnish_devmode', VarnishPurger::$devmode );
 
-		// Make sure pause is properly flagged.
-		$is_paused = self::importer_check();
-		if ( $is_paused || ( isset( $newmode['pause'] ) && $newmode['pause'] ) ) {
-			self::devmode_toggle( 'pause' );
-		}
-
 		if ( VHP_DEVMODE ) {
 			// If the define is set, we're true.
 			$return = true;
-		} elseif ( isset( $newmode['active'] ) && $newmode['active'] ) {
-			if ( ! $newmode['pause'] && $newmode['expire'] <= current_time( 'timestamp' ) ) {
+		} elseif ( $newmode['active'] ) {
+			$return = true;
+			if ( $newmode['expire'] <= current_time( 'timestamp' ) ) {
 				// if expire is less that NOW, it's over.
 				self::devmode_toggle( 'deactivate' );
 				$return = false;
-			} else {
-				$return = true;
 			}
-		}
-
-		return $return;
-	}
-
-	/**
-	 * Check if Importer is running
-	 *
-	 * @access public
-	 * @static
-	 * @return string  true|false
-	 * @since 4.8
-	 */
-	public static function importer_check() {
-		$return = false;
-
-		if ( defined( 'WP_LOAD_IMPORTERS' ) ) {
-			$return = true;
 		}
 
 		return $return;
@@ -77,15 +52,13 @@ class VarnishDebug {
 	public static function devmode_toggle( $state = 'deactivate' ) {
 		$newmode = get_site_option( 'vhp_varnish_devmode', VarnishPurger::$devmode );
 
-		$newmode['expire'] = current_time( 'timestamp' ) + DAY_IN_SECONDS;
+		$expire_time       = ( 'pause' === $state ) ? MINUTE_IN_SECONDS : DATE_IN_SECONDS;
+		$newmode['expire'] = current_time( 'timestamp' ) + $expire_time;
 
 		switch ( sanitize_text_field( $state ) ) {
 			case 'activate':
-				$newmode['active'] = true;
-				break;
 			case 'pause':
 				$newmode['active'] = true;
-				$newmode['pause']  = true;
 				break;
 			case 'toggle':
 				$newmode['active'] = ( self::devmode_check() ) ? false : true;

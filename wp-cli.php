@@ -135,7 +135,7 @@ if ( ! class_exists( 'WP_CLI_Varnish_Command' ) ) {
 		 */
 		public function devmode( $args, $assoc_args ) {
 
-			$valid_modes = array( 'activate', 'deactivate', 'toggle', 'pause' );
+			$valid_modes = array( 'activate', 'deactivate', 'toggle' );
 			$devmode     = get_site_option( 'vhp_varnish_devmode', VarnishPurger::$devmode );
 
 			// Check for valid arguments.

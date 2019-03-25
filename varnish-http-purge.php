@@ -72,7 +72,6 @@ class VarnishPurger {
 		self::$devmode = array(
 			'active' => false,
 			'expire' => current_time( 'timestamp' ),
-			'pause'  => false,
 		);
 		if ( ! get_site_option( 'vhp_varnish_devmode' ) ) {
 			update_site_option( 'vhp_varnish_devmode', self::$devmode );
@@ -193,9 +192,8 @@ class VarnishPurger {
 		// Success: Admin notice when purging.
 		if ( ( isset( $_GET['vhp_flush_all'] ) && check_admin_referer( 'vhp-flush-all' ) ) ||
 			( isset( $_GET['vhp_flush_do'] ) && check_admin_referer( 'vhp-flush-do' ) ) ) {
-			if ( 'devmode' === $_GET['vhp_flush_do'] ) {
-				$toggle = ( VarnishDebug::devmode_check() ) ? 'deactivate' : 'activate';
-				VarnishDebug::devmode_toggle( $toggle );
+			if ( 'devmode' === $_GET['vhp_flush_do'] && isset( $_GET['vhp_set_devmode'] ) ) {
+				VarnishDebug::devmode_toggle( esc_attr( $_GET['vhp_set_devmode'] ) );
 				add_action( 'admin_notices', array( $this, 'admin_message_devmode' ) );
 			} else {
 				add_action( 'admin_notices', array( $this, 'admin_message_purge' ) );
@@ -295,9 +293,7 @@ class VarnishPurger {
 			$devmode = get_site_option( 'vhp_varnish_devmode', self::$devmode );
 			$time    = human_time_diff( current_time( 'timestamp' ), $devmode['expire'] );
 
-			if ( $devmode['pause'] ) {
-				$message = __( 'Proxy Cache Purge is paused while the WordPress importer is running.', 'varnish-http-purge' );
-			} elseif ( ! $devmode['active'] ) {
+			if ( ! $devmode['active'] ) {
 				if ( ! is_multisite() ) {
 					// translators: %1$s is the time until dev mode expires.
 					// translators: %2$s is a link to the settings pages.
@@ -417,12 +413,25 @@ class VarnishPurger {
 			}
 
 			// Populate enable/disable cache button.
-			$purge_devmode_title = ( VarnishDebug::devmode_check() ) ? __( 'Restart Cache', 'varnish-http-purge' ) : __( 'Pause Cache (24h)', 'varnish-http-purge' );
-			$args[]              = array(
+			if ( VarnishDebug::devmode_check() ) {
+				$purge_devmode_title = __( 'Restart Cache', 'varnish-http-purge' );
+				$vhp_add_query_arg   = array(
+					'vhp_flush_do'    => 'devmode',
+					'vhp_set_devmode' => 'dectivate',
+				);
+			} else {
+				$purge_devmode_title = __( 'Pause Cache (24h)', 'varnish-http-purge' );
+				$vhp_add_query_arg   = array(
+					'vhp_flush_do'    => 'devmode',
+					'vhp_set_devmode' => 'activate',
+				);
+			}
+
+			$args[] = array(
 				'parent' => 'purge-varnish-cache',
 				'id'     => 'purge-varnish-cache-devmode',
 				'title'  => $purge_devmode_title,
-				'href'   => wp_nonce_url( add_query_arg( 'vhp_flush_do', 'devmode' ), 'vhp-flush-do' ),
+				'href'   => wp_nonce_url( add_query_arg( $vhp_add_query_arg ), 'vhp-flush-do' ),
 				'meta'   => array(
 					'title' => $purge_devmode_title,
 				),

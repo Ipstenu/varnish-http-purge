@@ -153,11 +153,11 @@ class VarnishPurger {
 		if ( VarnishDebug::devmode_check() ) {
 			if ( ! is_admin() ) {
 				// Sessions used to break PHP caching.
-				if ( ! is_user_logged_in() ) {
-					// @codingStandardsIgnoreStart
+				// @codingStandardsIgnoreStart
+				if ( ! is_user_logged_in() && session_status() != PHP_SESSION_ACTIVE ) {
 					@session_start();
-					// @codingStandardsIgnoreEnd
 				}
+				// @codingStandardsIgnoreEnd
 
 				// Add nocacche to CSS and JS.
 				add_filter( 'style_loader_src', array( 'VarnishDebug', 'nocache_cssjs' ), 10, 2 );

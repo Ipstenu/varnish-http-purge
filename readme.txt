@@ -115,11 +115,15 @@ There are three ways to do this:
 
 1. Chose 'Pause Cache (24hrs)' from the Cache dropdown menu in your toolbar
 2. Go to Proxy Cache -> Settings and enable development mode
-3. Add `define( 'VHP_DEVMODE', true );` to your `wp-config.php` file
+3. Add `define( 'VHP_DEVMODE', true );` to your `wp-config.php` file.
 
 The first two options will enable development mode for 24 hours. If you're working on long term development, you can should use the define.
 
 It is _not_ recommended you use development mode on production sites for extended periods of time, as it _will_ will slow your site down and lose all the benefits of caching in the first place.
+
+= Why is the restart cache button missing? =
+
+If you've disabled caching via the define, then you cannot restart cache via the plugin. You would need to change  `define( 'VHP_DEVMODE', true );` to  `define( 'VHP_DEVMODE', false );` in your `wp-config.php` file.
 
 = Why don't I have access to development mode? =
 
@@ -128,6 +132,10 @@ Due to the damage this can cause a site, access is limited to admins only. In th
 = Why do I still see cached content in development mode? =
 
 While development mode is on, your server will continue to cache content but the plugin will tell WordPress not to use the cached content. That means files that exist outside of WordPress (like CSS or images) _may_ serve cached content. The plugin does its best to add a No Cache parameter to javascript and CSS, however if a theme or plugin _doesn't_ use proper WordPress enqueues, then their cached content will be shown.
+
+= Why can I still flush cache while in development mode? =
+
+Because the server is still caching content. The plugin provides a way to flush the cache for those pages, as well as anything not included in WordPress, for your convinence.
 
 = How can I tell if everything's caching? =
 

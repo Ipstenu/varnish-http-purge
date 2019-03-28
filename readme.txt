@@ -135,7 +135,7 @@ While development mode is on, your server will continue to cache content but the
 
 = Why can I still flush cache while in development mode? =
 
-Because the server is still caching content. The plugin provides a way to flush the cache for those pages, as well as anything not included in WordPress, for your convinence.
+Because the server is still caching content. The plugin provides a way to flush the cache for those pages, as well as anything not included in WordPress, for your convenience.
 
 = How can I tell if everything's caching? =
 

@@ -50,14 +50,11 @@ class VarnishDebug {
 	 * @return true|false
 	 */
 	public static function devmode_toggle( $state = 'deactivate' ) {
-		$newmode = get_site_option( 'vhp_varnish_devmode', VarnishPurger::$devmode );
-
-		$expire_time       = ( 'pause' === $state ) ? MINUTE_IN_SECONDS : DATE_IN_SECONDS;
-		$newmode['expire'] = current_time( 'timestamp' ) + $expire_time;
+		$newmode           = get_site_option( 'vhp_varnish_devmode', VarnishPurger::$devmode );
+		$newmode['expire'] = current_time( 'timestamp' ) + DAY_IN_SECONDS;
 
 		switch ( sanitize_text_field( $state ) ) {
 			case 'activate':
-			case 'pause':
 				$newmode['active'] = true;
 				break;
 			case 'toggle':

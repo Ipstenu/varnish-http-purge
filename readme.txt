@@ -3,7 +3,7 @@ Contributors: Ipstenu, mikeschroder, techpriester, danielbachhuber
 Tags: proxy, purge, cache, varnish, nginx
 Requires at least: 4.7
 Tested up to: 5.1
-Stable tag: 4.7.3
+Stable tag: 4.8
 Requires PHP: 5.6
 
 Automatically empty proxy cached content when your site is modified.
@@ -16,7 +16,7 @@ One common method of caching content for websites is via the use of reverse prox
 
 A reverse proxy cache is installed in front of a server and reviews requests. If the page being requested is already cached, it delivers the cached content. Otherwise it generates the page and the cache on demand.
 
-The Proxy Cache Purge plugin sends a request to delete (aka flush) the cached data of a page or post every time it it modified. This happens when updating, publishing, commenting on, or deleting an post, and when changing themes.
+The Proxy Cache Purge plugin sends a request to delete (aka flush) the cached data of a page or post every time it's modified.
 
 = How It Works =
 
@@ -52,7 +52,7 @@ That will break cache on page loads. It is _not_ recommended for production!
 
 * `wp varnish purge` - Flush the entire cache
 * `wp varnish debug [<url>]` - Help for debugging how well your cache is (or isn't) working
-* `wp varnish devmode [<activate|deactivate|toggle>` - Change development mode state
+* `wp varnish devmode [<activate|deactivate|toggle>]` - Change development mode state
 
 = Privacy Policy =
 
@@ -115,11 +115,15 @@ There are three ways to do this:
 
 1. Chose 'Pause Cache (24hrs)' from the Cache dropdown menu in your toolbar
 2. Go to Proxy Cache -> Settings and enable development mode
-3. Add `define( 'VHP_DEVMODE', true );` to your `wp-config.php` file
+3. Add `define( 'VHP_DEVMODE', true );` to your `wp-config.php` file.
 
 The first two options will enable development mode for 24 hours. If you're working on long term development, you can should use the define.
 
 It is _not_ recommended you use development mode on production sites for extended periods of time, as it _will_ will slow your site down and lose all the benefits of caching in the first place.
+
+= Why is the restart cache button missing? =
+
+If you've disabled caching via the define, then you cannot restart cache via the plugin. You would need to change  `define( 'VHP_DEVMODE', true );` to  `define( 'VHP_DEVMODE', false );` in your `wp-config.php` file.
 
 = Why don't I have access to development mode? =
 
@@ -128,6 +132,10 @@ Due to the damage this can cause a site, access is limited to admins only. In th
 = Why do I still see cached content in development mode? =
 
 While development mode is on, your server will continue to cache content but the plugin will tell WordPress not to use the cached content. That means files that exist outside of WordPress (like CSS or images) _may_ serve cached content. The plugin does its best to add a No Cache parameter to javascript and CSS, however if a theme or plugin _doesn't_ use proper WordPress enqueues, then their cached content will be shown.
+
+= Why can I still flush cache while in development mode? =
+
+Because the server is still caching content. The plugin provides a way to flush the cache for those pages, as well as anything not included in WordPress, for your convenience.
 
 = How can I tell if everything's caching? =
 
@@ -195,26 +203,11 @@ This plugin is installed by default for _all_ DreamPress installs on DreamHost, 
 
 == Changelog ==
 
-= 4.7.3 =
-* December 2018
-* Bugfix for Jetpack (Props @jherve)
-
-= 4.7.2 =
-* October 2018
-* Fix regression with IP function name
-* Restore "Right Now" activity box _only_ for people who use WP.com toolbar
-
-= 4.7.1 =
-* October 2018
-* Documentation: Cleaning up language and spelling
-
-= 4.7.0 =
-* October 2018
-* WP-CLI: documentation
-* Bugfix: Nginx compatibility
-* Bugfix: Only enqueue CSS on front0end if the admin bar is used (props @mathieuhays)
-* Feature: Rebranding
-* Deprecation: "Right Now" button (not needed anymore)
+= 4.8 =
+* March 2019
+* Improve debugger
+* Clean code per standards
+* Improve callback on WP-CLI
 
 == Screenshots ==
 

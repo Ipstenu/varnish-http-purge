@@ -3,7 +3,7 @@
  * Plugin Name: Proxy Cache Purge
  * Plugin URI: https://halfelf.org/plugins/varnish-http-purge/
  * Description: Automatically empty cached pages when content on your site is modified.
- * Version: 4.7.3
+ * Version: 4.8
  * Author: Mika Epstein
  * Author URI: https://halfelf.org/
  * License: http://www.apache.org/licenses/LICENSE-2.0
@@ -90,6 +90,11 @@ class VarnishPurger {
 		// Release the hounds!
 		add_action( 'init', array( &$this, 'init' ) );
 		add_action( 'admin_init', array( &$this, 'admin_init' ) );
+		add_action( 'import_start', array( &$this, 'import_start' ) );
+		add_action( 'import_end', array( &$this, 'import_end' ) );
+
+		// Check if there's an upgrade
+		add_action( 'upgrader_process_complete', array( &$this, 'check_upgrades' ), 10, 2 );
 
 	}
 
@@ -135,17 +140,24 @@ class VarnishPurger {
 	 * @access public
 	 */
 	public function init() {
-		global $blog_id;
+		global $blog_id, $wp_db_version;
+
+		// If the DB version we detect isn't the same as the version core thinks
+		// we will fush DB cache. This may cause double dumping in some cases but
+		// should not be harmful.
+		if ( file_exists( WP_CONTENT_DIR . '/object-cache.php' ) && get_option( 'db_version' ) !== $wp_db_version ) {
+			wp_cache_flush();
+		}
 
 		// If Dev Mode is true, kill caching.
 		if ( VarnishDebug::devmode_check() ) {
 			if ( ! is_admin() ) {
-				// Sessions to break PHP caching.
-				if ( ! is_user_logged_in() ) {
-					// @codingStandardsIgnoreStart
+				// Sessions used to break PHP caching.
+				// @codingStandardsIgnoreStart
+				if ( ! is_user_logged_in() && session_status() != PHP_SESSION_ACTIVE ) {
 					@session_start();
-					// @codingStandardsIgnoreEnd
 				}
+				// @codingStandardsIgnoreEnd
 
 				// Add nocacche to CSS and JS.
 				add_filter( 'style_loader_src', array( 'VarnishDebug', 'nocache_cssjs' ), 10, 2 );
@@ -180,9 +192,8 @@ class VarnishPurger {
 		// Success: Admin notice when purging.
 		if ( ( isset( $_GET['vhp_flush_all'] ) && check_admin_referer( 'vhp-flush-all' ) ) ||
 			( isset( $_GET['vhp_flush_do'] ) && check_admin_referer( 'vhp-flush-do' ) ) ) {
-			if ( 'devmode' === $_GET['vhp_flush_do'] ) {
-				$toggle = ( VarnishDebug::devmode_check() ) ? 'deactivate' : 'activate';
-				VarnishDebug::devmode_toggle( $toggle );
+			if ( 'devmode' === $_GET['vhp_flush_do'] && isset( $_GET['vhp_set_devmode'] ) ) {
+				VarnishDebug::devmode_toggle( esc_attr( $_GET['vhp_set_devmode'] ) );
 				add_action( 'admin_notices', array( $this, 'admin_message_devmode' ) );
 			} else {
 				add_action( 'admin_notices', array( $this, 'admin_message_purge' ) );
@@ -193,6 +204,37 @@ class VarnishPurger {
 		add_action( 'admin_bar_menu', array( $this, 'varnish_rightnow_adminbar' ), 100 );
 		add_action( 'admin_enqueue_scripts', array( $this, 'custom_css' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'custom_css' ) );
+	}
+
+	/**
+	 * Check if something has upgraded and try to flush the DB cache.
+	 * This runs for ALL upgrades (theme, plugin, and core) to account for
+	 * the complex nature that are upgrades.
+	 *
+	 * @param  array $object of upgrade data
+	 * @param  array $options picked for upgrade
+	 * @since 4.8
+	 */
+	public function check_upgrades( $object, $options ) {
+		if ( file_exists( WP_CONTENT_DIR . '/object-cache.php' ) ) {
+			wp_cache_flush();
+		}
+	}
+
+	/**
+	 * Pause caching if Importer was started
+	 * @since 4.8
+	 */
+	public function import_start() {
+		VarnishDebug::devmode_toggle( 'activate' );
+	}
+
+	/**
+	 * Resume caching if Importer has ended
+	 * @since 4.8
+	 */
+	public function import_end() {
+		VarnishDebug::devmode_toggle( 'deactivate' );
 	}
 
 	/**
@@ -250,16 +292,23 @@ class VarnishPurger {
 		} else {
 			$devmode = get_site_option( 'vhp_varnish_devmode', self::$devmode );
 			$time    = human_time_diff( current_time( 'timestamp' ), $devmode['expire'] );
-			if ( ! is_multisite() ) {
-				// translators: %1$s is the time until dev mode expires.
-				// translators: %2$s is a link to the settings pages.
-				$message = sprintf( __( 'Proxy Cache Purge Development Mode is active for the next %1$s. You can disable this at the <a href="%2$s">Proxy Settings Page</a>.', 'varnish-http-purge' ), $time, esc_url( admin_url( 'admin.php?page=varnish-page' ) ) );
-			} else {
-				// translators: %1$s is the time until dev mode expires.
-				$message = sprintf( __( 'Proxy Cache Purge Development Mode is active for the next %1$s.', 'varnish-http-purge' ), $time );
+
+			if ( ! $devmode['active'] ) {
+				if ( ! is_multisite() ) {
+					// translators: %1$s is the time until dev mode expires.
+					// translators: %2$s is a link to the settings pages.
+					$message = sprintf( __( 'Proxy Cache Purge Development Mode is active for the next %1$s. You can disable this at the <a href="%2$s">Proxy Settings Page</a>.', 'varnish-http-purge' ), $time, esc_url( admin_url( 'admin.php?page=varnish-page' ) ) );
+				} else {
+					// translators: %1$s is the time until dev mode expires.
+					$message = sprintf( __( 'Proxy Cache Purge Development Mode is active for the next %1$s.', 'varnish-http-purge' ), $time );
+				}
 			}
 		}
-		echo '<div class="notice notice-warning"><p>' . wp_kses_post( $message ) . '</p></div>';
+
+		// Only echo if there's actually a message
+		if ( isset( $message ) ) {
+			echo '<div class="notice notice-warning"><p>' . wp_kses_post( $message ) . '</p></div>';
+		}
 	}
 
 	/**
@@ -363,17 +412,33 @@ class VarnishPurger {
 				);
 			}
 
-			// Populate enable/disable cache button.
-			$purge_devmode_title = ( VarnishDebug::devmode_check() ) ? __( 'Restart Cache', 'varnish-http-purge' ) : __( 'Pause Cache (24h)', 'varnish-http-purge' );
-			$args[]              = array(
-				'parent' => 'purge-varnish-cache',
-				'id'     => 'purge-varnish-cache-devmode',
-				'title'  => $purge_devmode_title,
-				'href'   => wp_nonce_url( add_query_arg( 'vhp_flush_do', 'devmode' ), 'vhp-flush-do' ),
-				'meta'   => array(
-					'title' => $purge_devmode_title,
-				),
-			);
+			// If Devmode is in the config, don't allow it to be disabled.
+			if ( ! VHP_DEVMODE ) {
+				// Populate enable/disable cache button.
+				if ( VarnishDebug::devmode_check() ) {
+					$purge_devmode_title = __( 'Restart Cache', 'varnish-http-purge' );
+					$vhp_add_query_arg   = array(
+						'vhp_flush_do'    => 'devmode',
+						'vhp_set_devmode' => 'dectivate',
+					);
+				} else {
+					$purge_devmode_title = __( 'Pause Cache (24h)', 'varnish-http-purge' );
+					$vhp_add_query_arg   = array(
+						'vhp_flush_do'    => 'devmode',
+						'vhp_set_devmode' => 'activate',
+					);
+				}
+
+				$args[] = array(
+					'parent' => 'purge-varnish-cache',
+					'id'     => 'purge-varnish-cache-devmode',
+					'title'  => $purge_devmode_title,
+					'href'   => wp_nonce_url( add_query_arg( $vhp_add_query_arg ), 'vhp-flush-do' ),
+					'meta'   => array(
+						'title' => $purge_devmode_title,
+					),
+				);
+			}
 		}
 
 		if ( $can_purge ) {
@@ -460,13 +525,15 @@ class VarnishPurger {
 
 		// Define registered purge events.
 		$actions = array(
-			'switch_theme',                    // After a theme is changed.
-			'autoptimize_action_cachepurged',  // Compat with https://wordpress.org/plugins/autoptimize/ plugin.
-			'save_post',                       // Save a post.
-			'deleted_post',                    // Delete a post.
-			'trashed_post',                    // Empty Trashed post.
-			'edit_post',                       // Edit a post - includes leaving comments.
-			'delete_attachment',               // Delete an attachment - includes re-uploading.
+			'autoptimize_action_cachepurged', // Compat with https://wordpress.org/plugins/autoptimize/ plugin.
+			'delete_attachment',              // Delete an attachment - includes re-uploading.
+			'deleted_post',                   // Delete a post.
+			'edit_post',                      // Edit a post - includes leaving comments.
+			'import_start',                   // When importer starts
+			'import_end',                     // When importer ends
+			'save_post',                      // Save a post.
+			'switch_theme',                   // After a theme is changed.
+			'trashed_post',                   // Empty Trashed post.
 		);
 
 		// send back the actions array, filtered.
@@ -485,8 +552,10 @@ class VarnishPurger {
 
 		// Define registered purge events.
 		$actions = array(
-			'switch_theme',                     // After a theme is changed.
-			'autoptimize_action_cachepurged,',  // Compat with https://wordpress.org/plugins/autoptimize/ plugin.
+			'autoptimize_action_cachepurged', // Compat with https://wordpress.org/plugins/autoptimize/ plugin.
+			'import_start',                   // When importer starts
+			'import_end',                     // When importer ends
+			'switch_theme',                   // After a theme is changed.
 		);
 
 		/**
@@ -629,14 +698,20 @@ class VarnishPurger {
 		 *
 		 * @since 4.1
 		 */
-		$headers  = apply_filters( 'varnish_http_purge_headers', array(
-			'host'           => $host_headers,
-			'X-Purge-Method' => $x_purge_method,
-		) );
-		$response = wp_remote_request( $purgeme, array(
-			'method'  => 'PURGE',
-			'headers' => $headers,
-		) );
+		$headers  = apply_filters(
+			'varnish_http_purge_headers',
+			array(
+				'host'           => $host_headers,
+				'X-Purge-Method' => $x_purge_method,
+			)
+		);
+		$response = wp_remote_request(
+			$purgeme,
+			array(
+				'method'  => 'PURGE',
+				'headers' => $headers,
+			)
+		);
 
 		do_action( 'after_purge_url', $parsed_url, $purgeme, $response, $headers );
 	}
@@ -768,7 +843,8 @@ class VarnishPurger {
 			$categories = get_the_category( $post_id );
 			if ( $categories ) {
 				foreach ( $categories as $cat ) {
-					array_push( $listofurls,
+					array_push(
+						$listofurls,
 						get_category_link( $cat->term_id ),
 						get_rest_url() . $rest_api_route . '/categories/' . $cat->term_id . '/'
 					);
@@ -783,7 +859,8 @@ class VarnishPurger {
 					$tag_base = '/tag/';
 				}
 				foreach ( $tags as $tag ) {
-					array_push( $listofurls,
+					array_push(
+						$listofurls,
 						get_tag_link( $tag->term_id ),
 						get_rest_url() . $rest_api_route . $tag_base . $tag->term_id . '/'
 					);
@@ -797,7 +874,8 @@ class VarnishPurger {
 					if ( $features['public'] ) {
 						$terms = wp_get_post_terms( $post_id, $taxonomy );
 						foreach ( $terms as $term ) {
-							array_push( $listofurls,
+							array_push(
+								$listofurls,
 								get_term_link( $term ),
 								get_rest_url() . $rest_api_route . '/' . $term->taxonomy . '/' . $term->slug . '/'
 							);
@@ -811,14 +889,16 @@ class VarnishPurger {
 			if ( $this_post_type && 'post' === $this_post_type ) {
 				// Author URLs:
 				$author_id = get_post_field( 'post_author', $post_id );
-				array_push( $listofurls,
+				array_push(
+					$listofurls,
 					get_author_posts_url( $author_id ),
 					get_author_feed_link( $author_id ),
 					get_rest_url() . $rest_api_route . '/users/' . $author_id . '/'
 				);
 
 				// Feeds:
-				array_push( $listofurls,
+				array_push(
+					$listofurls,
 					get_bloginfo_rss( 'rdf_url' ),
 					get_bloginfo_rss( 'rss_url' ),
 					get_bloginfo_rss( 'rss2_url' ),
@@ -830,7 +910,8 @@ class VarnishPurger {
 
 			// Archives and their feeds.
 			if ( $this_post_type && ! in_array( $this_post_type, $noarchive_post_type, true ) ) {
-				array_push( $listofurls,
+				array_push(
+					$listofurls,
 					get_post_type_archive_link( get_post_type( $post_id ) ),
 					get_post_type_archive_feed_link( get_post_type( $post_id ) )
 					// Need to add in JSON?
@@ -838,7 +919,8 @@ class VarnishPurger {
 			}
 
 			// Home Pages and (if used) posts page.
-			array_push( $listofurls,
+			array_push(
+				$listofurls,
 				get_rest_url(),
 				$this->the_home_url() . '/'
 			);

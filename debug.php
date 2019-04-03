@@ -17,7 +17,7 @@ class VarnishDebug {
 
 	/**
 	 * Devmode Check
-	 * See if Dev Mode is active
+	 * See if Dev Mode is active.
 	 *
 	 * @since 4.6.0
 	 * @returns true|false
@@ -27,16 +27,17 @@ class VarnishDebug {
 		$newmode = get_site_option( 'vhp_varnish_devmode', VarnishPurger::$devmode );
 
 		if ( VHP_DEVMODE ) {
+			// If the define is set, we're true.
 			$return = true;
-		} elseif ( isset( $newmode['active'] ) && $newmode['active'] ) {
-			// if expire is less that NOW, it's over.
+		} elseif ( $newmode['active'] ) {
+			$return = true;
 			if ( $newmode['expire'] <= current_time( 'timestamp' ) ) {
-				$newmode['active'] = false;
-				update_site_option( 'vhp_varnish_devmode', $newmode );
-			} else {
-				$return = true;
+				// if expire is less that NOW, it's over.
+				self::devmode_toggle( 'deactivate' );
+				$return = false;
 			}
 		}
+
 		return $return;
 	}
 
@@ -49,9 +50,7 @@ class VarnishDebug {
 	 * @return true|false
 	 */
 	public static function devmode_toggle( $state = 'deactivate' ) {
-		$newmode = get_site_option( 'vhp_varnish_devmode', VarnishPurger::$devmode );
-
-		// Weirdly this doesn't actually matter.
+		$newmode           = get_site_option( 'vhp_varnish_devmode', VarnishPurger::$devmode );
 		$newmode['expire'] = current_time( 'timestamp' ) + DAY_IN_SECONDS;
 
 		switch ( sanitize_text_field( $state ) ) {
@@ -65,6 +64,11 @@ class VarnishDebug {
 			default:
 				$newmode['active'] = false;
 				break;
+		}
+
+		// No matter what, when we mess with this, flush the DB caches.
+		if ( file_exists( WP_CONTENT_DIR . '/object-cache.php' ) ) {
+			wp_cache_flush();
 		}
 
 		update_site_option( 'vhp_varnish_devmode', $newmode );
@@ -148,10 +152,20 @@ class VarnishDebug {
 		// Lazy run twice to make sure we get a primed cache page.
 		$response1 = wp_remote_get( $url, $args );
 
+		// If this fails, we're going to assume bad things...
+		if ( is_wp_error( $response1 ) ) {
+			return 'fail';
+		}
+
 		// Because the 'Age' header is an important check, wait a second before fetching again.
 		sleep( 1 );
 
 		$response2 = wp_remote_get( $url, $args );
+
+		// And if this fails, we again assume badly.
+		if ( is_wp_error( $response2 ) ) {
+			return 'fail';
+		}
 
 		return $response2;
 	}
@@ -267,7 +281,7 @@ class VarnishDebug {
 
 			// Which service are we?
 			$cache_service = false;
-			if ( $x_varnish && $x_nginx ) {
+			if ( $x_nginx ) {
 				$cache_service  = __( 'Nginx', 'varnish-http-purge' );
 				$still_cachable = ( $is_cachable && $x_age_nginx && $x_varn_hit && $x_pragma ) ? true : false;
 			} elseif ( $x_varnish && ! $x_nginx ) {

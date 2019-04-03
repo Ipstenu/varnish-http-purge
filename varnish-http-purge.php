@@ -226,7 +226,7 @@ class VarnishPurger {
 	 * @since 4.8
 	 */
 	public function import_start() {
-		VarnishDebug::devmode_toggle( 'pause' );
+		VarnishDebug::devmode_toggle( 'activate' );
 	}
 
 	/**

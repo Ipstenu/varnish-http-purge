@@ -145,7 +145,7 @@ class VarnishPurger {
 		// If the DB version we detect isn't the same as the version core thinks
 		// we will fush DB cache. This may cause double dumping in some cases but
 		// should not be harmful.
-		if ( file_exists( WP_CONTENT_DIR . '/object-cache.php' ) && get_option( 'db_version' ) !== $wp_db_version ) {
+		if ( file_exists( WP_CONTENT_DIR . '/object-cache.php' ) && (int) get_option( 'db_version' ) !== $wp_db_version ) {
 			wp_cache_flush();
 		}
 

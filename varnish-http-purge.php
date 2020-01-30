@@ -533,6 +533,7 @@ class VarnishPurger {
 			'import_end',                     // When importer ends
 			'save_post',                      // Save a post.
 			'switch_theme',                   // After a theme is changed.
+			'customize_save_after',           // After Customizer is updated.
 			'trashed_post',                   // Empty Trashed post.
 		);
 
@@ -556,6 +557,7 @@ class VarnishPurger {
 			'import_start',                   // When importer starts
 			'import_end',                     // When importer ends
 			'switch_theme',                   // After a theme is changed.
+			'customize_save_after',           // After Customizer is updated.
 		);
 
 		/**

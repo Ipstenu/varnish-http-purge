@@ -1,9 +1,9 @@
 <?php
 /**
  * Plugin Name: Proxy Cache Purge
- * Plugin URI: https://halfelf.org/plugins/varnish-http-purge/
+ * Plugin URI: https://github.com/ipstenu/varnish-http-purge/
  * Description: Automatically empty cached pages when content on your site is modified.
- * Version: 4.9
+ * Version: 5.0
  * Author: Mika Epstein
  * Author URI: https://halfelf.org/
  * License: http://www.apache.org/licenses/LICENSE-2.0
@@ -12,7 +12,7 @@
  *
  * @package varnish-http-purge
  *
- * Copyright 2016-2018 Mika Epstein (email: ipstenu@halfelf.org)
+ * Copyright 2016-2020 Mika Epstein (email: ipstenu@halfelf.org)
  *
  * This file is part of Proxy Cache Purge, a plugin for WordPress.
  *
@@ -775,7 +775,7 @@ class VarnishPurger {
 		 * If this is a valid post we want to purge the post,
 		 * the home page and any associated tags and categories
 		 */
-		$valid_post_status = array( 'publish', 'private', 'trash' );
+		$valid_post_status = array( 'publish', 'private', 'trash', 'pending', 'draft' );
 		$this_post_status  = get_post_status( $post_id );
 
 		// Not all post types are created equal.
@@ -785,7 +785,7 @@ class VarnishPurger {
 
 		/**
 		 * Determine the route for the rest API
-		 * This will need to be revisted if WP updates the version.
+		 * This will need to be revisited if WP updates the version.
 		 * Future me: Consider an array? 4.7-?? use v2, and then adapt from there?
 		 */
 		if ( version_compare( get_bloginfo( 'version' ), '4.7', '>=' ) ) {

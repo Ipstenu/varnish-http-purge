@@ -222,14 +222,6 @@ class VarnishStatus {
 	public function options_check_caching_scan() {
 		?>
 		<p><?php esc_html_e( 'This feature performs a check of the most common issues that prevents your site from caching properly. This feature is provided to help you in resolve potential conflicts on your own. When filing an issue with your web-host, we recommend you include the output in your ticket.', 'varnish-http-purge' ); ?></p>
-		<h4><?php esc_html_e( 'Privacy Note', 'varnish-http-purge' ); ?></h4>
-		<p>
-		<?php
-			// translators: %s is a link to the readme for the detection service.
-			printf( wp_kses_post( __( '<strong>This check uses <a href="%s">a remote service hosted on DreamObjects</a></strong>.', 'varnish-http-purge' ) ), 'https://varnish-http-purge.objects-us-east-1.dream.io/readme.txt' );
-		?>
-		</p>
-		<p><?php esc_html_e( 'The service used only for providing up to date compatibility checks on plugins and themes that may conflict with running a server based cache. No personally identifying information regarding persons running this check, nor the plugins and themes in use on this site will be transmitted. The bare minimum of usage information is collected, concerning only IPs and domains making requests of the service. If you do not wish to use this service, please do not use this feature.', 'varnish-http-purge' ); ?></p>
 		<?php
 
 		// If there's no post made, let's not...

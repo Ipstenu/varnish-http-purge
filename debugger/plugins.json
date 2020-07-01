@@ -1,0 +1,176 @@
+{
+	"bad-behavior":{
+		"type": "bad",
+		"path": "bad-behavior/bad-behavior.php",
+		"reason": "incompatible",
+		"always": true
+	},
+	"captainform":{
+		"type": "bad",
+		"path": "captainform/captainform.php",
+		"reason": "incompatible",
+		"always": true
+	},
+	"cleantalk":{
+		"type": "warning",
+		"path": "cleantalk/cleantalk.php",
+		"reason": "translation",
+		"always": true
+	},
+	"divi-protect":{
+		"type": "bad",
+		"path": "divi-protect/divi-protect.php",
+		"reason": "sessions",
+		"always": true
+	},
+	"download-manager":{
+		"type": "bad",
+		"path": "download-manager/download-manager.php",
+		"reason": "sessions",
+		"always": true
+	},
+	"forms-contact":{
+		"type": "bad",
+		"path": "forms-contact/forms-contact.php",
+		"reason": "incompatible",
+		"always": false
+	},
+	"give":{
+		"type": "warning",
+		"path": "give/give.php",
+		"reason": "sessions",
+		"always": false
+	},
+	"google-authenticator":{
+		"type": "warning",
+		"path": "google-authenticator/google-authenticator.php",
+		"reason": "sessions",
+		"always": false
+	},
+	"gtranslate":{
+		"type": "warning",
+		"path": "gtranslate/gtranslate.php",
+		"reason": "translation",
+		"always": true
+	},
+	"pie-register":{
+		"type": "warning",
+		"path": "pie-register/pie-register.php",
+		"reason": "sessions",
+		"always": false
+	},
+	"pods":{
+		"type": "warning",
+		"path": "pods/init.php",
+		"reason": "sessions",
+		"always": false
+	},
+	"polylang":{
+		"type": "warning",
+		"path": "polylang/polylang.php",
+		"reason": "translation",
+		"always": true
+	},
+	"quick-cache":{
+		"type": "bad",
+		"path": "quick-cache/quick-cache.php",
+		"reason": "cache",
+		"always": true
+	},
+	"qtranslate":{
+		"type": "warning",
+		"path": "qtranslate/qtranslate.php",
+		"reason": "translation",
+		"always": true
+	},
+	"qtranslate-x":{
+		"type": "warning",
+		"path": "qtranslate-x/qtranslate.php",
+		"reason": "translation",
+		"always": true
+	},
+	"simplemodal-login":{
+		"type": "bad",
+		"path": "simplemodal-login/simplemodal-login.php",
+		"reason": "incompatible",
+		"always": true
+	},
+	"simple-session-support":{
+		"type": "bad",
+		"path": "simple-session-support/simple-session-support.php",
+		"reason": "sessions",
+		"always": true
+	},
+	"tweet-blender":{
+		"type": "bad",
+		"path": "tweet-blender/tweet-blender.php",
+		"reason": "incompatible",
+		"always": true
+	},
+	"wglot":{
+		"type": "warning",
+		"path": "wglot/wglot.php",
+		"reason": "translation",
+		"always": true
+	},
+	"w3-total-cache":{
+		"type": "warning",
+		"path": "w3-total-cache/w3-total-cache.php",
+		"reason": "cache",
+		"always": true
+	},
+	"woo-advanced-discounts":{
+		"type": "bad",
+		"path": "woo-advanced-discounts/wad.php",
+		"reason": "sessions",
+		"always": true
+	},
+	"woocommerce-all-discounts":{
+		"type": "bad",
+		"path": "woocommerce-all-discounts/wad.php",
+		"reason": "sessions",
+		"always": true
+	},
+	"wordfence":{
+		"type": "warning",
+		"path": "wordfence/wordfence.php",
+		"reason": "cookies",
+		"always": false
+	},
+	"wp-cache":{
+		"type": "bad",
+		"path": "wp-cache/wp-cache.php",
+		"reason": "cache",
+		"always": true
+	},
+	"wp-file-cache":{
+		"type": "bad",
+		"path": "wp-file-cache/file-cache.php",
+		"reason": "cache",
+		"always": true
+	},
+	"wp-floating-menu-pro":{
+		"type": "bad",
+		"path": "wp-floating-menu-pro/wp-floating-menu-pro.php",
+		"reason": "sessions",
+		"always": true
+	},
+	"wp-super-cache":{
+		"type": "warning",
+		"path": "wp-super-cache/wp-cache.php",
+		"reason": "cache",
+		"always": false
+	},
+	"xtranslate":{
+		"type": "warning",
+		"path": "xtranslate/xtranslate.php",
+		"reason": "translation",
+		"always": true
+	},
+	"wp-rocket":{
+		"type": "warning",
+		"path": "wp-rocket/wp-rocket.php",
+		"reason": "addon",
+		"always": false
+	}
+}

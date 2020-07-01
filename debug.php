@@ -496,14 +496,8 @@ class VarnishDebug {
 			);
 
 			// Let's check our known bad cookies.
-			$request = wp_remote_get( 'https://varnish-http-purge.objects-us-east-1.dream.io/cookies.json' );
-
-			if ( is_wp_error( $request ) ) {
-				return $return; // Bail if we can't hit the server.
-			}
-
-			$body    = wp_remote_retrieve_body( $request );
-			$cookies = json_decode( $body );
+			$json_data = file_get_contents( plugin_dir_path( __FILE__ ) . 'debugger/cookies.json' );
+			$cookies   = json_decode( $json_data );
 
 			if ( empty( $cookies ) ) {
 				if ( WP_DEBUG ) {
@@ -654,20 +648,9 @@ class VarnishDebug {
 	public static function bad_themes_results() {
 
 		$return  = array();
-		$request = wp_remote_get( 'https://varnish-http-purge.objects-us-east-1.dream.io/themes.json' );
-
-		if ( is_wp_error( $request ) ) {
-			if ( WP_DEBUG ) {
-				$return['Theme Check'] = array(
-					'icon'    => 'warning',
-					'message' => __( 'Error: Theme data cannot be loaded.', 'varnish-http-purge' ),
-				);
-			}
-			return $return; // Bail early.
-		}
-
-		$body   = wp_remote_retrieve_body( $request );
-		$themes = json_decode( $body );
+		// Let's check our known bad themes.
+		$json_data = file_get_contents( plugin_dir_path( __FILE__ ) . 'debugger/themes.json' );
+		$themes    = json_decode( $json_data );
 
 		if ( empty( $themes ) ) {
 			if ( WP_DEBUG ) {
@@ -728,6 +711,7 @@ class VarnishDebug {
 
 		$return   = array();
 		$messages = array(
+			'addon'        => __( 'This plugin may require add-ons to ensure full compatibility. Please check their documentation.', 'varnish-http-purge' ),
 			'incompatible' => __( 'This plugin has unexpected results with caching, making not function properly.', 'varnish-http-purge' ),
 			'translation'  => __( 'Translation plugins that use cookies and/or sessions prevent most server side caching from running properly.', 'varnish-http-purge' ),
 			'sessions'     => __( 'This plugin uses sessions, which conflicts with server side caching.', 'varnish-http-purge' ),
@@ -738,19 +722,8 @@ class VarnishDebug {
 			'maybe'        => __( 'This plugin is usually fine, but may be configured in a way that breaks caching. Please resolve all other errors. If this is the only one left, and caching is running, you may safely ignore this message.', 'varnish-http-purge' ),
 		);
 
-		$request = wp_remote_get( 'https://varnish-http-purge.objects-us-east-1.dream.io/plugins.json' );
-		if ( is_wp_error( $request ) ) {
-			if ( WP_DEBUG ) {
-				$return['Plugin Check'] = array(
-					'icon'    => 'warning',
-					'message' => __( 'Error: Plugin data cannot be loaded.', 'varnish-http-purge' ),
-				);
-			}
-			return $return; // Bail early.
-		}
-
-		$body    = wp_remote_retrieve_body( $request );
-		$plugins = json_decode( $body );
+		$json_data = file_get_contents( plugin_dir_path( __FILE__ ) . 'debugger/plugins.json' );
+		$plugins   = json_decode( $json_data );
 
 		if ( empty( $plugins ) ) {
 			if ( WP_DEBUG ) {

@@ -1,0 +1,18 @@
+{
+	"Avada":{
+		"type": "warning",
+		"message": "Avada can cause data to be saved improperly, due to how older versions indiscriminately empty caches on every page-save. This primarily impacts transaction plugins like eCommerce."
+	},
+	"divi":{
+		"type": "warning",
+		"message": "Older Divi themes use sessions in their headers for many of their themes. Please make sure to upgrade your theme regularly."
+	},
+	"enfold":{
+		"type": "warning",
+		"message": "The Enfold theme uses sessions for every call of shortcodes in certain situations."
+	},
+	"prophoto6":{
+		"type": "warning",
+		"message": "Prophoto version 6 requires you to be on version 6.21.8 or higher to work properly with caching services. Please make sure your theme is up to date."
+	}
+}

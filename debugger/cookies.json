@@ -1,0 +1,82 @@
+{
+	"JS Sessions":{
+		"type": "bad",
+		"cookie": "JSESSIONID",
+		"message": "A plugin or theme is setting a Javascript session cookie on every pageload, which prevents caching."
+	},
+	"PHP Sessions":{
+		"type": "bad",
+		"cookie": "PHPSESSID",
+		"message": "A plugin or theme is setting a PHP session cookie on every pageload, which prevents caching."
+	},
+	"Chartitable":{
+		"type": "bad",
+		"cookie": "charitable_sessions",
+		"message": "The plugin Charitable is putting down cookies on every page load. This has been fixed as of version 1.5.0; please upgrade to the latest version."
+	},
+	"EDD Sessions":{
+		"type": "warning",
+		"cookie": "edd_wp_session",
+		"message": "The plugin Easy Digital Downloads is being used with cookie sessions. This may cause your cache to misbehave. If you have issues, please set <code>define( 'EDD_USE_PHP_SESSIONS', true );</code> in your <code>wp-config.php</code> file."
+	},
+	"EDD Cart":{
+		"type": "warning",
+		"cookie": "edd_items_in_cart",
+		"message": "The plugin Easy Digital Downloads is putting down a shopping cart cookie on every page load. Make sure your cache is set up to ignore that when it's empty."
+	},
+	"Give Sessions":{
+		"type": "warning",
+		"cookie": "give_wp_session",
+		"message": "The plugin Give is putting down a session cookie on all page loads. Please make sure to add <code>define( 'GIVE_USE_PHP_SESSIONS' , false);</code> to your <code>wp-config.php</code> file."
+	},
+	"HubSpot":{
+		"type": "bad",
+		"cookie": "hubspotutk",
+		"message": "The plugin HubSpot is putting down cookies on every page load."
+	},
+	"Invite Anyone":{
+		"type": "bad",
+		"cookie": "invite-anyone",
+		"message": "The plugin Invite Anyone is putting down cookies on every page load."
+	},
+	"Marketo Forms and Tracking":{
+		"type": "bad",
+		"cookie": "trwv.uid",
+		"message": "The plugin Marketo Forms and Tracking is putting down cookies on every page load."
+	},
+	"Optimizely Classic":{
+		"type": "bad",
+		"cookie": "optimizelyBuckets",
+		"message": "The plugin Optimizely Classic is putting down cookies on every page load in order to give people unique experiences to perform it's experiments."
+	},
+	" Optimizely X or Classic":{
+		"type": "bad",
+		"cookie": "optimizelyEndUserId",
+		"message": "Either the plugin Optimizely X or Optimizely Classic is putting down cookies on every page load in order to track users for it's experiments."
+	},
+	"Optimizely X Web":{
+		"type": "bad",
+		"cookie": "optimizelyRedirectData",
+		"message": "The plugin Optimizely X is putting down cookies on every page load in order to run web experiments."
+	},	
+	"Simple Membership":{
+		"type": "bad",
+		"cookie": "swpm_session",
+		"message": "The plugin Simple Membership is putting down cookies on every page load."
+	},
+	"WP Math Captcha":{
+		"type": "bad",
+		"cookie": "mc_session_ids",
+		"message": "The plugin WP Math Captcha uses session cookies on every page load."
+	},
+	"WordFence":{
+		"type": "warning",
+		"cookie": "wfvt_",
+		"message": "The plugin WordFence is putting down cookies on every page load. Please check 'Disable WordFence Cookies' under General Wordfence Options to resolve."
+	},
+	"WordFence Verified Human":{
+		"type": "bad",
+		"cookie": "wordfence_verifiedHuman",
+		"message": "The plugin WordFence is putting down Verified Homan cookies on every page load. This should not be possible. Please open a support ticket with WordFence for assistance."
+	}
+}

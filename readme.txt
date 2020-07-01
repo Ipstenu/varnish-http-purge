@@ -1,9 +1,9 @@
 = Proxy Cache Purge =
 Contributors: Ipstenu, mikeschroder, techpriester, danielbachhuber
 Tags: proxy, purge, cache, varnish, nginx
-Requires at least: 4.7
-Tested up to: 5.4
-Stable tag: 4.8.1
+Requires at least: 5.0
+Tested up to: 5.5
+Stable tag: 5.0
 Requires PHP: 5.6
 
 Automatically empty proxy cached content when your site is modified.
@@ -56,11 +56,7 @@ That will break cache on page loads. It is _not_ recommended for production!
 
 = Privacy Policy =
 
-By default, no data is tracked. If you use the site scanner/debugging tool, your domain and IP address will access [a remote service hosted on DreamObjects](https://varnish-http-purge.objects-us-east-1.dream.io/readme.txt). No personally identifying transaction data is recorded or stored, only overall usage. IP addresses of the website making the request may be recorded by the service, but there is no way to access them and use it to correspond with individuals or processes.
-
-Use of this service is required for the cache checking in order to provide up to date compatibility checks on plugins and themes that may conflict with running a server based cache without needing to update the plugin every day.
-
-<em>No visitor information from your site is tracked.</em>
+As of July 2020, this plugin no longer uses any remote data.
 
 == Installation ==
 
@@ -203,17 +199,10 @@ This plugin is installed by default for _all_ DreamPress installs on DreamHost, 
 
 == Changelog ==
 
-= 4.8.1 =
-* May 2019
-* Compat with WP 5.2
-* Correct changes with DB cache flushing (props @mathieuhays)
-* Simplified logic for edge case debugging
-
-= 4.8 =
-* March 2019
-* Improve debugger
-* Clean code per standards
-* Improve callback on WP-CLI
+= 5.0 =
+* July 2019
+* Now purges draft and pending posts (to account for people who unpublish) - props @jerlarke
+* Localhost the debugger json. They aren't updated that often, and the remote load is unnessecary.
 
 == Screenshots ==
 

@@ -1,5 +1,17 @@
 ## CHANGELOG
 
+= 4.8.1 =
+* May 2019
+* Compat with WP 5.2
+* Correct changes with DB cache flushing (props @mathieuhays)
+* Simplified logic for edge case debugging
+
+= 4.8 =
+* March 2019
+* Improve debugger
+* Clean code per standards
+* Improve callback on WP-CLI
+
 = 4.7.3 =
 * December 2018
 * Bugfix for Jetpack (Props @jherve)

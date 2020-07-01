@@ -593,11 +593,6 @@ class VarnishDebug {
 				'message' => sprintf( __( 'The "Age" header is returning %s, which means it is not properly caching. Either this URL is intentionally excluded from caching, or a theme or plugin is instructing WordPress not to cache.', 'varnish-http-purge' ), $age_header ),
 				'icon'    => 'warning',
 			);
-		} elseif ( (bool) strtotime( $headers['Age'] ) && time() <= strtotime( $headers['Age'] ) ) {
-			$return['Age Headers'] = array(
-				'icon'    => 'bad',
-				'message' => __( 'The "Age" header is set to an invalid time, which will result in incorrect caching.', 'varnish-http-purge' ),
-			);
 		} else {
 			$return['Age Headers'] = array(
 				'icon'    => 'awesome',

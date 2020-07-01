@@ -87,6 +87,11 @@ class VarnishPurger {
 			update_site_option( 'vhp_varnish_ip', '' );
 		}
 
+		// Default IP is nothing.
+		if ( ! get_site_option( 'vhp_varnish_debug' ) ) {
+			update_site_option( 'vhp_varnish_debug', array( $this->the_home_url() => array() ) );
+		}
+
 		// Release the hounds!
 		add_action( 'init', array( &$this, 'init' ) );
 		add_action( 'admin_init', array( &$this, 'admin_init' ) );
@@ -635,13 +640,23 @@ class VarnishPurger {
 			$x_purge_method = 'regex';
 		}
 
-		// Build a varniship.
+		// Build a varniship to sail.
 		if ( VHP_VARNISH_IP !== false ) {
 			$varniship = VHP_VARNISH_IP;
 		} else {
 			$varniship = get_site_option( 'vhp_varnish_ip' );
 		}
-		$varniship = apply_filters( 'vhp_varnish_ip', $varniship );
+
+		// Apply filters:
+		if ( is_array( $varniship ) ) {
+			// To each ship:
+			for ( $i = 0; $i++; $i < count( $varniship ) ) {
+				$varniship[ $i ] = apply_filters( 'vhp_varnish_ip', $varniship[ $i ] );
+			}
+		} else {
+			// To the only ship:
+			$varniship = apply_filters( 'vhp_varnish_ip', $varniship );
+		}
 
 		// Determine the path.
 		$path = '';
@@ -659,61 +674,72 @@ class VarnishPurger {
 		 */
 		$schema = apply_filters( 'varnish_http_purge_schema', 'http://' );
 
-		// If we made varniship, let it sail.
+		// When we have Varnish IPs, we use them in lieu of hosts.
 		if ( isset( $varniship ) && ! empty( $varniship ) ) {
-			$host = $varniship;
+			if ( ! is_array( $varniship ) ) {
+				// if we're not an array, let's make it one.
+				$hosts = array( $varniship );
+			} else {
+				$hosts = $varniship;
+			}
 		} else {
-			$host = $p['host'];
+			// default is the main host, made into an array
+			$hosts = array( $p['host'] );
 		}
 
-		/**
-		 * Allow setting of ports in host name
-		 * Credit: davidbarratt - https://github.com/Ipstenu/varnish-http-purge/pull/38/
-		 *
-		 * (default value: $p['host'])
-		 *
-		 * @var string
-		 * @access public
-		 * @since 4.4.0
-		 */
-		$host_headers = $p['host'];
-		if ( isset( $p['port'] ) ) {
-			$host_headers .= ':' . $p['port'];
+		// Since the ship is always an array now, let's loop.
+		foreach ( $hosts as $host ) {
+			/**
+			 * Allow setting of ports in host name
+			 * Credit: davidbarratt - https://github.com/Ipstenu/varnish-http-purge/pull/38/
+			 *
+			 * (default value: $p['host'])
+			 *
+			 * @var string
+			 * @access public
+			 * @since 4.4.0
+			 */
+			$host_headers = $host;
+
+			// If the URL to be purged has a port, we're going to re-use it.
+			if ( isset( $p['port'] ) ) {
+				$host_headers .= ':' . $p['port'];
+			}
+
+			$parsed_url = $url;
+			// Filter URL based on the Proxy IP for nginx compatibility
+			if ( 'localhost' === $host ) {
+				$parsed_url = str_replace( $p['host'], 'localhost', $parsed_url );
+			}
+
+			// Create path to purge.
+			$purgeme = $schema . $host . $path . $pregex;
+
+			// Check the queries...
+			if ( ! empty( $p['query'] ) && 'vhp-regex' !== $p['query'] ) {
+				$purgeme .= '?' . $p['query'];
+			}
+
+			/**
+			 * Filters the HTTP headers to send with a PURGE request.
+			 *
+			 * @since 4.1
+			 */
+			$headers  = apply_filters(
+				'varnish_http_purge_headers',
+				array(
+					'host'           => $host_headers,
+					'X-Purge-Method' => $x_purge_method,
+				)
+			);
+			$response = wp_remote_request(
+				$purgeme,
+				array(
+					'method'  => 'PURGE',
+					'headers' => $headers,
+				)
+			);
 		}
-
-		$parsed_url = $url;
-		// Filter URL based on the Proxy IP for nginx compatibility
-		if ( 'localhost' === $varniship ) {
-			$parsed_url = str_replace( $p['host'], 'localhost', $parsed_url );
-		}
-
-		// Create path to purge.
-		$purgeme = $schema . $host . $path . $pregex;
-
-		// Check the queries...
-		if ( ! empty( $p['query'] ) && 'vhp-regex' !== $p['query'] ) {
-			$purgeme .= '?' . $p['query'];
-		}
-
-		/**
-		 * Filters the HTTP headers to send with a PURGE request.
-		 *
-		 * @since 4.1
-		 */
-		$headers  = apply_filters(
-			'varnish_http_purge_headers',
-			array(
-				'host'           => $host_headers,
-				'X-Purge-Method' => $x_purge_method,
-			)
-		);
-		$response = wp_remote_request(
-			$purgeme,
-			array(
-				'method'  => 'PURGE',
-				'headers' => $headers,
-			)
-		);
 
 		do_action( 'after_purge_url', $parsed_url, $purgeme, $response, $headers );
 	}

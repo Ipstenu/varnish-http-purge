@@ -201,8 +201,10 @@ This plugin is installed by default for _all_ DreamPress installs on DreamHost, 
 
 = 5.0 =
 * July 2019
-* Now purges draft and pending posts (to account for people who unpublish) - props @jerlarke
-* Localhost the debugger json. They aren't updated that often, and the remote load is unnessecary.
+* Now purges draft and pending posts (to account for people who un-publish) - props @jerlarke
+* Localhost the debugger json. They aren't updated that often, and the remote load is unnecessary.
+* More support for Health Check
+* Remove strtotime check on Age header - props Matt Fields
 
 == Screenshots ==
 

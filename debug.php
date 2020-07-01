@@ -815,6 +815,11 @@ class VarnishDebug {
 		$bad_themes_results = self::bad_themes_results();
 		$output             = array_merge( $output, $bad_themes_results );
 
+		// Update site option data
+		$debug_log = get_site_option( 'vhp_varnish_debug' );
+		$debug_log[ VarnishPurger::the_home_url() ] = $output;
+		update_site_option( 'vhp_varnish_debug', $debug_log );
+
 		return $output;
 	}
 }

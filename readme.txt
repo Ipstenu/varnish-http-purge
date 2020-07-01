@@ -167,15 +167,15 @@ If your web host set up your service, check their documentation.
 
 = What if I have multiple proxy cache IPs? =
 
-Multiple IPs are not supported at this time.
+You may enter them, separated by a comma, on the settings page.
 
 = What version of Varnish is supported? =
 
-This was built and tested on Varnish 3.x. While it is reported to work on 2.x and 4.x, it is only supported on v3 at this time.
+So far this plugin has been reported to successfully function on Varnish v2 through v5.
 
 = Does this work with Nginx caching? =
 
-It can, if you've configured Nginx caching to respect the curl PURGE request. If this doesn't work, I recommend setting your Varnish IP to `localhost` as Nginx requires a service control installed for the IP address to work.
+It can, if you've configured Nginx caching to respect the curl PURGE request. If this doesn't work, try setting your Varnish IP to `localhost` as Nginx requires a service control installed for the IP address to work.
 
 = What should my cache rules be? =
 
@@ -205,6 +205,7 @@ This plugin is installed by default for _all_ DreamPress installs on DreamHost, 
 * Localhost the debugger json. They aren't updated that often, and the remote load is unnecessary.
 * More support for Health Check
 * Remove strtotime check on Age header - props Matt Fields
+* Support for multiple IPs (based on P.Brisson's work)
 
 == Screenshots ==
 

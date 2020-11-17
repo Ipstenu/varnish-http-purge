@@ -249,7 +249,7 @@ class VarnishPurger {
 	 * @since 4.6
 	 */
 	public function admin_message_purge() {
-		echo '<div id="message" class="notice notice-success fade is-dismissible"><p><strong>' . esc_html__( 'Varnish cache emptied!', 'varnish-http-purge' ) . '</strong></p></div>';
+		echo '<div id="message" class="notice notice-success fade is-dismissible"><p><strong>' . esc_html__( 'Cache emptied!', 'varnish-http-purge' ) . '</strong></p></div>';
 	}
 
 	/**
@@ -495,7 +495,7 @@ class VarnishPurger {
 		// translators: %1$s links to the plugin's page on WordPress.org.
 		$intro    = sprintf( __( '<a href="%1$s">Proxy Cache Purge</a> automatically deletes your cached posts when published or updated. When making major site changes, such as with a new theme, plugins, or widgets, you may need to manually empty the cache.', 'varnish-http-purge' ), 'http://wordpress.org/plugins/varnish-http-purge/' );
 		$url      = wp_nonce_url( add_query_arg( 'vhp_flush_do', 'all' ), 'vhp-flush-do' );
-		$button   = __( 'Press the button below to force it to empty your entire Varnish cache.', 'varnish-http-purge' );
+		$button   = __( 'Press the button below to force it to empty your entire cache.', 'varnish-http-purge' );
 		$button  .= '</p><p><span class="button"><strong><a href="' . $url . '">';
 		$button  .= __( 'Empty Cache', 'varnish-http-purge' );
 		$button  .= '</a></strong></span>';

@@ -171,7 +171,7 @@ You may enter them, separated by a comma, on the settings page.
 
 = What version of Varnish is supported? =
 
-So far this plugin has been reported to successfully function on Varnish v2 through v5.
+So far this plugin has been reported to successfully function on Varnish v2 through v6.
 
 = Does this work with Nginx caching? =
 

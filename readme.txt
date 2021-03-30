@@ -50,13 +50,37 @@ That will break cache on page loads. It is _not_ recommended for production!
 
 = WP CLI =
 
-* `wp varnish purge` - Flush the entire cache
-* `wp varnish debug [<url>]` - Help for debugging how well your cache is (or isn't) working
+<strong>Purge</strong>
+
+Purge commands let you empty the cache.
+
+* `wp varnish purge` - Flush the cache for your front page
+* `wp varnish purge [<url>]` - Flush the cache for one URL
+
+You can use the parameter `--wildcard` to empty everything from that URL down. So if you wanted to empty cache for all themes, you would do this:
+
+* `wp varnish purge https://example.com/wp-content/themes --wildcard`
+
+<strong>Debug</strong>
+
+Debugging can help you figure out why your cache isn't working as well as it could. The default is for your home page, but you can pass any URL on your domain.
+
+* `wp varnish debug [<url>]`
+
+Available parameters:
+
+* `[--include-headers]` --  Include headers in debug check output
+* `[--include-grep]` -- Grep active theme and plugin directories for common issues
+
+<strong>DevMode</strong>
+
+Development mode allows you to disable the cache, temporarily.
+
 * `wp varnish devmode [<activate|deactivate|toggle>]` - Change development mode state
 
 = Privacy Policy =
 
-As of July 2020, this plugin no longer uses any remote data.
+As of version 5, this plugin no longer uses any remote data.
 
 == Installation ==
 

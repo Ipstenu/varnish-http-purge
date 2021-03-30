@@ -419,7 +419,7 @@ class VarnishDebug {
 
 		if ( isset( $headers['X-Powered-By'] ) && strpos( $headers['X-Powered-By'], 'DreamPress' ) !== false ) {
 			$return['DreamHost'] = array(
-				'icon'    => 'excellent',
+				'icon'    => 'awesome',
 				'message' => __( 'This site is hosted on DreamHost (as DreamPress). The results of this scan will be accurate.', 'varnish-http-purge' ),
 			);
 		}

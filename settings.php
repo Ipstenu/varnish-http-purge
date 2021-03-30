@@ -145,7 +145,8 @@ class VarnishStatus {
 	public function options_settings_ip() {
 		?>
 		<p><a name="#configureip"></a><?php esc_html_e( 'There are cases when a custom IP Address is needed to for the plugin to properly communicate with the cache service. If you\'re using a CDN like Cloudflare or a Firewall Proxy like Sucuri, or your cache is Nginx based, you may need to customize this setting.', 'varnish-http-purge' ); ?></p>
-		<p><?php esc_html_e( 'Normally your Proxy Cache IP is the IP address of the server where your caching service (i.e. Varnish or Nginx) is installed. It must an address used by your cache service. If you use multiple IPs, or have customized your ACLs, you\'ll need to pick one that doesn\'t conflict with your other settings. For example, if you have Varnish listening on a public and private IP, pick the private. On the other hand, if you told Varnish to listen on 0.0.0.0 (i.e. "listen on every interface you can") you would need to check what IP you set your purge ACL to allow (commonly 127.0.0.1 aka localhost), and use that (i.e. 127.0.0.1 or localhost).', 'varnish-http-purge' ); ?></p>
+		<p><?php esc_html_e( 'Normally your Proxy Cache IP is the IP address of the server where your caching service (i.e. Varnish or Nginx) is installed. It must an address used by your cache service. If you use multiple IPs, or have customized your ACLs, you\'ll need to pick one that doesn\'t conflict with your other settings. For example, if you have your proxy cache listening on a public and private IP, pick the private. On the other hand, if you told Varnish to listen on 0.0.0.0 (i.e. "listen on every interface you can") you would need to check what IP you set your purge ACL to allow (commonly 127.0.0.1 aka localhost), and use that (i.e. 127.0.0.1 or localhost).', 'varnish-http-purge' ); ?></p>
+		<p><?php esc_html_e( 'You may use multiple IPs by separating them with a comma (,). If you do so, all IPs will be sent purge requests. This can be useful if you\'re using round robin DNS entries or hosting multiple proxy cache solutions (i.e. Nginx and Varnish).', 'varnish-http-purge' ); ?></p>
 		<p><?php esc_html_e( 'If your webhost set the service up for you, as is the case with DreamPress or WP Engine, ask them for the specifics.', 'varnish-http-purge' ); ?></p>
 		<p><strong><?php esc_html_e( 'If you aren\'t sure what to do, contact your webhost or server admin before making any changes.', 'varnish-http-purge' ); ?></strong></p>
 		<?php
@@ -167,13 +168,13 @@ class VarnishStatus {
 		}
 
 		echo '<input type="text" id="vhp_varnish_ip" name="vhp_varnish_ip" value="' . esc_attr( $varniship ) . '" size="25" ' . disabled( $disabled, true ) . '/>';
-		echo '<label for="vhp_varnish_ip">';
+		echo '<label for="vhp_varnish_ip">&nbsp;';
 
 		if ( $disabled ) {
 			esc_html_e( 'A Proxy Cache IP has been defined in your wp-config file, so it is not editable in settings.', 'varnish-http-purge' );
 		} else {
-			esc_html_e( 'Example: ', 'varnish-http-purge' );
-			echo '<code>123.45.67.89</code> or <code>localhost</code>';
+			esc_html_e( 'Examples: ', 'varnish-http-purge' );
+			echo '<code>123.45.67.89</code> or <code>localhost</code> or <code>12.34.56.78, 23.45.67.89</code>';
 		}
 
 		echo '</label>';
@@ -193,10 +194,26 @@ class VarnishStatus {
 
 		if ( empty( $input ) ) {
 			return; // do nothing.
+		} elseif ( strpos( $input, ',' ) ) {
+			// Turn IPs into an array
+			$ips       = explode( ',', $input );
+			$valid_ips = array();
+
+			foreach ( $ips as $ip ) {
+				if ( 'localhost' === $input || filter_var( trim( $ip ), FILTER_VALIDATE_IP ) ) {
+					$valid_ips[] = trim( $ip );
+				}
+			}
+			// If all the IPs are valid, then we can carry on.
+			if ( ! empty( $valid_ips ) ) {
+				$set_message = __( 'Proxy Cache IPs Updated', 'varnish-http-purge' );
+				$set_type    = 'updated';
+				$output      = implode( ', ', $valid_ips );
+			}
 		} elseif ( 'localhost' === $input || filter_var( $input, FILTER_VALIDATE_IP ) ) {
-			$set_message = 'Proxy Cache IP Updated.';
+			$set_message = __( 'Proxy Cache IP Updated', 'varnish-http-purge' );
 			$set_type    = 'updated';
-			$output      = filter_var( $input, FILTER_VALIDATE_IP );
+			$output      = $input;
 		}
 
 		add_settings_error( 'vhp_varnish_ip', 'varnish-ip', $set_message, $set_type );
@@ -222,14 +239,6 @@ class VarnishStatus {
 	public function options_check_caching_scan() {
 		?>
 		<p><?php esc_html_e( 'This feature performs a check of the most common issues that prevents your site from caching properly. This feature is provided to help you in resolve potential conflicts on your own. When filing an issue with your web-host, we recommend you include the output in your ticket.', 'varnish-http-purge' ); ?></p>
-		<h4><?php esc_html_e( 'Privacy Note', 'varnish-http-purge' ); ?></h4>
-		<p>
-		<?php
-			// translators: %s is a link to the readme for the detection service.
-			printf( wp_kses_post( __( '<strong>This check uses <a href="%s">a remote service hosted on DreamObjects</a></strong>.', 'varnish-http-purge' ) ), 'https://varnish-http-purge.objects-us-east-1.dream.io/readme.txt' );
-		?>
-		</p>
-		<p><?php esc_html_e( 'The service used only for providing up to date compatibility checks on plugins and themes that may conflict with running a server based cache. No personally identifying information regarding persons running this check, nor the plugins and themes in use on this site will be transmitted. The bare minimum of usage information is collected, concerning only IPs and domains making requests of the service. If you do not wish to use this service, please do not use this feature.', 'varnish-http-purge' ); ?></p>
 		<?php
 
 		// If there's no post made, let's not...

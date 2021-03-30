@@ -1,9 +1,9 @@
 = Proxy Cache Purge =
 Contributors: Ipstenu, mikeschroder, techpriester, danielbachhuber
 Tags: proxy, purge, cache, varnish, nginx
-Requires at least: 4.7
-Tested up to: 5.4
-Stable tag: 4.8.1
+Requires at least: 5.0
+Tested up to: 5.7
+Stable tag: 5.0
 Requires PHP: 5.6
 
 Automatically empty proxy cached content when your site is modified.
@@ -50,17 +50,37 @@ That will break cache on page loads. It is _not_ recommended for production!
 
 = WP CLI =
 
-* `wp varnish purge` - Flush the entire cache
-* `wp varnish debug [<url>]` - Help for debugging how well your cache is (or isn't) working
+<strong>Purge</strong>
+
+Purge commands let you empty the cache.
+
+* `wp varnish purge` - Flush the cache for your front page
+* `wp varnish purge [<url>]` - Flush the cache for one URL
+
+You can use the parameter `--wildcard` to empty everything from that URL down. So if you wanted to empty cache for all themes, you would do this:
+
+* `wp varnish purge https://example.com/wp-content/themes --wildcard`
+
+<strong>Debug</strong>
+
+Debugging can help you figure out why your cache isn't working as well as it could. The default is for your home page, but you can pass any URL on your domain.
+
+* `wp varnish debug [<url>]`
+
+Available parameters:
+
+* `[--include-headers]` --  Include headers in debug check output
+* `[--include-grep]` -- Grep active theme and plugin directories for common issues
+
+<strong>DevMode</strong>
+
+Development mode allows you to disable the cache, temporarily.
+
 * `wp varnish devmode [<activate|deactivate|toggle>]` - Change development mode state
 
 = Privacy Policy =
 
-By default, no data is tracked. If you use the site scanner/debugging tool, your domain and IP address will access [a remote service hosted on DreamObjects](https://varnish-http-purge.objects-us-east-1.dream.io/readme.txt). No personally identifying transaction data is recorded or stored, only overall usage. IP addresses of the website making the request may be recorded by the service, but there is no way to access them and use it to correspond with individuals or processes.
-
-Use of this service is required for the cache checking in order to provide up to date compatibility checks on plugins and themes that may conflict with running a server based cache without needing to update the plugin every day.
-
-<em>No visitor information from your site is tracked.</em>
+As of version 5, this plugin no longer uses any remote data.
 
 == Installation ==
 
@@ -171,15 +191,15 @@ If your web host set up your service, check their documentation.
 
 = What if I have multiple proxy cache IPs? =
 
-Multiple IPs are not supported at this time.
+You may enter them, separated by a comma, on the settings page.
 
 = What version of Varnish is supported? =
 
-This was built and tested on Varnish 3.x. While it is reported to work on 2.x and 4.x, it is only supported on v3 at this time.
+So far this plugin has been reported to successfully function on Varnish v2 through v6.
 
 = Does this work with Nginx caching? =
 
-It can, if you've configured Nginx caching to respect the curl PURGE request. If this doesn't work, I recommend setting your Varnish IP to `localhost` as Nginx requires a service control installed for the IP address to work.
+It can, if you've configured Nginx caching to respect the curl PURGE request. If this doesn't work, try setting your Varnish IP to `localhost` as Nginx requires a service control installed for the IP address to work.
 
 = What should my cache rules be? =
 
@@ -203,17 +223,13 @@ This plugin is installed by default for _all_ DreamPress installs on DreamHost, 
 
 == Changelog ==
 
-= 4.8.1 =
-* May 2019
-* Compat with WP 5.2
-* Correct changes with DB cache flushing (props @mathieuhays)
-* Simplified logic for edge case debugging
-
-= 4.8 =
-* March 2019
-* Improve debugger
-* Clean code per standards
-* Improve callback on WP-CLI
+= 5.0 =
+* March 2021
+* Now purges draft and pending posts (to account for people who un-publish) - props @jerlarke
+* Localhost the debugger json. They aren't updated that often, and the remote load is unnecessary.
+* More support for Health Check
+* Remove strtotime check on Age header - props Matt Fields
+* Support for multiple IPs (based on P.Brisson's work)
 
 == Screenshots ==
 

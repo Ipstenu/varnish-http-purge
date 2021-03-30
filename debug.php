@@ -342,10 +342,10 @@ class VarnishDebug {
 		} elseif ( false === $remote_ip && ! empty( $varniship ) ) {
 			$return = array(
 				// translators: %s is an IP address.
-				'message' => sprintf( __( 'Your Varnish IP address is set to %s but a proxy (like Cloudflare or Sucuri) has not been detected. This is mostly harmless, but if you have issues with your cache not emptying when you make a post, you may need to remove your Varnish IP. Please check with your webhost or server admin before doing so.', 'varnish-http-purge' ), $varniship ),
+				'message' => sprintf( __( 'Your Proxy IP address is set to %s but a proxy (like Cloudflare or Sucuri) has not been detected. This is mostly harmless, but if you have issues with your cache not emptying when you make a post, you may need to remove the IP. Please check with your webhost or server admin before doing so.', 'varnish-http-purge' ), $varniship ),
 				'icon'    => 'warning',
 			);
-		} elseif ( false !== $remote_ip && $remote_ip !== $varniship ) {
+		} elseif ( false !== $remote_ip && 'cloudflare' !== $remote_ip && $remote_ip !== $varniship ) {
 			$return = array(
 				'icon'    => 'warning',
 				'message' => __( 'You\'re using a custom Varnish IP that doesn\'t appear to match your server IP address. If you\'re using multiple caching servers or IPv6, this is fine. Please make sure you\'ve properly configured it according to your webhost\'s specifications.', 'varnish-http-purge' ),
@@ -397,7 +397,7 @@ class VarnishDebug {
 			if ( strpos( $headers['Server'], 'cloudflare' ) !== false ) {
 				$return['CloudFlare'] = array(
 					'icon'    => 'warning',
-					'message' => __( 'CloudFlare has been detected. Make sure you configure WordPress properly by adding your Varnish IP and to flush the CloudFlare cache if you see inconsistencies.', 'varnish-http-purge' ),
+					'message' => __( 'CloudFlare has been detected. Make sure you configure WordPress properly by adding your Cache IP and to flush the CloudFlare cache if you see inconsistencies.', 'varnish-http-purge' ),
 				);
 			}
 
@@ -405,7 +405,7 @@ class VarnishDebug {
 			if ( isset( $headers['X-Powered-By'] ) && strpos( $headers['X-Powered-By'], 'HHVM' ) !== false ) {
 				$return['HHVM'] = array(
 					'icon'    => 'notice',
-					'message' => __( 'You are running HHVM instead of PHP. While that is compatible with Varnish, you should consider PHP 7. WordPress will cease support for HHVM in 2018.', 'varnish-http-purge' ),
+					'message' => __( 'You are running HHVM instead of PHP. While that is compatible with Varnish and Nginx, you should consider PHP 7. WordPress no longer supports HHVM.', 'varnish-http-purge' ),
 				);
 			}
 
@@ -415,6 +415,13 @@ class VarnishDebug {
 					'message' => __( 'This site is hosted on Pagely. The results of this scan may not be accurate.', 'varnish-http-purge' ),
 				);
 			}
+		}
+
+		if ( isset( $headers['X-Powered-By'] ) && strpos( $headers['X-Powered-By'], 'DreamPress' ) !== false ) {
+			$return['DreamHost'] = array(
+				'icon'    => 'awesome',
+				'message' => __( 'This site is hosted on DreamHost (as DreamPress). The results of this scan will be accurate.', 'varnish-http-purge' ),
+			);
 		}
 
 		if ( isset( $headers['X-hacker'] ) ) {
@@ -496,14 +503,8 @@ class VarnishDebug {
 			);
 
 			// Let's check our known bad cookies.
-			$request = wp_remote_get( 'https://varnish-http-purge.objects-us-east-1.dream.io/cookies.json' );
-
-			if ( is_wp_error( $request ) ) {
-				return $return; // Bail if we can't hit the server.
-			}
-
-			$body    = wp_remote_retrieve_body( $request );
-			$cookies = json_decode( $body );
+			$json_data = file_get_contents( plugin_dir_path( __FILE__ ) . 'debugger/cookies.json' );
+			$cookies   = json_decode( $json_data );
 
 			if ( empty( $cookies ) ) {
 				if ( WP_DEBUG ) {
@@ -599,11 +600,6 @@ class VarnishDebug {
 				'message' => sprintf( __( 'The "Age" header is returning %s, which means it is not properly caching. Either this URL is intentionally excluded from caching, or a theme or plugin is instructing WordPress not to cache.', 'varnish-http-purge' ), $age_header ),
 				'icon'    => 'warning',
 			);
-		} elseif ( (bool) strtotime( $headers['Age'] ) && time() <= strtotime( $headers['Age'] ) ) {
-			$return['Age Headers'] = array(
-				'icon'    => 'bad',
-				'message' => __( 'The "Age" header is set to an invalid time, which will result in incorrect caching.', 'varnish-http-purge' ),
-			);
 		} else {
 			$return['Age Headers'] = array(
 				'icon'    => 'awesome',
@@ -659,20 +655,9 @@ class VarnishDebug {
 	public static function bad_themes_results() {
 
 		$return  = array();
-		$request = wp_remote_get( 'https://varnish-http-purge.objects-us-east-1.dream.io/themes.json' );
-
-		if ( is_wp_error( $request ) ) {
-			if ( WP_DEBUG ) {
-				$return['Theme Check'] = array(
-					'icon'    => 'warning',
-					'message' => __( 'Error: Theme data cannot be loaded.', 'varnish-http-purge' ),
-				);
-			}
-			return $return; // Bail early.
-		}
-
-		$body   = wp_remote_retrieve_body( $request );
-		$themes = json_decode( $body );
+		// Let's check our known bad themes.
+		$json_data = file_get_contents( plugin_dir_path( __FILE__ ) . 'debugger/themes.json' );
+		$themes    = json_decode( $json_data );
 
 		if ( empty( $themes ) ) {
 			if ( WP_DEBUG ) {
@@ -733,6 +718,7 @@ class VarnishDebug {
 
 		$return   = array();
 		$messages = array(
+			'addon'        => __( 'This plugin may require add-ons to ensure full compatibility. Please check their documentation.', 'varnish-http-purge' ),
 			'incompatible' => __( 'This plugin has unexpected results with caching, making not function properly.', 'varnish-http-purge' ),
 			'translation'  => __( 'Translation plugins that use cookies and/or sessions prevent most server side caching from running properly.', 'varnish-http-purge' ),
 			'sessions'     => __( 'This plugin uses sessions, which conflicts with server side caching.', 'varnish-http-purge' ),
@@ -743,19 +729,8 @@ class VarnishDebug {
 			'maybe'        => __( 'This plugin is usually fine, but may be configured in a way that breaks caching. Please resolve all other errors. If this is the only one left, and caching is running, you may safely ignore this message.', 'varnish-http-purge' ),
 		);
 
-		$request = wp_remote_get( 'https://varnish-http-purge.objects-us-east-1.dream.io/plugins.json' );
-		if ( is_wp_error( $request ) ) {
-			if ( WP_DEBUG ) {
-				$return['Plugin Check'] = array(
-					'icon'    => 'warning',
-					'message' => __( 'Error: Plugin data cannot be loaded.', 'varnish-http-purge' ),
-				);
-			}
-			return $return; // Bail early.
-		}
-
-		$body    = wp_remote_retrieve_body( $request );
-		$plugins = json_decode( $body );
+		$json_data = file_get_contents( plugin_dir_path( __FILE__ ) . 'debugger/plugins.json' );
+		$plugins   = json_decode( $json_data );
 
 		if ( empty( $plugins ) ) {
 			if ( WP_DEBUG ) {
@@ -846,6 +821,11 @@ class VarnishDebug {
 		// Themes that don't play nicely with Varnish.
 		$bad_themes_results = self::bad_themes_results();
 		$output             = array_merge( $output, $bad_themes_results );
+
+		// Update site option data
+		$debug_log = get_site_option( 'vhp_varnish_debug' );
+		$debug_log[ VarnishPurger::the_home_url() ] = $output;
+		update_site_option( 'vhp_varnish_debug', $debug_log );
 
 		return $output;
 	}

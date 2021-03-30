@@ -1,9 +1,9 @@
 <?php
 /**
  * Plugin Name: Proxy Cache Purge
- * Plugin URI: https://halfelf.org/plugins/varnish-http-purge/
+ * Plugin URI: https://github.com/ipstenu/varnish-http-purge/
  * Description: Automatically empty cached pages when content on your site is modified.
- * Version: 4.8.1
+ * Version: 5.0
  * Author: Mika Epstein
  * Author URI: https://halfelf.org/
  * License: http://www.apache.org/licenses/LICENSE-2.0
@@ -12,7 +12,7 @@
  *
  * @package varnish-http-purge
  *
- * Copyright 2016-2018 Mika Epstein (email: ipstenu@halfelf.org)
+ * Copyright 2016-2021 Mika Epstein (email: ipstenu@halfelf.org)
  *
  * This file is part of Proxy Cache Purge, a plugin for WordPress.
  *
@@ -35,7 +35,7 @@ class VarnishPurger {
 	 * Version Number
 	 * @var string
 	 */
-	public static $version = '4.8.1';
+	public static $version = '5.0';
 
 	/**
 	 * List of URLs to be purged
@@ -87,6 +87,11 @@ class VarnishPurger {
 			update_site_option( 'vhp_varnish_ip', '' );
 		}
 
+		// Default Debug is the home.
+		if ( ! get_site_option( 'vhp_varnish_debug' ) ) {
+			update_site_option( 'vhp_varnish_debug', array( $this->the_home_url() => array() ) );
+		}
+
 		// Release the hounds!
 		add_action( 'init', array( &$this, 'init' ) );
 		add_action( 'admin_init', array( &$this, 'admin_init' ) );
@@ -95,7 +100,6 @@ class VarnishPurger {
 
 		// Check if there's an upgrade
 		add_action( 'upgrader_process_complete', array( &$this, 'check_upgrades' ), 10, 2 );
-
 	}
 
 	/**
@@ -105,6 +109,7 @@ class VarnishPurger {
 	 * @access public
 	 */
 	public function admin_init() {
+		global $pagenow;
 
 		// If WordPress.com Master Bar is active, show the activity box.
 		if ( class_exists( 'Jetpack' ) && Jetpack::is_module_active( 'masterbar' ) ) {
@@ -119,7 +124,7 @@ class VarnishPurger {
 		}
 
 		// Admin notices.
-		if ( current_user_can( 'manage_options' ) ) {
+		if ( current_user_can( 'manage_options' ) && 'site-health.php' !== $pagenow ) {
 
 			// Warning: Debug is active.
 			if ( VarnishDebug::devmode_check() ) {
@@ -244,7 +249,7 @@ class VarnishPurger {
 	 * @since 4.6
 	 */
 	public function admin_message_purge() {
-		echo '<div id="message" class="notice notice-success fade is-dismissible"><p><strong>' . esc_html__( 'Varnish cache emptied!', 'varnish-http-purge' ) . '</strong></p></div>';
+		echo '<div id="message" class="notice notice-success fade is-dismissible"><p><strong>' . esc_html__( 'Cache emptied!', 'varnish-http-purge' ) . '</strong></p></div>';
 	}
 
 	/**
@@ -490,7 +495,7 @@ class VarnishPurger {
 		// translators: %1$s links to the plugin's page on WordPress.org.
 		$intro    = sprintf( __( '<a href="%1$s">Proxy Cache Purge</a> automatically deletes your cached posts when published or updated. When making major site changes, such as with a new theme, plugins, or widgets, you may need to manually empty the cache.', 'varnish-http-purge' ), 'http://wordpress.org/plugins/varnish-http-purge/' );
 		$url      = wp_nonce_url( add_query_arg( 'vhp_flush_do', 'all' ), 'vhp-flush-do' );
-		$button   = __( 'Press the button below to force it to empty your entire Varnish cache.', 'varnish-http-purge' );
+		$button   = __( 'Press the button below to force it to empty your entire cache.', 'varnish-http-purge' );
 		$button  .= '</p><p><span class="button"><strong><a href="' . $url . '">';
 		$button  .= __( 'Empty Cache', 'varnish-http-purge' );
 		$button  .= '</a></strong></span>';
@@ -533,6 +538,7 @@ class VarnishPurger {
 			'import_end',                     // When importer ends
 			'save_post',                      // Save a post.
 			'switch_theme',                   // After a theme is changed.
+			'customize_save_after',           // After Customizer is updated.
 			'trashed_post',                   // Empty Trashed post.
 		);
 
@@ -556,6 +562,7 @@ class VarnishPurger {
 			'import_start',                   // When importer starts
 			'import_end',                     // When importer ends
 			'switch_theme',                   // After a theme is changed.
+			'customize_save_after',           // After Customizer is updated.
 		);
 
 		/**
@@ -633,19 +640,26 @@ class VarnishPurger {
 			$x_purge_method = 'regex';
 		}
 
-		// Build a varniship.
+		// Build a varniship to sail.
 		if ( VHP_VARNISH_IP !== false ) {
 			$varniship = VHP_VARNISH_IP;
 		} else {
 			$varniship = get_site_option( 'vhp_varnish_ip' );
 		}
-		$varniship = apply_filters( 'vhp_varnish_ip', $varniship );
+
+		// Apply filters:
+		if ( is_array( $varniship ) ) {
+			// To each ship:
+			for ( $i = 0; $i++; $i < count( $varniship ) ) {
+				$varniship[ $i ] = apply_filters( 'vhp_varnish_ip', $varniship[ $i ] );
+			}
+		} else {
+			// To the only ship:
+			$varniship = apply_filters( 'vhp_varnish_ip', $varniship );
+		}
 
 		// Determine the path.
-		$path = '';
-		if ( isset( $p['path'] ) ) {
-			$path = $p['path'];
-		}
+		$path = ( isset( $p['path'] ) ) ? $p['path'] : '';
 
 		/**
 		 * Schema filter
@@ -655,65 +669,88 @@ class VarnishPurger {
 		 *
 		 * @since 3.7.3
 		 */
-		$schema = apply_filters( 'varnish_http_purge_schema', 'http://' );
 
-		// If we made varniship, let it sail.
+		// This is a very annoying check for DreamHost who needs to default to HTTPS without breaking
+		// people who've been around before
+		$server_hostname = gethostname();
+		switch ( substr( $server_hostname, 0, 3 ) ) {
+			case 'dp-':
+				$schema_type = 'https://';
+				break;
+			default:
+				$schema_type = 'http://';
+				break;
+		}
+		$schema = apply_filters( 'varnish_http_purge_schema', $schema_type );
+
+		// When we have Varnish IPs, we use them in lieu of hosts.
 		if ( isset( $varniship ) && ! empty( $varniship ) ) {
-			$host = $varniship;
+			$all_hosts = ( ! is_array( $varniship ) ) ? array( $varniship ) : $varniship;
 		} else {
-			$host = $p['host'];
+			// default is the main host, made into an array
+			$all_hosts = array( $p['host'] );
 		}
 
-		/**
-		 * Allow setting of ports in host name
-		 * Credit: davidbarratt - https://github.com/Ipstenu/varnish-http-purge/pull/38/
-		 *
-		 * (default value: $p['host'])
-		 *
-		 * @var string
-		 * @access public
-		 * @since 4.4.0
-		 */
-		$host_headers = $p['host'];
-		if ( isset( $p['port'] ) ) {
-			$host_headers .= ':' . $p['port'];
+		// Since the ship is always an array now, let's loop.
+		foreach ( $all_hosts as $one_host ) {
+
+			/**
+			 * Allow setting of ports in host name
+			 * Credit: davidbarratt - https://github.com/Ipstenu/varnish-http-purge/pull/38/
+			 *
+			 * (default value: $p['host'])
+			 *
+			 * @var string
+			 * @access public
+			 * @since 4.4.0
+			 */
+			$host_headers = $p['host'];
+
+			// If the URL to be purged has a port, we're going to re-use it.
+			if ( isset( $p['port'] ) ) {
+				$host_headers .= ':' . $p['port'];
+			}
+
+			$parsed_url = $url;
+
+			// Filter URL based on the Proxy IP for nginx compatibility
+			if ( 'localhost' === $one_host ) {
+				$parsed_url = str_replace( $p['host'], 'localhost', $parsed_url );
+			}
+
+			// Create path to purge.
+			$purgeme = $schema . $one_host . $path . $pregex;
+
+			// Check the queries...
+			if ( ! empty( $p['query'] ) && 'vhp-regex' !== $p['query'] ) {
+				$purgeme .= '?' . $p['query'];
+			}
+
+			/**
+			 * Filters the HTTP headers to send with a PURGE request.
+			 *
+			 * @since 4.1
+			 */
+			$headers  = apply_filters(
+				'varnish_http_purge_headers',
+				array(
+					'host'           => $host_headers,
+					'X-Purge-Method' => $x_purge_method,
+				)
+			);
+
+			// Send response.
+			$response = wp_remote_request(
+				$purgeme,
+				array(
+					'sslverify' => false,
+					'method'    => 'PURGE',
+					'headers'   => $headers,
+				)
+			);
+
+			do_action( 'after_purge_url', $parsed_url, $purgeme, $response, $headers );
 		}
-
-		$parsed_url = $url;
-		// Filter URL based on the Proxy IP for nginx compatibility
-		if ( 'localhost' === $varniship ) {
-			$parsed_url = str_replace( $p['host'], 'localhost', $parsed_url );
-		}
-
-		// Create path to purge.
-		$purgeme = $schema . $host . $path . $pregex;
-
-		// Check the queries...
-		if ( ! empty( $p['query'] ) && 'vhp-regex' !== $p['query'] ) {
-			$purgeme .= '?' . $p['query'];
-		}
-
-		/**
-		 * Filters the HTTP headers to send with a PURGE request.
-		 *
-		 * @since 4.1
-		 */
-		$headers  = apply_filters(
-			'varnish_http_purge_headers',
-			array(
-				'host'           => $host_headers,
-				'X-Purge-Method' => $x_purge_method,
-			)
-		);
-		$response = wp_remote_request(
-			$purgeme,
-			array(
-				'method'  => 'PURGE',
-				'headers' => $headers,
-			)
-		);
-
-		do_action( 'after_purge_url', $parsed_url, $purgeme, $response, $headers );
 	}
 
 	/**
@@ -773,7 +810,7 @@ class VarnishPurger {
 		 * If this is a valid post we want to purge the post,
 		 * the home page and any associated tags and categories
 		 */
-		$valid_post_status = array( 'publish', 'private', 'trash' );
+		$valid_post_status = array( 'publish', 'private', 'trash', 'pending', 'draft' );
 		$this_post_status  = get_post_status( $post_id );
 
 		// Not all post types are created equal.
@@ -783,7 +820,7 @@ class VarnishPurger {
 
 		/**
 		 * Determine the route for the rest API
-		 * This will need to be revisted if WP updates the version.
+		 * This will need to be revisited if WP updates the version.
 		 * Future me: Consider an array? 4.7-?? use v2, and then adapt from there?
 		 */
 		if ( version_compare( get_bloginfo( 'version' ), '4.7', '>=' ) ) {
@@ -1004,5 +1041,6 @@ if ( ! is_network_admin() ) {
 	require_once 'settings.php';
 }
 require_once 'debug.php';
+require_once 'health-check.php';
 
 $purger = new VarnishPurger();

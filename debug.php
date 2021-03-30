@@ -345,7 +345,7 @@ class VarnishDebug {
 				'message' => sprintf( __( 'Your Proxy IP address is set to %s but a proxy (like Cloudflare or Sucuri) has not been detected. This is mostly harmless, but if you have issues with your cache not emptying when you make a post, you may need to remove the IP. Please check with your webhost or server admin before doing so.', 'varnish-http-purge' ), $varniship ),
 				'icon'    => 'warning',
 			);
-		} elseif ( false !== $remote_ip && $remote_ip !== $varniship ) {
+		} elseif ( false !== $remote_ip && 'cloudflare' !== $remote_ip && $remote_ip !== $varniship ) {
 			$return = array(
 				'icon'    => 'warning',
 				'message' => __( 'You\'re using a custom Varnish IP that doesn\'t appear to match your server IP address. If you\'re using multiple caching servers or IPv6, this is fine. Please make sure you\'ve properly configured it according to your webhost\'s specifications.', 'varnish-http-purge' ),
@@ -405,7 +405,7 @@ class VarnishDebug {
 			if ( isset( $headers['X-Powered-By'] ) && strpos( $headers['X-Powered-By'], 'HHVM' ) !== false ) {
 				$return['HHVM'] = array(
 					'icon'    => 'notice',
-					'message' => __( 'You are running HHVM instead of PHP. While that is compatible with Varnish and Nginx, you should consider PHP 7. WordPress will cease support for HHVM in 2018.', 'varnish-http-purge' ),
+					'message' => __( 'You are running HHVM instead of PHP. While that is compatible with Varnish and Nginx, you should consider PHP 7. WordPress no longer supports HHVM.', 'varnish-http-purge' ),
 				);
 			}
 
@@ -415,6 +415,13 @@ class VarnishDebug {
 					'message' => __( 'This site is hosted on Pagely. The results of this scan may not be accurate.', 'varnish-http-purge' ),
 				);
 			}
+		}
+
+		if ( isset( $headers['X-Powered-By'] ) && strpos( $headers['X-Powered-By'], 'DreamPress' ) !== false ) {
+			$return['DreamHost'] = array(
+				'icon'    => 'excellent',
+				'message' => __( 'This site is hosted on DreamHost (as DreamPress). The results of this scan will be accurate.', 'varnish-http-purge' ),
+			);
 		}
 
 		if ( isset( $headers['X-hacker'] ) ) {

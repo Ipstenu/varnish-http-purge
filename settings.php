@@ -168,7 +168,7 @@ class VarnishStatus {
 		}
 
 		echo '<input type="text" id="vhp_varnish_ip" name="vhp_varnish_ip" value="' . esc_attr( $varniship ) . '" size="25" ' . disabled( $disabled, true ) . '/>';
-		echo '<label for="vhp_varnish_ip">';
+		echo '<label for="vhp_varnish_ip">&nbsp;';
 
 		if ( $disabled ) {
 			esc_html_e( 'A Proxy Cache IP has been defined in your wp-config file, so it is not editable in settings.', 'varnish-http-purge' );

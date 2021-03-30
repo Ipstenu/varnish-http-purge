@@ -2,7 +2,7 @@
 Contributors: Ipstenu, mikeschroder, techpriester, danielbachhuber
 Tags: proxy, purge, cache, varnish, nginx
 Requires at least: 5.0
-Tested up to: 5.6
+Tested up to: 5.7
 Stable tag: 5.0
 Requires PHP: 5.6
 
@@ -200,7 +200,7 @@ This plugin is installed by default for _all_ DreamPress installs on DreamHost, 
 == Changelog ==
 
 = 5.0 =
-* July 2019
+* March 2021
 * Now purges draft and pending posts (to account for people who un-publish) - props @jerlarke
 * Localhost the debugger json. They aren't updated that often, and the remote load is unnecessary.
 * More support for Health Check

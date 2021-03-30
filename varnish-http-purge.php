@@ -12,7 +12,7 @@
  *
  * @package varnish-http-purge
  *
- * Copyright 2016-2020 Mika Epstein (email: ipstenu@halfelf.org)
+ * Copyright 2016-2021 Mika Epstein (email: ipstenu@halfelf.org)
  *
  * This file is part of Proxy Cache Purge, a plugin for WordPress.
  *
@@ -945,6 +945,8 @@ class VarnishPurger {
 					// Need to add in JSON?
 				);
 			}
+
+			// Need to add in something here for custom post types!!!
 
 			// Home Pages and (if used) posts page.
 			array_push(

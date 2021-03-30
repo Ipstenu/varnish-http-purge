@@ -87,7 +87,7 @@ class VarnishPurger {
 			update_site_option( 'vhp_varnish_ip', '' );
 		}
 
-		// Default IP is nothing.
+		// Default Debug is the home.
 		if ( ! get_site_option( 'vhp_varnish_debug' ) ) {
 			update_site_option( 'vhp_varnish_debug', array( $this->the_home_url() => array() ) );
 		}
@@ -659,10 +659,7 @@ class VarnishPurger {
 		}
 
 		// Determine the path.
-		$path = '';
-		if ( isset( $p['path'] ) ) {
-			$path = $p['path'];
-		}
+		$path = ( isset( $p['path'] ) ) ? $p['path'] : '';
 
 		/**
 		 * Schema filter
@@ -672,23 +669,31 @@ class VarnishPurger {
 		 *
 		 * @since 3.7.3
 		 */
-		$schema = apply_filters( 'varnish_http_purge_schema', 'http://' );
+
+		// This is a very annoying check for DreamHost who needs to default to HTTPS without breaking
+		// people who've been around before
+		$server_hostname = gethostname();
+		switch ( substr( $server_hostname, 0, 3 ) ) {
+			case 'dp-':
+				$schema_type = 'https://';
+				break;
+			default:
+				$schema_type = 'http://';
+				break;
+		}
+		$schema = apply_filters( 'varnish_http_purge_schema', $schema_type );
 
 		// When we have Varnish IPs, we use them in lieu of hosts.
 		if ( isset( $varniship ) && ! empty( $varniship ) ) {
-			if ( ! is_array( $varniship ) ) {
-				// if we're not an array, let's make it one.
-				$hosts = array( $varniship );
-			} else {
-				$hosts = $varniship;
-			}
+			$all_hosts = ( ! is_array( $varniship ) ) ? array( $varniship ) : $varniship;
 		} else {
 			// default is the main host, made into an array
-			$hosts = array( $p['host'] );
+			$all_hosts = array( $p['host'] );
 		}
 
 		// Since the ship is always an array now, let's loop.
-		foreach ( $hosts as $host ) {
+		foreach ( $all_hosts as $one_host ) {
+
 			/**
 			 * Allow setting of ports in host name
 			 * Credit: davidbarratt - https://github.com/Ipstenu/varnish-http-purge/pull/38/
@@ -699,7 +704,7 @@ class VarnishPurger {
 			 * @access public
 			 * @since 4.4.0
 			 */
-			$host_headers = $host;
+			$host_headers = $p['host'];
 
 			// If the URL to be purged has a port, we're going to re-use it.
 			if ( isset( $p['port'] ) ) {
@@ -707,13 +712,14 @@ class VarnishPurger {
 			}
 
 			$parsed_url = $url;
+
 			// Filter URL based on the Proxy IP for nginx compatibility
-			if ( 'localhost' === $host ) {
+			if ( 'localhost' === $one_host ) {
 				$parsed_url = str_replace( $p['host'], 'localhost', $parsed_url );
 			}
 
 			// Create path to purge.
-			$purgeme = $schema . $host . $path . $pregex;
+			$purgeme = $schema . $one_host . $path . $pregex;
 
 			// Check the queries...
 			if ( ! empty( $p['query'] ) && 'vhp-regex' !== $p['query'] ) {
@@ -732,16 +738,19 @@ class VarnishPurger {
 					'X-Purge-Method' => $x_purge_method,
 				)
 			);
+
+			// Send response.
 			$response = wp_remote_request(
 				$purgeme,
 				array(
-					'method'  => 'PURGE',
-					'headers' => $headers,
+					'sslverify' => false,
+					'method'    => 'PURGE',
+					'headers'   => $headers,
 				)
 			);
-		}
 
-		do_action( 'after_purge_url', $parsed_url, $purgeme, $response, $headers );
+			do_action( 'after_purge_url', $parsed_url, $purgeme, $response, $headers );
+		}
 	}
 
 	/**

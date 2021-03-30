@@ -946,8 +946,6 @@ class VarnishPurger {
 				);
 			}
 
-			// Need to add in something here for custom post types!!!
-
 			// Home Pages and (if used) posts page.
 			array_push(
 				$listofurls,

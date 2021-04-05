@@ -330,7 +330,7 @@ class VarnishPurger {
 	}
 
 	/**
-	 * Custom CSS to allow for coloring.
+	 * Custom CSS to allow for colouring.
 	 *
 	 * @since 4.5.0
 	 */
@@ -586,12 +586,15 @@ class VarnishPurger {
 	public function execute_purge() {
 		$purge_urls = array_unique( $this->purge_urls );
 
-		if ( empty( $purge_urls ) ) {
-
-			if ( ! isset( $_GET ) ) {
-				return;
-			} elseif ( isset( $_GET['vhp_flush_all'] ) && check_admin_referer( 'vhp-flush-all' ) ) {
-				// Flush Cache recursize.
+		if ( ! empty( $purge_urls ) && is_array( $purge_urls ) ) {
+			// If there are URLs to purge and it's an array...
+			foreach ( $purge_urls as $url ) {
+				$this->purge_url( $url );
+			}
+		} elseif ( isset( $_GET ) ) {
+			// Otherwise, if we've passed a GET call...
+			if ( isset( $_GET['vhp_flush_all'] ) && check_admin_referer( 'vhp-flush-all' ) ) {
+				// Flush Cache recursive.
 				$this->purge_url( $this->the_home_url() . '/?vhp-regex' );
 			} elseif ( isset( $_GET['vhp_flush_do'] ) && check_admin_referer( 'vhp-flush-do' ) ) {
 				if ( 'object' === $_GET['vhp_flush_do'] ) {
@@ -600,7 +603,7 @@ class VarnishPurger {
 						wp_cache_flush();
 					}
 				} elseif ( 'all' === $_GET['vhp_flush_do'] ) {
-					// Flush Cache recursize.
+					// Flush Cache recursive.
 					$this->purge_url( $this->the_home_url() . '/?vhp-regex' );
 				} else {
 					// Flush the URL we're on.
@@ -610,10 +613,6 @@ class VarnishPurger {
 					}
 					$this->purge_url( esc_url_raw( wp_unslash( $_GET['vhp_flush_do'] ) ) );
 				}
-			}
-		} else {
-			foreach ( $purge_urls as $url ) {
-				$this->purge_url( $url );
 			}
 		}
 	}

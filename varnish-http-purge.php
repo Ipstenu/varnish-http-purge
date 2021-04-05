@@ -626,6 +626,12 @@ class VarnishPurger {
 	 * @access protected
 	 */
 	public static function purge_url( $url ) {
+
+		// Bail early if someone sent a non-URL
+		if ( false === filter_var( $url, FILTER_VALIDATE_URL ) ) {
+			return;
+		}
+
 		$p = wp_parse_url( $url );
 
 		// Bail early if there's no host since some plugins are weird.
@@ -642,12 +648,8 @@ class VarnishPurger {
 			$x_purge_method = 'regex';
 		}
 
-		// Build a varniship to sail.
-		if ( VHP_VARNISH_IP !== false ) {
-			$varniship = VHP_VARNISH_IP;
-		} else {
-			$varniship = get_site_option( 'vhp_varnish_ip' );
-		}
+		// Build a varniship to sail. ⛵️
+		$varniship = ( VHP_VARNISH_IP !== false ) ? VHP_VARNISH_IP : get_site_option( 'vhp_varnish_ip' );
 
 		// Apply filters:
 		if ( is_array( $varniship ) ) {
@@ -673,7 +675,7 @@ class VarnishPurger {
 		 */
 
 		// This is a very annoying check for DreamHost who needs to default to HTTPS without breaking
-		// people who've been around before
+		// people who've been around before.
 		$server_hostname = gethostname();
 		switch ( substr( $server_hostname, 0, 3 ) ) {
 			case 'dp-':
@@ -689,7 +691,7 @@ class VarnishPurger {
 		if ( isset( $varniship ) && ! empty( $varniship ) ) {
 			$all_hosts = ( ! is_array( $varniship ) ) ? array( $varniship ) : $varniship;
 		} else {
-			// default is the main host, made into an array
+			// The default is the main host, converted into an array.
 			$all_hosts = array( $p['host'] );
 		}
 
@@ -742,6 +744,7 @@ class VarnishPurger {
 			);
 
 			// Send response.
+			// SSL Verify is required here since Varnish is HTTP only, but proxies are a thing.
 			$response = wp_remote_request(
 				$purgeme,
 				array(

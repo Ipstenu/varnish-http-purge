@@ -3,7 +3,7 @@
  * Plugin Name: Proxy Cache Purge
  * Plugin URI: https://github.com/ipstenu/varnish-http-purge/
  * Description: Automatically empty cached pages when content on your site is modified.
- * Version: 5.0
+ * Version: 5.0.1
  * Author: Mika Epstein
  * Author URI: https://halfelf.org/
  * License: http://www.apache.org/licenses/LICENSE-2.0
@@ -35,7 +35,7 @@ class VarnishPurger {
 	 * Version Number
 	 * @var string
 	 */
-	public static $version = '5.0';
+	public static $version = '5.0.1';
 
 	/**
 	 * List of URLs to be purged
@@ -148,7 +148,7 @@ class VarnishPurger {
 		global $blog_id, $wp_db_version;
 
 		// If the DB version we detect isn't the same as the version core thinks
-		// we will fush DB cache. This may cause double dumping in some cases but
+		// we will flush DB cache. This may cause double dumping in some cases but
 		// should not be harmful.
 		if ( file_exists( WP_CONTENT_DIR . '/object-cache.php' ) && (int) get_option( 'db_version' ) !== $wp_db_version ) {
 			wp_cache_flush();
@@ -586,8 +586,11 @@ class VarnishPurger {
 	public function execute_purge() {
 		$purge_urls = array_unique( $this->purge_urls );
 
-		if ( empty( $purge_urls ) && isset( $_GET ) ) {
-			if ( isset( $_GET['vhp_flush_all'] ) && check_admin_referer( 'vhp-flush-all' ) ) {
+		if ( empty( $purge_urls ) ) {
+
+			if ( ! isset( $_GET ) ) {
+				return;
+			} elseif ( isset( $_GET['vhp_flush_all'] ) && check_admin_referer( 'vhp-flush-all' ) ) {
 				// Flush Cache recursize.
 				$this->purge_url( $this->the_home_url() . '/?vhp-regex' );
 			} elseif ( isset( $_GET['vhp_flush_do'] ) && check_admin_referer( 'vhp-flush-do' ) ) {
@@ -824,7 +827,21 @@ class VarnishPurger {
 		 * Future me: Consider an array? 4.7-?? use v2, and then adapt from there?
 		 */
 		if ( version_compare( get_bloginfo( 'version' ), '4.7', '>=' ) ) {
-			$rest_api_route = 'wp/v2';
+			$json_disabled  = false;
+			$json_disablers = array(
+				'disable-json-api/disable-json-api.php',
+			);
+
+			foreach ( $json_disablers as $json_plugin ) {
+				if ( is_plugin_active( $json_plugin ) ) {
+					$json_disabled = true;
+				}
+			}
+
+			// If json is NOT disabled...
+			if ( ! $json_disabled ) {
+				$rest_api_route = 'wp/v2';
+			}
 		}
 
 		// array to collect all our URLs.
@@ -851,10 +868,10 @@ class VarnishPurger {
 				} elseif ( 'page' === $this_post_type ) {
 					$rest_permalink = get_rest_url() . $rest_api_route . '/pages/' . $post_id . '/';
 				}
-			}
 
-			if ( $rest_permalink ) {
-				array_push( $listofurls, $rest_permalink );
+				if ( isset( $rest_permalink ) ) {
+					array_push( $listofurls, $rest_permalink );
+				}
 			}
 
 			// Add in AMP permalink for offical WP AMP plugin:

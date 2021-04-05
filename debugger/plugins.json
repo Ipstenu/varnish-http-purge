@@ -53,6 +53,12 @@
 		"reason": "translation",
 		"always": true
 	},
+	"iron-demo-importer":{
+		"type": "bad",
+		"path": "iron-demo-importer/iron-importer.php",
+		"reason": "incompatible",
+		"always": true
+	},
 	"pie-register":{
 		"type": "warning",
 		"path": "pie-register/pie-register.php",
@@ -119,6 +125,12 @@
 		"reason": "cache",
 		"always": true
 	},
+	"wccp-pro":{
+		"type": "bad",
+		"path": "wccp-pro/preventer-index.php",
+		"reason": "cookies",
+		"always": true
+	},
 	"woo-advanced-discounts":{
 		"type": "bad",
 		"path": "woo-advanced-discounts/wad.php",
@@ -141,6 +153,12 @@
 		"type": "bad",
 		"path": "wp-cache/wp-cache.php",
 		"reason": "cache",
+		"always": true
+	},
+	"wp-content-copy-protector":{
+		"type": "bad",
+		"path": "wp-content-copy-protector/preventer-index.php",
+		"reason": "cookies",
 		"always": true
 	},
 	"wp-file-cache":{

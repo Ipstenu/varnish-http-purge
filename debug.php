@@ -404,8 +404,8 @@ class VarnishDebug {
 			// HHVM: Note, WP is dropping support.
 			if ( isset( $headers['X-Powered-By'] ) && strpos( $headers['X-Powered-By'], 'HHVM' ) !== false ) {
 				$return['HHVM'] = array(
-					'icon'    => 'notice',
-					'message' => __( 'You are running HHVM instead of PHP. While that is compatible with Varnish and Nginx, you should consider PHP 7. WordPress no longer supports HHVM.', 'varnish-http-purge' ),
+					'icon'    => 'warning',
+					'message' => __( 'You are running HHVM which is no longer supported by WordPress. As such, this plugin does not officially support it either.', 'varnish-http-purge' ),
 				);
 			}
 
@@ -637,6 +637,33 @@ class VarnishDebug {
 				);
 			}
 		}
+
+		// Cloudflare
+		if ( isset( $headers['cf-cache-status'] ) ) {
+
+			switch ( $headers['cf-cache-status'] ) {
+				case 'MISS':
+					$return['CloudFlare Cache'] = array(
+						'icon'    => 'warning',
+						'message' => __( 'CloudFlare reported this page as not cached. That may be okay. If it goes away when you re-run this check, you\'re fine.', 'varnish-http-purge' ),
+					);
+					break;
+				case 'DYNAMIC':
+					$return['CloudFlare Cache'] = array(
+						'icon'    => 'good',
+						'message' => __( 'CloudFlare is caching properly.', 'varnish-http-purge' ),
+					);
+					break;
+				case 'HIT':
+				case 'HIT from Backend':
+					$return['CloudFlare Cache'] = array(
+						'icon'    => 'warning',
+						'message' => __( 'CloudFlare is caching however you appear to be using Automatic Platform Optimization (APO). Be advised there are currently issues with emptying cache on Varnish and APO. At this time, we recommend disabling APO.', 'varnish-http-purge' ),
+					);
+					break;
+			}
+		}
+
 
 		return $return;
 	}

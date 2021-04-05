@@ -200,9 +200,7 @@ class VarnishStatus {
 			$valid_ips = array();
 
 			foreach ( $ips as $ip ) {
-				if ( 'localhost' === $input || filter_var( trim( $ip ), FILTER_VALIDATE_IP ) ) {
-					$valid_ips[] = trim( $ip );
-				}
+				$valid_ips[] = sanitize_text_field( $ip );
 			}
 			// If all the IPs are valid, then we can carry on.
 			if ( ! empty( $valid_ips ) ) {
@@ -210,10 +208,10 @@ class VarnishStatus {
 				$set_type    = 'updated';
 				$output      = implode( ', ', $valid_ips );
 			}
-		} elseif ( 'localhost' === $input || filter_var( $input, FILTER_VALIDATE_IP ) ) {
+		} else {
 			$set_message = __( 'Proxy Cache IP Updated', 'varnish-http-purge' );
 			$set_type    = 'updated';
-			$output      = $input;
+			$output      = sanitize_text_field( $input );
 		}
 
 		add_settings_error( 'vhp_varnish_ip', 'varnish-ip', $set_message, $set_type );

@@ -121,7 +121,7 @@ No. WordPress can't detect those file changes so it can't tell your cache what t
 
 = Does every WordPress plugin and theme work with a proxy cache? =
 
-No. Some of them have behavior that causes them not to cache, either by accident or design.
+No. Some of them have behaviours that causes them not to cache, either by accident or design. It's incredibly hard to debug those, since many of the related issues are contextual (like _if_ you save a page with a special setting). I've done my best to flag everything as possible issues with the debugger.
 
 = I'm a developer, can I tell your cache to empty in my plugin/theme? =
 
@@ -199,7 +199,7 @@ You may enter them, separated by a comma, on the settings page.
 
 = What version of Varnish is supported? =
 
-So far this plugin has been reported to successfully function on Varnish v2 through v6.
+So far this plugin has been reported to successfully function on Varnish v 2 through v 6.5.
 
 = Does this work with Nginx caching? =
 
@@ -216,7 +216,7 @@ This is a question beyond the support of plugin. I do not have the resources ava
 
 = How can I see what the plugin is sending to the cache service? =
 
-Yes _IF_ the service has an interface. Sadly Nginx does not. [Detailed directions can be found on the debugging section on GitHub](https://github.com/Ipstenu/varnish-http-purge/wiki#debugging). Bear in mind, these interfaces tend to be command-line only.
+Yes _IF_ the service has an interface. Sadly Nginx does not. [Detailed directions can be found on the debugging section on GitHub](https://github.com/Ipstenu/varnish-http-purge/wiki). Bear in mind, these interfaces tend to be command-line only.
 
 = Don't you work at DreamHost? Is this Official or DreamHost only? =
 

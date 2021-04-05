@@ -664,7 +664,6 @@ class VarnishDebug {
 			}
 		}
 
-
 		return $return;
 	}
 

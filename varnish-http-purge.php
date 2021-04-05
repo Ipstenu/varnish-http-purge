@@ -244,7 +244,7 @@ class VarnishPurger {
 
 	/**
 	 * Purge Message
-	 * Informs of a succcessful purge
+	 * Informs of a successful purge
 	 *
 	 * @since 4.6
 	 */

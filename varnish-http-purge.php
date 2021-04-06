@@ -809,9 +809,6 @@ class VarnishPurger {
 	public function purge_post( $post_id ) {
 
 		/**
-		 * Future Me: You may need this if you figure out how to use an array
-		 * further down with versions of WP and their json versions.
-		 * Maybe use global $wp_version;
 		 * If this is a valid post we want to purge the post,
 		 * the home page and any associated tags and categories
 		 */
@@ -849,7 +846,7 @@ class VarnishPurger {
 		// array to collect all our URLs.
 		$listofurls = array();
 
-		// Verify we have a permalink and that we're a valid post status and a not an invalid post type.
+		// Verify we have a permalink and that we're a valid post status and type.
 		if ( false !== get_permalink( $post_id ) && in_array( $this_post_status, $valid_post_status, true ) && ! in_array( $this_post_type, $invalid_post_type, true ) ) {
 
 			// Post URL.
@@ -876,7 +873,7 @@ class VarnishPurger {
 				}
 			}
 
-			// Add in AMP permalink for offical WP AMP plugin:
+			// Add in AMP permalink for official WP AMP plugin:
 			// https://wordpress.org/plugins/amp/
 			if ( function_exists( 'amp_get_permalink' ) ) {
 				array_push( $listofurls, amp_get_permalink( $post_id ) );
@@ -992,7 +989,9 @@ class VarnishPurger {
 		}
 
 		// If the array isn't empty, proceed.
-		if ( ! empty( $listofurls ) ) {
+		if ( empty( $listofurls ) ) {
+			return;
+		} else {
 			// Strip off query variables
 			foreach ( $listofurls as $url ) {
 				$url = strtok( $url, '?' );

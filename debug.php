@@ -633,7 +633,7 @@ class VarnishDebug {
 			} else {
 				$return['Mod Pagespeed'] = array(
 					'icon'    => 'bad',
-					'message' => __( 'Mod Pagespeed is active but your caching headers may not be right. This may be a false negative if other parts of your site are overwriting headers. Fix all other errors listed, then come back to this. If you are still having errors, you will need to look into using .htaccess or Nginx to override the Pagespeed headers.', 'varnish-http-purge' ),
+					'message' => __( 'Mod Pagespeed is active but your caching headers may not be right. This could be a false negative if other parts of your site are overwriting headers. Fix all other errors listed, then come back to this. If you are still having errors, you will need to look into using .htaccess or Nginx to override the Pagespeed headers.', 'varnish-http-purge' ),
 				);
 			}
 		}
@@ -658,7 +658,7 @@ class VarnishDebug {
 				case 'HIT from Backend':
 					$return['CloudFlare Cache'] = array(
 						'icon'    => 'warning',
-						'message' => __( 'CloudFlare is caching however you appear to be using Automatic Platform Optimization (APO). Be advised there are currently issues with emptying cache on Varnish and APO. At this time, we recommend disabling APO.', 'varnish-http-purge' ),
+						'message' => __( 'CloudFlare is caching however you appear to be using Automatic Platform Optimization (APO). You may face issues with emptying cache on Varnish and APO depending on your webhost. If you find that saving posts takes an exceptionally long time, or does not appear to update content, try disabling APO.', 'varnish-http-purge' ),
 					);
 					break;
 			}

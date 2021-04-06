@@ -174,7 +174,7 @@ class VarnishStatus {
 			esc_html_e( 'A Proxy Cache IP has been defined in your wp-config file, so it is not editable in settings.', 'varnish-http-purge' );
 		} else {
 			esc_html_e( 'Examples: ', 'varnish-http-purge' );
-			echo '<code>123.45.67.89</code> or <code>localhost</code> or <code>12.34.56.78, 23.45.67.89</code>';
+			echo '<code>123.45.67.89</code><br /><code>localhost</code><br /><code>12.34.56.78, 23.45.67.89</code>';
 		}
 
 		echo '</label>';

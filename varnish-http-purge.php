@@ -67,6 +67,7 @@ class VarnishPurger {
 	public function __construct() {
 		defined( 'VHP_VARNISH_IP' ) || define( 'VHP_VARNISH_IP', false );
 		defined( 'VHP_DEVMODE' ) || define( 'VHP_DEVMODE', false );
+		defined( 'VHP_DOMAINS' ) || define( 'VHP_URLS', false );
 
 		// Development mode defaults to off.
 		self::$devmode = array(
@@ -164,7 +165,7 @@ class VarnishPurger {
 				}
 				// @codingStandardsIgnoreEnd
 
-				// Add nocacche to CSS and JS.
+				// Add nocache to CSS and JS.
 				add_filter( 'style_loader_src', array( 'VarnishDebug', 'nocache_cssjs' ), 10, 2 );
 				add_filter( 'script_loader_src', array( 'VarnishDebug', 'nocache_cssjs' ), 10, 2 );
 			}
@@ -995,6 +996,30 @@ class VarnishPurger {
 			// Strip off query variables
 			foreach ( $listofurls as $url ) {
 				$url = strtok( $url, '?' );
+			}
+
+			// If the DOMAINS setup is defined, we duplicate the URLs
+			if ( false !== VHP_DOMAINS ) {
+				// Split domains into an array
+				$domains = explode( ',', VHP_DOMAINS );
+				$newurls = array();
+
+				// Loop through all the domains
+				foreach ( $domains as $a_domain ) {
+					foreach ( $listofurls as $url ) {
+						// If the URL contains the filtered home_url, and is NOT equal to the domain we're trying to replace, we will add it to the new urls
+						if ( false !== strpos( $this->the_home_url(), $url ) && $this->the_home_url() !== $a_domain ) {
+							$newurls[] = str_replace( $this->the_home_url(), $a_domain, $url );
+						}
+						// If the URL contains the raw home_url, and is NOT equal to the domain we're trying to replace, we will add it to the new urls
+						if ( false !== strpos( home_url(), $url ) && home_url() !== $a_domain ) {
+							$newurls[] = str_replace( home_url(), $a_domain, $url );
+						}
+					}
+				}
+
+				// Merge all the URLs
+				array_push( $listofurls, $newurls );
 			}
 
 			// Make sure each URL only gets purged once, eh?

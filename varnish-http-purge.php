@@ -652,7 +652,13 @@ class VarnishPurger {
 		// Build a varniship to sail. ⛵️
 		$varniship = ( VHP_VARNISH_IP !== false ) ? VHP_VARNISH_IP : get_site_option( 'vhp_varnish_ip' );
 
-		// Apply filters:
+		// If there are commas, and for whatever reason this didn't become an array
+		// properly, force it.
+		if ( ! is_array( $varniship ) && strpos( $varniship, ',' ) !== false ) {
+			$varniship = explode( ',', $varniship );
+		}
+
+		// Now apply filters
 		if ( is_array( $varniship ) ) {
 			// To each ship:
 			for ( $i = 0; $i++; $i < count( $varniship ) ) {

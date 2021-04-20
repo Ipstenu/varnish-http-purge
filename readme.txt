@@ -234,6 +234,7 @@ This plugin is installed by default for _all_ DreamPress installs on DreamHost, 
 * Allow saving Proxy IP with ports
 * Add check for CloudFlare APO
 * Improve purge execution fails
+* Double check multiple varnish IPs
 
 = 5.0 =
 * March 2021

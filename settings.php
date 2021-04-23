@@ -167,8 +167,14 @@ class VarnishStatus {
 			$varniship = get_site_option( 'vhp_varnish_ip' );
 		}
 
+		if ( is_array( $varniship ) ) {
+			$list_varniship = implode( ',', $varniship );
+		} else {
+			$list_varniship = $varniship;
+		}
+
 		?>
-		<input type="text" id="vhp_varnish_ip" name="vhp_varnish_ip" value="<?php echo esc_attr( $varniship ); ?>" size="25" <?php disabled( $disabled, true ); ?> />
+		<input type="text" id="vhp_varnish_ip" name="vhp_varnish_ip" value="<?php echo esc_attr( $list_varniship ); ?>" size="25" <?php disabled( $disabled, true ); ?> />
 		<label for="vhp_varnish_ip">&nbsp;
 		<?php
 
@@ -176,7 +182,7 @@ class VarnishStatus {
 			esc_html_e( 'A Proxy Cache IP has been defined in your wp-config file, so it is not editable in settings.', 'varnish-http-purge' );
 		} else {
 			esc_html_e( 'Examples: ', 'varnish-http-purge' );
-			echo '<code>123.45.67.89</code><br /><code>localhost</code><br /><code>12.34.56.78, 23.45.67.89</code>';
+			echo '<br /><code>123.45.67.89</code><br /><code>localhost</code><br /><code>12.34.56.78, 23.45.67.89</code>';
 		}
 
 		echo '</label>';
@@ -196,9 +202,9 @@ class VarnishStatus {
 
 		if ( empty( $input ) ) {
 			return; // do nothing.
-		} elseif ( strpos( $input, ',' ) ) {
+		} elseif ( strpos( $input, ',' ) !== false ) {
 			// Turn IPs into an array
-			$ips       = explode( ',', $input );
+			$ips       = array_map( 'trim', explode( ',', $input ) );
 			$valid_ips = array();
 
 			foreach ( $ips as $ip ) {

@@ -655,7 +655,7 @@ class VarnishPurger {
 		// If there are commas, and for whatever reason this didn't become an array
 		// properly, force it.
 		if ( ! is_array( $varniship ) && strpos( $varniship, ',' ) !== false ) {
-			$varniship = explode( ',', $varniship );
+			$varniship = array_map( 'trim', explode( ',', $varniship ) );
 		}
 
 		// Now apply filters

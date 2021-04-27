@@ -228,7 +228,7 @@ This plugin is installed by default for _all_ DreamPress installs on DreamHost, 
 == Changelog ==
 
 = 5.0.1 =
-* DATE
+* April 2021
 * Updating incompatibility lists
 * HHVM deprecation
 * Allow saving Proxy IP with ports

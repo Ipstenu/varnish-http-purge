@@ -3,7 +3,7 @@
  * Plugin Name: Proxy Cache Purge
  * Plugin URI: https://github.com/ipstenu/varnish-http-purge/
  * Description: Automatically empty cached pages when content on your site is modified.
- * Version: 5.0
+ * Version: 5.0.1
  * Author: Mika Epstein
  * Author URI: https://halfelf.org/
  * License: http://www.apache.org/licenses/LICENSE-2.0
@@ -35,7 +35,7 @@ class VarnishPurger {
 	 * Version Number
 	 * @var string
 	 */
-	public static $version = '5.0';
+	public static $version = '5.0.1';
 
 	/**
 	 * List of URLs to be purged
@@ -67,6 +67,7 @@ class VarnishPurger {
 	public function __construct() {
 		defined( 'VHP_VARNISH_IP' ) || define( 'VHP_VARNISH_IP', false );
 		defined( 'VHP_DEVMODE' ) || define( 'VHP_DEVMODE', false );
+		defined( 'VHP_DOMAINS' ) || define( 'VHP_URLS', false );
 
 		// Development mode defaults to off.
 		self::$devmode = array(
@@ -148,7 +149,7 @@ class VarnishPurger {
 		global $blog_id, $wp_db_version;
 
 		// If the DB version we detect isn't the same as the version core thinks
-		// we will fush DB cache. This may cause double dumping in some cases but
+		// we will flush DB cache. This may cause double dumping in some cases but
 		// should not be harmful.
 		if ( file_exists( WP_CONTENT_DIR . '/object-cache.php' ) && (int) get_option( 'db_version' ) !== $wp_db_version ) {
 			wp_cache_flush();
@@ -164,7 +165,7 @@ class VarnishPurger {
 				}
 				// @codingStandardsIgnoreEnd
 
-				// Add nocacche to CSS and JS.
+				// Add nocache to CSS and JS.
 				add_filter( 'style_loader_src', array( 'VarnishDebug', 'nocache_cssjs' ), 10, 2 );
 				add_filter( 'script_loader_src', array( 'VarnishDebug', 'nocache_cssjs' ), 10, 2 );
 			}
@@ -244,7 +245,7 @@ class VarnishPurger {
 
 	/**
 	 * Purge Message
-	 * Informs of a succcessful purge
+	 * Informs of a successful purge
 	 *
 	 * @since 4.6
 	 */
@@ -330,7 +331,7 @@ class VarnishPurger {
 	}
 
 	/**
-	 * Custom CSS to allow for coloring.
+	 * Custom CSS to allow for colouring.
 	 *
 	 * @since 4.5.0
 	 */
@@ -586,9 +587,15 @@ class VarnishPurger {
 	public function execute_purge() {
 		$purge_urls = array_unique( $this->purge_urls );
 
-		if ( empty( $purge_urls ) && isset( $_GET ) ) {
+		if ( ! empty( $purge_urls ) && is_array( $purge_urls ) ) {
+			// If there are URLs to purge and it's an array...
+			foreach ( $purge_urls as $url ) {
+				$this->purge_url( $url );
+			}
+		} elseif ( isset( $_GET ) ) {
+			// Otherwise, if we've passed a GET call...
 			if ( isset( $_GET['vhp_flush_all'] ) && check_admin_referer( 'vhp-flush-all' ) ) {
-				// Flush Cache recursize.
+				// Flush Cache recursive.
 				$this->purge_url( $this->the_home_url() . '/?vhp-regex' );
 			} elseif ( isset( $_GET['vhp_flush_do'] ) && check_admin_referer( 'vhp-flush-do' ) ) {
 				if ( 'object' === $_GET['vhp_flush_do'] ) {
@@ -597,7 +604,7 @@ class VarnishPurger {
 						wp_cache_flush();
 					}
 				} elseif ( 'all' === $_GET['vhp_flush_do'] ) {
-					// Flush Cache recursize.
+					// Flush Cache recursive.
 					$this->purge_url( $this->the_home_url() . '/?vhp-regex' );
 				} else {
 					// Flush the URL we're on.
@@ -607,10 +614,6 @@ class VarnishPurger {
 					}
 					$this->purge_url( esc_url_raw( wp_unslash( $_GET['vhp_flush_do'] ) ) );
 				}
-			}
-		} else {
-			foreach ( $purge_urls as $url ) {
-				$this->purge_url( $url );
 			}
 		}
 	}
@@ -624,6 +627,12 @@ class VarnishPurger {
 	 * @access protected
 	 */
 	public static function purge_url( $url ) {
+
+		// Bail early if someone sent a non-URL
+		if ( false === filter_var( $url, FILTER_VALIDATE_URL ) ) {
+			return;
+		}
+
 		$p = wp_parse_url( $url );
 
 		// Bail early if there's no host since some plugins are weird.
@@ -640,14 +649,16 @@ class VarnishPurger {
 			$x_purge_method = 'regex';
 		}
 
-		// Build a varniship to sail.
-		if ( VHP_VARNISH_IP !== false ) {
-			$varniship = VHP_VARNISH_IP;
-		} else {
-			$varniship = get_site_option( 'vhp_varnish_ip' );
+		// Build a varniship to sail. ⛵️
+		$varniship = ( VHP_VARNISH_IP !== false ) ? VHP_VARNISH_IP : get_site_option( 'vhp_varnish_ip' );
+
+		// If there are commas, and for whatever reason this didn't become an array
+		// properly, force it.
+		if ( ! is_array( $varniship ) && strpos( $varniship, ',' ) !== false ) {
+			$varniship = array_map( 'trim', explode( ',', $varniship ) );
 		}
 
-		// Apply filters:
+		// Now apply filters
 		if ( is_array( $varniship ) ) {
 			// To each ship:
 			for ( $i = 0; $i++; $i < count( $varniship ) ) {
@@ -671,7 +682,7 @@ class VarnishPurger {
 		 */
 
 		// This is a very annoying check for DreamHost who needs to default to HTTPS without breaking
-		// people who've been around before
+		// people who've been around before.
 		$server_hostname = gethostname();
 		switch ( substr( $server_hostname, 0, 3 ) ) {
 			case 'dp-':
@@ -687,7 +698,7 @@ class VarnishPurger {
 		if ( isset( $varniship ) && ! empty( $varniship ) ) {
 			$all_hosts = ( ! is_array( $varniship ) ) ? array( $varniship ) : $varniship;
 		} else {
-			// default is the main host, made into an array
+			// The default is the main host, converted into an array.
 			$all_hosts = array( $p['host'] );
 		}
 
@@ -740,6 +751,7 @@ class VarnishPurger {
 			);
 
 			// Send response.
+			// SSL Verify is required here since Varnish is HTTP only, but proxies are a thing.
 			$response = wp_remote_request(
 				$purgeme,
 				array(
@@ -804,9 +816,6 @@ class VarnishPurger {
 	public function purge_post( $post_id ) {
 
 		/**
-		 * Future Me: You may need this if you figure out how to use an array
-		 * further down with versions of WP and their json versions.
-		 * Maybe use global $wp_version;
 		 * If this is a valid post we want to purge the post,
 		 * the home page and any associated tags and categories
 		 */
@@ -824,13 +833,27 @@ class VarnishPurger {
 		 * Future me: Consider an array? 4.7-?? use v2, and then adapt from there?
 		 */
 		if ( version_compare( get_bloginfo( 'version' ), '4.7', '>=' ) ) {
-			$rest_api_route = 'wp/v2';
+			$json_disabled  = false;
+			$json_disablers = array(
+				'disable-json-api/disable-json-api.php',
+			);
+
+			foreach ( $json_disablers as $json_plugin ) {
+				if ( is_plugin_active( $json_plugin ) ) {
+					$json_disabled = true;
+				}
+			}
+
+			// If json is NOT disabled...
+			if ( ! $json_disabled ) {
+				$rest_api_route = 'wp/v2';
+			}
 		}
 
 		// array to collect all our URLs.
 		$listofurls = array();
 
-		// Verify we have a permalink and that we're a valid post status and a not an invalid post type.
+		// Verify we have a permalink and that we're a valid post status and type.
 		if ( false !== get_permalink( $post_id ) && in_array( $this_post_status, $valid_post_status, true ) && ! in_array( $this_post_type, $invalid_post_type, true ) ) {
 
 			// Post URL.
@@ -851,13 +874,13 @@ class VarnishPurger {
 				} elseif ( 'page' === $this_post_type ) {
 					$rest_permalink = get_rest_url() . $rest_api_route . '/pages/' . $post_id . '/';
 				}
+
+				if ( isset( $rest_permalink ) ) {
+					array_push( $listofurls, $rest_permalink );
+				}
 			}
 
-			if ( $rest_permalink ) {
-				array_push( $listofurls, $rest_permalink );
-			}
-
-			// Add in AMP permalink for offical WP AMP plugin:
+			// Add in AMP permalink for official WP AMP plugin:
 			// https://wordpress.org/plugins/amp/
 			if ( function_exists( 'amp_get_permalink' ) ) {
 				array_push( $listofurls, amp_get_permalink( $post_id ) );
@@ -973,10 +996,36 @@ class VarnishPurger {
 		}
 
 		// If the array isn't empty, proceed.
-		if ( ! empty( $listofurls ) ) {
+		if ( empty( $listofurls ) ) {
+			return;
+		} else {
 			// Strip off query variables
 			foreach ( $listofurls as $url ) {
 				$url = strtok( $url, '?' );
+			}
+
+			// If the DOMAINS setup is defined, we duplicate the URLs
+			if ( false !== VHP_DOMAINS ) {
+				// Split domains into an array
+				$domains = explode( ',', VHP_DOMAINS );
+				$newurls = array();
+
+				// Loop through all the domains
+				foreach ( $domains as $a_domain ) {
+					foreach ( $listofurls as $url ) {
+						// If the URL contains the filtered home_url, and is NOT equal to the domain we're trying to replace, we will add it to the new urls
+						if ( false !== strpos( $this->the_home_url(), $url ) && $this->the_home_url() !== $a_domain ) {
+							$newurls[] = str_replace( $this->the_home_url(), $a_domain, $url );
+						}
+						// If the URL contains the raw home_url, and is NOT equal to the domain we're trying to replace, we will add it to the new urls
+						if ( false !== strpos( home_url(), $url ) && home_url() !== $a_domain ) {
+							$newurls[] = str_replace( home_url(), $a_domain, $url );
+						}
+					}
+				}
+
+				// Merge all the URLs
+				array_push( $listofurls, $newurls );
 			}
 
 			// Make sure each URL only gets purged once, eh?

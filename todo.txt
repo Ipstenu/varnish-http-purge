@@ -4,3 +4,4 @@ We're going to sit down and look into how the plugin is structured to make it ev
 
 * Refactor automated purge all to be kinder
 * Get rid of the need to parse_url()
+* Allow additional domains to be purged.

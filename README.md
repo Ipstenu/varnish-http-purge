@@ -12,4 +12,3 @@ If you find a new theme or plugin with known conflict, please open a new issue i
 * [WP Readme](readme.txt)
 * [Changelog](changelog.txt)
 * [Varnish VCLs](https://github.com/Ipstenu/varnish-http-purge/wiki/Sample-VCLs)
-* [Debug Service](https://github.com/Ipstenu/varnish-debug-service/)

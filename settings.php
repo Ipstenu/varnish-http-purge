@@ -167,14 +167,22 @@ class VarnishStatus {
 			$varniship = get_site_option( 'vhp_varnish_ip' );
 		}
 
-		echo '<input type="text" id="vhp_varnish_ip" name="vhp_varnish_ip" value="' . esc_attr( $varniship ) . '" size="25" ' . disabled( $disabled, true ) . '/>';
-		echo '<label for="vhp_varnish_ip">&nbsp;';
+		if ( is_array( $varniship ) ) {
+			$list_varniship = implode( ',', $varniship );
+		} else {
+			$list_varniship = $varniship;
+		}
+
+		?>
+		<input type="text" id="vhp_varnish_ip" name="vhp_varnish_ip" value="<?php echo esc_attr( $list_varniship ); ?>" size="25" <?php disabled( $disabled, true ); ?> />
+		<label for="vhp_varnish_ip">&nbsp;
+		<?php
 
 		if ( $disabled ) {
 			esc_html_e( 'A Proxy Cache IP has been defined in your wp-config file, so it is not editable in settings.', 'varnish-http-purge' );
 		} else {
 			esc_html_e( 'Examples: ', 'varnish-http-purge' );
-			echo '<code>123.45.67.89</code> or <code>localhost</code> or <code>12.34.56.78, 23.45.67.89</code>';
+			echo '<br /><code>123.45.67.89</code><br /><code>localhost</code><br /><code>12.34.56.78, 23.45.67.89</code>';
 		}
 
 		echo '</label>';
@@ -194,15 +202,13 @@ class VarnishStatus {
 
 		if ( empty( $input ) ) {
 			return; // do nothing.
-		} elseif ( strpos( $input, ',' ) ) {
+		} elseif ( strpos( $input, ',' ) !== false ) {
 			// Turn IPs into an array
-			$ips       = explode( ',', $input );
+			$ips       = array_map( 'trim', explode( ',', $input ) );
 			$valid_ips = array();
 
 			foreach ( $ips as $ip ) {
-				if ( 'localhost' === $input || filter_var( trim( $ip ), FILTER_VALIDATE_IP ) ) {
-					$valid_ips[] = trim( $ip );
-				}
+				$valid_ips[] = sanitize_text_field( $ip );
 			}
 			// If all the IPs are valid, then we can carry on.
 			if ( ! empty( $valid_ips ) ) {
@@ -210,10 +216,10 @@ class VarnishStatus {
 				$set_type    = 'updated';
 				$output      = implode( ', ', $valid_ips );
 			}
-		} elseif ( 'localhost' === $input || filter_var( $input, FILTER_VALIDATE_IP ) ) {
+		} else {
 			$set_message = __( 'Proxy Cache IP Updated', 'varnish-http-purge' );
 			$set_type    = 'updated';
-			$output      = $input;
+			$output      = sanitize_text_field( $input );
 		}
 
 		add_settings_error( 'vhp_varnish_ip', 'varnish-ip', $set_message, $set_type );

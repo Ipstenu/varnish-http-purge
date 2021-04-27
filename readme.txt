@@ -3,7 +3,7 @@ Contributors: Ipstenu, mikeschroder, techpriester, danielbachhuber
 Tags: proxy, purge, cache, varnish, nginx
 Requires at least: 5.0
 Tested up to: 5.7
-Stable tag: 5.0
+Stable tag: 5.0.1
 Requires PHP: 5.6
 
 Automatically empty proxy cached content when your site is modified.
@@ -121,7 +121,7 @@ No. WordPress can't detect those file changes so it can't tell your cache what t
 
 = Does every WordPress plugin and theme work with a proxy cache? =
 
-No. Some of them have behavior that causes them not to cache, either by accident or design.
+No. Some of them have behaviours that causes them not to cache, either by accident or design. It's incredibly hard to debug those, since many of the related issues are contextual (like _if_ you save a page with a special setting). I've done my best to flag everything as possible issues with the debugger.
 
 = I'm a developer, can I tell your cache to empty in my plugin/theme? =
 
@@ -177,6 +177,10 @@ Replace `123.45.67.89` with the IP of your <em>Proxy Cache Server</em> (_not_ Cl
 
 If you want to use WP-CLI, you can set an option in the database. This will not take precedence over the define, and exists for people who want to use automation tools: `wp option update vhp_varnish_ip 123.45.67.890`
 
+= Why are my posts timing out/not showing when I'm using CloudFlare? =
+
+This is usually related to CloudFlare's APO setup. I have an open ticket with CloudFlare trying to debug this, but basically whatever they're doing with APO doesn't 'like' the flush command and times out (or crashes).
+
 = Why do I get a 503 or 504 error on every post update? =
 
 Your IP address is incorrect. Check the IP of your server and then the setting for your proxy cache IP. If they're _not_ the same, that's likely why.
@@ -195,7 +199,7 @@ You may enter them, separated by a comma, on the settings page.
 
 = What version of Varnish is supported? =
 
-So far this plugin has been reported to successfully function on Varnish v2 through v6.
+So far this plugin has been reported to successfully function on Varnish v 2 through v 6.5.
 
 = Does this work with Nginx caching? =
 
@@ -212,7 +216,7 @@ This is a question beyond the support of plugin. I do not have the resources ava
 
 = How can I see what the plugin is sending to the cache service? =
 
-Yes _IF_ the service has an interface. Sadly Nginx does not. [Detailed directions can be found on the debugging section on GitHub](https://github.com/Ipstenu/varnish-http-purge/wiki#debugging). Bear in mind, these interfaces tend to be command-line only.
+Yes _IF_ the service has an interface. Sadly Nginx does not. [Detailed directions can be found on the debugging section on GitHub](https://github.com/Ipstenu/varnish-http-purge/wiki). Bear in mind, these interfaces tend to be command-line only.
 
 = Don't you work at DreamHost? Is this Official or DreamHost only? =
 
@@ -222,6 +226,15 @@ Yes _IF_ the service has an interface. Sadly Nginx does not. [Detailed direction
 This plugin is installed by default for _all_ DreamPress installs on DreamHost, and I maintain it for DreamHost, but it was not originally an official DreamHost plugin which means I will continue to support all users to the best of my ability.
 
 == Changelog ==
+
+= 5.0.1 =
+* April 2021
+* Updating incompatibility lists
+* HHVM deprecation
+* Allow saving Proxy IP with ports
+* Add check for CloudFlare APO
+* Improve purge execution fails
+* Double check multiple varnish IPs
 
 = 5.0 =
 * March 2021

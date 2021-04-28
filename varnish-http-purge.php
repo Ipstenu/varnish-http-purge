@@ -67,7 +67,7 @@ class VarnishPurger {
 	public function __construct() {
 		defined( 'VHP_VARNISH_IP' ) || define( 'VHP_VARNISH_IP', false );
 		defined( 'VHP_DEVMODE' ) || define( 'VHP_DEVMODE', false );
-		defined( 'VHP_DOMAINS' ) || define( 'VHP_URLS', false );
+		defined( 'VHP_DOMAINS' ) || define( 'VHP_DOMAINS', false );
 
 		// Development mode defaults to off.
 		self::$devmode = array(

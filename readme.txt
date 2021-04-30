@@ -3,7 +3,7 @@ Contributors: Ipstenu, mikeschroder, techpriester, danielbachhuber
 Tags: proxy, purge, cache, varnish, nginx
 Requires at least: 5.0
 Tested up to: 5.7
-Stable tag: 5.0.1
+Stable tag: 5.0.2
 Requires PHP: 5.6
 
 Automatically empty proxy cached content when your site is modified.
@@ -226,6 +226,10 @@ Yes _IF_ the service has an interface. Sadly Nginx does not. [Detailed direction
 This plugin is installed by default for _all_ DreamPress installs on DreamHost, and I maintain it for DreamHost, but it was not originally an official DreamHost plugin which means I will continue to support all users to the best of my ability.
 
 == Changelog ==
+
+= 5.0.2 =
+* April 2021
+* Wrapping a function_exists check which shouldn't be needed, but it fataled for someone and an ounce of prevention yadda yadda.
 
 = 5.0.1 =
 * April 2021

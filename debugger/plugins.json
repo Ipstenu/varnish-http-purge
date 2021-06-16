@@ -77,6 +77,13 @@
 		"reason": "translation",
 		"always": true
 	},
+	"profilepress":{
+		"type": "bad",
+		"path": "wp-user-avatar/wp-user-avatar.php",
+		"reason": "cookies",
+		"always": true
+	},
+	},
 	"quick-cache":{
 		"type": "bad",
 		"path": "quick-cache/quick-cache.php",

@@ -340,7 +340,7 @@ class VarnishStatus {
 								// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_print_r
 								$content = print_r( $key, true );
 							} else {
-								$content = wp_kses_post( $key );
+								$content = esc_html( $key );
 							}
 							echo '<tr><td width="200px" style="text-align:right;">' . wp_kses_post( ucfirst( $header ) ) . ':</td><td>' . wp_kses_post( $content ) . '</td></tr>';
 						}

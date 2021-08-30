@@ -292,7 +292,7 @@ class VarnishDebug {
 			// Determine the default message.
 			if ( false !== $cache_service ) {
 				// translators: %1 is the type of caching service detected (i.e. nginx or varnish).
-				$return['message'] = sprintf( __( 'Your %1 caching service appears to be running properly.', 'varnish-http-purge' ), $cache_service );
+				$return['message'] = sprintf( __( 'Your %1s caching service appears to be running properly.', 'varnish-http-purge' ), $cache_service );
 				$return['icon']    = 'good';
 			}
 		}
@@ -310,7 +310,7 @@ class VarnishDebug {
 			$return['icon'] = 'awesome';
 		} else {
 			// translators: %1 is the type of caching service detected (i.e. nginx or varnish).
-			$return['message'] = sprintf( __( '%s caching service is running but is unable to cache your site.', 'varnish-http-purge' ), $cache_service );
+			$return['message'] = sprintf( __( '%1s caching service is running but is unable to cache your site.', 'varnish-http-purge' ), $cache_service );
 			$return['icon']    = 'warning';
 		}
 

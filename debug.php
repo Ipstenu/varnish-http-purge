@@ -107,11 +107,8 @@ class VarnishDebug {
 		if ( ! empty( $input ) ) {
 			$parsed_input = wp_parse_url( $input );
 			if ( empty( $parsed_input['scheme'] ) ) {
-				$schema_input = 'http://';
-				if ( is_ssl() ) {
-					$schema_input = 'https://';
-				}
-				$input = $schema_input . ltrim( $input, '/' );
+				$schema_input = ( is_ssl() ) ? 'https://' : 'http://';
+				$input        = $schema_input . ltrim( $input, '/' );
 			}
 		}
 
@@ -139,7 +136,7 @@ class VarnishDebug {
 	 */
 	public static function remote_get( $url = '' ) {
 
-		// Make sure it's not a stupid URL.
+		// Make sure it's not a bad entry.
 		$url = esc_url( $url );
 
 		$args = array(
@@ -157,8 +154,9 @@ class VarnishDebug {
 			return 'fail';
 		}
 
-		// Because the 'Age' header is an important check, wait a second before fetching again.
-		sleep( 1 );
+		// Because the 'Age' header is an important check, wait two seconds before
+		// fetching again.
+		sleep( 2 );
 
 		$response2 = wp_remote_get( $url, $args );
 
@@ -192,7 +190,7 @@ class VarnishDebug {
 			$message  .= $response->get_error_message();
 		} elseif ( '404' === wp_remote_retrieve_response_code( $response ) ) {
 			$preflight = false;
-			$message   = __( 'This URL does not resolve properly. Either it\'s was not found or it redirects incorrectly.', 'varnish-http-purge' );
+			$message   = __( 'This URL does not resolve properly. Either it was not found or it redirects incorrectly.', 'varnish-http-purge' );
 		}
 
 		$return = array(
@@ -297,7 +295,7 @@ class VarnishDebug {
 			}
 		}
 
-		if ( ! $cache_service ) {
+		if ( ! isset( $cache_service ) || ! $cache_service ) {
 			$return['icon']    = 'bad';
 			$return['message'] = __( 'No known cache service has been detected on your site.', 'varnish-http-purge' );
 		} elseif ( ! $kronk ) {
@@ -305,12 +303,12 @@ class VarnishDebug {
 			$return['message'] = __( 'Your site is not responding. If this happens again, please contact your webhost.', 'varnish-http-purge' );
 		} elseif ( ! $cacheheaders_set ) {
 			$return['icon']    = 'notice';
-			$return['message'] = __( 'We were unable find a caching service active for this domain. This may occur if you use a proxy service (such as CloudFlare or Sucuri) or if you\'re in the middle of a DNS move.', 'varnish-http-purge' );
+			$return['message'] = __( 'We were unable find a caching service active for this domain. This may occur if you use a proxy service (such as CloudFlare or Sucuri), your host removed the X-Cacheable tag, or if you\'re in the middle of a DNS move.', 'varnish-http-purge' );
 		} elseif ( $is_cachable && $still_cachable ) {
 			$return['icon'] = 'awesome';
 		} else {
 			// translators: %1 is the type of caching service detected (i.e. nginx or varnish).
-			$return['message'] = sprintf( __( '%1s caching service is running but is unable to cache your site.', 'varnish-http-purge' ), $cache_service );
+			$return['message'] = sprintf( __( 'We detected that the %1s caching service is running, but we are unable to determine that it\'s working.', 'varnish-http-purge' ), $cache_service );
 			$return['icon']    = 'warning';
 		}
 
@@ -335,25 +333,27 @@ class VarnishDebug {
 		$x_nginx = ( isset( $headers['server'] ) && ( strpos( $headers['server'], 'nginx' ) !== false || strpos( $headers['server'], 'openresty' ) !== false ) ) ? true : false;
 
 		if ( $x_nginx && 'localhost' === $varniship ) {
+			// This is a pretty DreamHost specific check. If other hosts want to use it,
+			// or extend it, please let me know.
 			$return = array(
-				'icon'    => 'awesome',
 				'message' => __( 'Your Nginx Proxy is set up correctly.', 'varnish-http-purge' ),
+				'icon'    => 'awesome',
 			);
 		} elseif ( false === $remote_ip && ! empty( $varniship ) ) {
 			$return = array(
 				// translators: %s is an IP address.
 				'message' => sprintf( __( 'Your Proxy IP address is set to %s but a proxy (like Cloudflare or Sucuri) has not been detected. This is mostly harmless, but if you have issues with your cache not emptying when you make a post, you may need to remove the IP. Please check with your webhost or server admin before doing so.', 'varnish-http-purge' ), $varniship ),
-				'icon'    => 'warning',
+				'icon'    => 'notice',
 			);
 		} elseif ( false !== $remote_ip && 'cloudflare' !== $remote_ip && $remote_ip !== $varniship ) {
 			$return = array(
-				'icon'    => 'warning',
 				'message' => __( 'You\'re using a custom Varnish IP that doesn\'t appear to match your server IP address. If you\'re using multiple caching servers or IPv6, this is fine. Please make sure you\'ve properly configured it according to your webhost\'s specifications.', 'varnish-http-purge' ),
+				'icon'    => 'notice',
 			);
 		} else {
 			$return = array(
-				'icon'    => 'awesome',
 				'message' => __( 'Your server IP setup looks good.', 'varnish-http-purge' ),
+				'icon'    => 'awesome',
 			);
 		}
 
@@ -633,7 +633,7 @@ class VarnishDebug {
 			} else {
 				$return['Mod Pagespeed'] = array(
 					'icon'    => 'bad',
-					'message' => __( 'Mod Pagespeed is active but your caching headers may not be right. This could be a false negative if other parts of your site are overwriting headers. Fix all other errors listed, then come back to this. If you are still having errors, you will need to look into using .htaccess or Nginx to override the Pagespeed headers.', 'varnish-http-purge' ),
+					'message' => __( 'Mod Pagespeed is active but your caching headers may not be correct. This may be a false negative if other parts of your site are overwriting headers. Fix all other errors listed, then come back to this. If you are still having errors, you will need to look into using .htaccess or Nginx to override the Pagespeed headers.', 'varnish-http-purge' ),
 				);
 			}
 		}

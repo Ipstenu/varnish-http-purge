@@ -127,6 +127,10 @@ No. Some of them have behaviours that causes them not to cache, either by accide
 
 Yes. [Full documentation can be found on Custom Filters in the wiki](https://github.com/Ipstenu/varnish-http-purge/wiki/Custom-Filters).
 
+= How come my site does a full site purge if I edit over 50 posts at a time? =
+
+In order to prevent your site from crashing by running the same checks over and over, if you try to purge more than 50 URLs at once, the plugin will do a full purge. You can change this value in your settings, or via the define VHP_VARNISH_MAXPOSTS in your `wp-config.php` file.
+
 = Can I turn off caching? =
 
 Kind of. You can use development mode to have WordPress tell your proxy service not to serve cached content, but the content will still be cached by the service.

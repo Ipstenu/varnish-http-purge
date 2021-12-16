@@ -93,6 +93,11 @@ class VarnishPurger {
 			update_site_option( 'vhp_varnish_debug', array( $this->the_home_url() => array() ) );
 		}
 
+		// Default Max posts to purge before purge all happens instead.
+		if ( ! get_site_option( 'vhp_varnish_max_posts_before_all' ) ) {
+			update_site_option( 'vhp_varnish_max_posts_before_all', 50 );
+		}
+
 		// Release the hounds!
 		add_action( 'init', array( &$this, 'init' ) );
 		add_action( 'admin_init', array( &$this, 'admin_init' ) );
@@ -589,16 +594,30 @@ class VarnishPurger {
 
 		if ( ! empty( $purge_urls ) && is_array( $purge_urls ) ) {
 
+			// If there are URLs to purge and it's an array, we'll likely purge.
+
 			// Number of URLs to purge.
 			$count = count( $purge_urls );
 
-			// To do: If the count is over X% of posts, do a purge all instead?
-			// Some rate limiting needs to happen here.
-
-			// If there are URLs to purge and it's an array...
-			foreach ( $purge_urls as $url ) {
-				$this->purge_url( $url );
+			// Max posts
+			if ( defined( 'VHP_VARNISH_MAXPOSTS' ) && false !== VHP_VARNISH_MAXPOSTS ) {
+				$max_posts = VHP_VARNISH_MAXPOSTS;
+			} else {
+				$max_posts = get_option( 'vhp_varnish_max_posts_before_all' );
 			}
+
+			// If there are more than vhp_varnish_max_posts_before_all URLs to purge (default 50), 
+			// do a purge ALL instead. Else, do the normal.
+			if ( $max_posts <= $count ) {
+				// Too many URLs, purge all instead.
+				$this->purge_url( $this->the_home_url() . '/?vhp-regex' );
+			} else {
+				// Purge each URL.
+				foreach ( $purge_urls as $url ) {
+					$this->purge_url( $url );
+				}
+			}
+
 		} elseif ( isset( $_GET ) ) {
 			// Otherwise, if we've passed a GET call...
 			if ( isset( $_GET['vhp_flush_all'] ) && check_admin_referer( 'vhp-flush-all' ) ) {

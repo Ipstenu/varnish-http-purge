@@ -738,6 +738,16 @@ class VarnishPurger {
 			}
 
 			/**
+			 * Filter the purge path
+			 *
+			 * Allows dynamically changing the purge cache for custom purge location
+			 * or systems not supporting .* regex purge for example
+			 *
+			 * @since 5.1.1
+			 */
+			$purgeme = apply_filters( 'vhp_purgeme_path', $purgeme, $schema, $one_host, $path, $pregex, $p );
+
+			/**
 			 * Filters the HTTP headers to send with a PURGE request.
 			 *
 			 * @since 4.1

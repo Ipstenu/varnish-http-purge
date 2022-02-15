@@ -12,7 +12,7 @@
  *
  * @package varnish-http-purge
  *
- * Copyright 2016-2021 Mika Epstein (email: ipstenu@halfelf.org)
+ * Copyright 2016-2022 Mika Epstein (email: ipstenu@halfelf.org)
  *
  * This file is part of Proxy Cache Purge, a plugin for WordPress.
  *
@@ -72,7 +72,7 @@ class VarnishPurger {
 		// Development mode defaults to off.
 		self::$devmode = array(
 			'active' => false,
-			'expire' => current_time( 'timestamp' ),
+			'expire' => time(),
 		);
 		if ( ! get_site_option( 'vhp_varnish_devmode' ) ) {
 			update_site_option( 'vhp_varnish_devmode', self::$devmode );
@@ -302,7 +302,7 @@ class VarnishPurger {
 			$message = __( 'Proxy Cache Purge Development Mode has been activated via wp-config.', 'varnish-http-purge' );
 		} else {
 			$devmode = get_site_option( 'vhp_varnish_devmode', self::$devmode );
-			$time    = human_time_diff( current_time( 'timestamp' ), $devmode['expire'] );
+			$time    = human_time_diff( time(), $devmode['expire'] );
 
 			if ( ! $devmode['active'] ) {
 				if ( ! is_multisite() ) {
@@ -606,7 +606,7 @@ class VarnishPurger {
 				$max_posts = get_option( 'vhp_varnish_max_posts_before_all' );
 			}
 
-			// If there are more than vhp_varnish_max_posts_before_all URLs to purge (default 50), 
+			// If there are more than vhp_varnish_max_posts_before_all URLs to purge (default 50),
 			// do a purge ALL instead. Else, do the normal.
 			if ( $max_posts <= $count ) {
 				// Too many URLs, purge all instead.
@@ -617,7 +617,6 @@ class VarnishPurger {
 					$this->purge_url( $url );
 				}
 			}
-
 		} elseif ( isset( $_GET ) ) {
 			// Otherwise, if we've passed a GET call...
 			if ( isset( $_GET['vhp_flush_all'] ) && check_admin_referer( 'vhp-flush-all' ) ) {
@@ -768,7 +767,7 @@ class VarnishPurger {
 			 *
 			 * @since 4.1
 			 */
-			$headers  = apply_filters(
+			$headers = apply_filters(
 				'varnish_http_purge_headers',
 				array(
 					'host'           => $host_headers,

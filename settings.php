@@ -63,7 +63,6 @@ class VarnishStatus {
 		add_settings_section( 'vhp-settings-maxposts-section', __( 'Maximum Individual URLs before Full Purge', 'varnish-http-purge' ), array( &$this, 'options_settings_maxposts' ), 'varnish-maxposts-settings' );
 		add_settings_field( 'varnish_maxposts', __( 'Set Max URLs', 'varnish-http-purge' ), array( &$this, 'settings_maxposts_callback' ), 'varnish-maxposts-settings', 'vhp-settings-maxposts-section' );
 
-
 		// IP Settings.
 		register_setting( 'vhp-settings-ip', 'vhp_varnish_ip', array( &$this, 'settings_ip_sanitize' ) );
 		add_settings_section( 'vhp-settings-ip-section', __( 'Configure Custom IP', 'varnish-http-purge' ), array( &$this, 'options_settings_ip' ), 'varnish-ip-settings' );
@@ -92,7 +91,7 @@ class VarnishStatus {
 		$devmode = get_site_option( 'vhp_varnish_devmode', VarnishPurger::$devmode );
 		$active  = ( isset( $devmode['active'] ) ) ? $devmode['active'] : false;
 		$active  = ( VHP_DEVMODE ) ? true : $active;
-		$expire  = current_time( 'timestamp' ) + DAY_IN_SECONDS;
+		$expire  = time() + DAY_IN_SECONDS;
 		?>
 		<input type="hidden" name="vhp_varnish_devmode[expire]" value="<?php $expire; ?>" />
 		<input type="checkbox" name="vhp_varnish_devmode[active]" value="true" <?php disabled( VHP_DEVMODE ); ?> <?php checked( $active, true ); ?> />
@@ -121,7 +120,7 @@ class VarnishStatus {
 	public function settings_devmode_sanitize( $input ) {
 
 		$output      = array();
-		$expire      = current_time( 'timestamp' ) + DAY_IN_SECONDS;
+		$expire      = time() + DAY_IN_SECONDS;
 		$set_message = __( 'Something has gone wrong!', 'varnish-http-purge' );
 		$set_type    = 'error';
 

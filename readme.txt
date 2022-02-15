@@ -109,6 +109,24 @@ No. This plugin tells your cache system when content is updated, and to delete t
 
 Speed and stability. Emptying too much of a cache on every change can slow a server down. This plugin does it's best to determine what needs to be deleted and when, while providing hooks for developers to use as necessary.
 
+= How many cached files are deleted when a post is updated? =
+
+It depends on the post, but in general the tool will delete cached content for:
+
+1. The post name
+2. The front page of the site
+3. All first pages of related tags/categories
+4. The JSON API pages
+5. All related RSS feeds
+
+= Is there a limit to how many pages I can purge at once? =
+
+Not really, but in order to prevent your site from crashing by running the same checks over and over, if you try to purge more than 50 URLs at once, the plugin will do a full purge. Normally this never happens, but there are some plugins that hook into the options to add more pages to purge on an update.
+
+You can change this value in your settings, or via the define VHP_VARNISH_MAXPOSTS in your `wp-config.php` file.
+
+Keep in mind, the count of 50 <em>does not</em> include category/tags, API, or RSS pages. It's just the sheer number of individual posts/pages you're trying to purge at once.
+
 = Can I delete the entire cache? =
 
 Yes. Click the 'Empty Cache' button on the "Right Now" Dashboard (see the screenshot if you can't find it). There's also an "Empty Cache" button on the admin toolbar.
@@ -127,13 +145,11 @@ No. Some of them have behaviours that causes them not to cache, either by accide
 
 Yes. [Full documentation can be found on Custom Filters in the wiki](https://github.com/Ipstenu/varnish-http-purge/wiki/Custom-Filters).
 
-= How come my site does a full site purge if I edit over 50 posts at a time? =
-
-In order to prevent your site from crashing by running the same checks over and over, if you try to purge more than 50 URLs at once, the plugin will do a full purge. You can change this value in your settings, or via the define VHP_VARNISH_MAXPOSTS in your `wp-config.php` file.
-
 = Can I turn off caching? =
 
-Kind of. You can use development mode to have WordPress tell your proxy service not to serve cached content, but the content will still be cached by the service.
+Not permanently, and remember that this plugin is not actually caching your content.
+
+You can use development mode to have WordPress attempt to tell your proxy service not to serve cached content, but the content will still be cached by the service.
 
 There are three ways to do this:
 
@@ -232,33 +248,12 @@ This plugin is installed by default for _all_ DreamPress installs on DreamHost, 
 == Changelog ==
 
 = 5.1 =
-* December 2021
-* Rate limiting to prevent abuse
-
-= 5.0.3 =
-* August 2021
-* PHP 8 Compat
-
-= 5.0.2 =
-* April 2021
-* Wrapping a function_exists check which shouldn't be needed, but it fataled for someone and an ounce of prevention yadda yadda.
-
-= 5.0.1 =
-* April 2021
-* Updating incompatibility lists
-* HHVM deprecation
-* Allow saving Proxy IP with ports
-* Add check for CloudFlare APO
-* Improve purge execution fails
-* Double check multiple varnish IPs
-
-= 5.0 =
-* March 2021
-* Now purges draft and pending posts (to account for people who un-publish) - props @jerlarke
-* Localhost the debugger json. They aren't updated that often, and the remote load is unnecessary.
-* More support for Health Check
-* Remove strtotime check on Age header - props Matt Fields
-* Support for multiple IPs (based on P.Brisson's work)
+* February 2022
+* WP 5.9 Compat
+* Rate limiting to prevent abuse - if you try to purge more than the max number of posts in a go (default 50), a purge ALL is triggered
+* Allows customizing the purge URL to support: (credit mickaelperrin)
+- Nginx cache purge mechanism that doesn't support regex directives
+- Custom purge location
 
 == Screenshots ==
 

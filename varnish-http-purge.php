@@ -648,7 +648,7 @@ class VarnishPurger {
 	 * Parse the URL for proxy proxies
 	 *
 	 * @since 1.0
-	 * @param array $url - The url to be purged.
+	 * @param string $url - The url to be purged.
 	 * @access protected
 	 */
 	public static function purge_url( $url ) {
@@ -667,11 +667,20 @@ class VarnishPurger {
 
 		// Determine if we're using regex to flush all pages or not.
 		$pregex         = '';
+		$bregex         = '';
 		$x_purge_method = 'default';
 
-		if ( isset( $p['query'] ) && ( 'vhp-regex' === $p['query'] ) ) {
-			$pregex         = '.*';
-			$x_purge_method = 'regex';
+		$query = array();
+		if ( isset( $p['query'] ) ) {
+			parse_str( $p['query'], $query );
+			if ( isset( $query['vhp-ban-regex'] ) ) {
+				$bregex         = ! empty( $query['vhp-ban-regex'] ) ? $query['vhp-ban-regex'] : '.*';
+				$x_purge_method = 'ban-regex';
+			} elseif ( isset( $query['vhp-regex'] ) ) {
+				$pregex         = '.*';
+				$x_purge_method = 'regex';
+			}
+			unset( $query['vhp-ban-regex'], $query['vhp-regex'] );
 		}
 
 		// Build a varniship to sail. ⛵️
@@ -758,8 +767,8 @@ class VarnishPurger {
 			$purgeme = $schema . $one_host . $path . $pregex;
 
 			// Check the queries...
-			if ( ! empty( $p['query'] ) && 'vhp-regex' !== $p['query'] ) {
-				$purgeme .= '?' . $p['query'];
+			if ( ! empty( $query ) ) {
+				$purgeme = add_query_arg( $query, $purgeme );
 			}
 
 			/**
@@ -770,20 +779,23 @@ class VarnishPurger {
 			 *
 			 * @since 5.1.1
 			 */
-			$purgeme = apply_filters( 'vhp_purgeme_path', $purgeme, $schema, $one_host, $path, $pregex, $p );
+			$purgeme = apply_filters( 'vhp_purgeme_path', $purgeme, $schema, $one_host, $path, $pregex, $p, $bregex );
+
+			$headers = array(
+				'host'           => $host_headers,
+				'X-Purge-Method' => $x_purge_method,
+			);
+
+			if ( ! empty( $bregex ) ) {
+				$headers['X-Ban-Regex'] = $bregex;
+			}
 
 			/**
 			 * Filters the HTTP headers to send with a PURGE request.
 			 *
 			 * @since 4.1
 			 */
-			$headers = apply_filters(
-				'varnish_http_purge_headers',
-				array(
-					'host'           => $host_headers,
-					'X-Purge-Method' => $x_purge_method,
-				)
-			);
+			$headers = apply_filters( 'varnish_http_purge_headers', $headers );
 
 			// Send response.
 			// SSL Verify is required here since Varnish is HTTP only, but proxies are a thing.
@@ -845,7 +857,7 @@ class VarnishPurger {
 	 * Flush the post
 	 *
 	 * @since 1.0
-	 * @param array $post_id - The ID of the post to be purged.
+	 * @param int|string $post_id - The ID of the post to be purged.
 	 * @access public
 	 */
 	public function purge_post( $post_id ) {
@@ -901,17 +913,24 @@ class VarnishPurger {
 			 */
 			if ( isset( $rest_api_route ) ) {
 				$post_type_object = get_post_type_object( $post_id );
-				$rest_permalink   = false;
-				if ( isset( $post_type_object->rest_base ) ) {
-					$rest_permalink = get_rest_url() . $rest_api_route . '/' . $post_type_object->rest_base . '/' . $post_id . '/';
+				if ( null !== $post_type_object && ! empty( $post_type_object->rest_base ) ) {
+					$rest_base = $post_type_object->rest_base;
 				} elseif ( 'post' === $this_post_type ) {
-					$rest_permalink = get_rest_url() . $rest_api_route . '/posts/' . $post_id . '/';
+					$rest_base = 'posts';
 				} elseif ( 'page' === $this_post_type ) {
-					$rest_permalink = get_rest_url() . $rest_api_route . '/pages/' . $post_id . '/';
+					$rest_base = 'pages';
 				}
 
-				if ( isset( $rest_permalink ) ) {
-					array_push( $listofurls, $rest_permalink );
+				if ( ! empty( $rest_base ) ) {
+					array_push(
+						$listofurls,
+						self::ban_url_with_any_query_string(
+							get_rest_url() . $rest_api_route . '/' . $rest_base . '/' . $post_id . '/'
+						),
+						self::ban_url_with_any_query_string(
+							get_rest_url() . $rest_api_route . '/' . $rest_base . '/'
+						),
+					);
 				}
 			}
 
@@ -1078,6 +1097,54 @@ class VarnishPurger {
 		 * @param int $post_id the id of the new/edited post
 		 */
 		$this->purge_urls = apply_filters( 'vhp_purge_urls', $this->purge_urls, $post_id );
+	}
+
+	/**
+	 * Generate a purge url that bans the url itself (with and without trailing slash)
+	 * and any query string, but the sub-resources (more path fragments).
+	 *
+	 * Adds the query parameter "vhp-ban-regex" with an urlencoded regex to the input url.
+	 * In VarnishPurger::purge_url(), the value will be sent as an additional header
+	 * "X-Ban-Regex", along with the header "X-Purge-Method: ban-regex".
+	 * The query parameter itself is removed. The VCL should contain the following config:
+	 *
+	 * if (req.http.X-Purge-Method == "ban-regex" && req.http.X-Ban-Regex) {
+	 *     ban("obj.http.x-url ~ " + req.http.X-Ban-Regex + " && obj.http.x-host ~ " + req.http.host);
+	 *     return (synth(200, "Banned"));
+	 * }
+	 *
+	 * If the VCL does not support this functionality, only the url itself is purged.
+	 *
+	 * Example of urls to be banned using the default regex:
+	 * - /the/path
+	 * - /the/path/
+	 * - /the/path?
+	 * - /the/path/?
+	 * - /the/path?foo=bar
+	 * - /the/path/?foo=bar
+	 * Sub-resources are not banned:
+	 * - /the/path/foo
+	 * - /the/path/foo/bar
+	 *
+	 * Useful for REST endpoints which can contain query parameters.
+	 *
+	 * @param string|null $url   The url to be banned. Only the path will be used in the final regex.
+	 * @param string      $regex The regex to be appended to the url.
+	 *
+	 * @return string
+	 *
+	 * @see VarnishPurger::purge_url()
+	 */
+	public static function ban_url_with_any_query_string( $url, $regex = '($|/$|\?.*|/\?.*)' ) {
+		return add_query_arg(
+			'vhp-ban-regex',
+			urlencode(
+				'^'
+				. untrailingslashit( str_replace( self::the_home_url(), '', $url ) )
+				. $regex
+			),
+			$url
+		);
 	}
 
 	// @codingStandardsIgnoreStart

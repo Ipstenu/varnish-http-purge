@@ -247,9 +247,14 @@ This plugin is installed by default for _all_ DreamPress installs on DreamHost, 
 
 == Changelog ==
 
+= 5.1.2 = 
+* April 2022
+* Fix typo in readme
+
 = 5.1.1 =
 * April 2022
 * Prevent two versions of the plugin from running at once.
+* Correct JSON
 
 = 5.1 =
 * February 2022

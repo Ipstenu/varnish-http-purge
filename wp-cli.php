@@ -13,6 +13,7 @@ if ( ! defined( 'WP_CLI' ) ) {
 	return;
 }
 
+// Only load if the class doesn't exist.
 if ( ! class_exists( 'WP_CLI_Varnish_Command' ) ) {
 
 	/**

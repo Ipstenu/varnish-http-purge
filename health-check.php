@@ -21,17 +21,17 @@ function vhp_add_site_status_tests( $tests ) {
 
 function vhp_site_status_caching_test() {
 
-	// Check the debug log
+	// Check the debug log.
 	$debug_log     = get_site_option( 'vhp_varnish_debug' );
 	$debug_results = array();
 	foreach ( $debug_log as $site => $results ) {
 		foreach ( $results as $item => $content ) {
 			$sitename = ( VarnishPurger::the_home_url() !== $site ) ? 'Site: ' . $site . '<br />' : '';
-			// Log cache not working
+			// Log cache not working.
 			if ( 'Cache Service' === $item && 'notice' === $content['icon'] ) {
 				$debug_results[ $item ] = $sitename . $content['message'];
 			}
-			// Log all Criticals
+			// Log all critical warnings.
 			if ( isset( $content['icon'] ) && 'bad' === $content['icon'] ) {
 				$debug_results[ $item ] = $sitename . $content['message'];
 			}
@@ -74,12 +74,12 @@ function vhp_site_status_caching_test() {
 	} elseif ( ! empty( $debug_results ) && '' !== $debug_results ) {
 		$count = count( $debug_results );
 		// Translators: %d is the number of issues reported
-		$desc  = sprintf( _n( 'The most recent cache status check reported %d issue.', 'The most recent cache status check reported %d issues.', $count, 'varnish-http-purge' ), $count );
+		$desc = sprintf( _n( 'The most recent cache status check reported %d issue.', 'The most recent cache status check reported %d issues.', $count, 'varnish-http-purge' ), $count );
 
-		$result['status']      = 'critical';
+		$result['status'] = 'critical';
 		// Translators: %d is the number of issues reported
-		$result['label']       = sprintf( __( 'Proxy Cache Purge has reported caching errors (%s)', 'varnish-http-purge' ), $count );
-		$result['description'] = sprintf(
+		$result['label']        = sprintf( __( 'Proxy Cache Purge has reported caching errors (%s)', 'varnish-http-purge' ), $count );
+		$result['description']  = sprintf(
 			'<p>%s</p>',
 			$desc
 		);

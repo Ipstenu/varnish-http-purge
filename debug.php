@@ -31,7 +31,7 @@ class VarnishDebug {
 			$return = true;
 		} elseif ( $newmode['active'] ) {
 			$return = true;
-			if ( $newmode['expire'] <= current_time( 'timestamp' ) ) {
+			if ( $newmode['expire'] <= time() ) {
 				// if expire is less that NOW, it's over.
 				self::devmode_toggle( 'deactivate' );
 				$return = false;
@@ -51,7 +51,7 @@ class VarnishDebug {
 	 */
 	public static function devmode_toggle( $state = 'deactivate' ) {
 		$newmode           = get_site_option( 'vhp_varnish_devmode', VarnishPurger::$devmode );
-		$newmode['expire'] = current_time( 'timestamp' ) + DAY_IN_SECONDS;
+		$newmode['expire'] = time() + DAY_IN_SECONDS;
 
 		switch ( sanitize_text_field( $state ) ) {
 			case 'activate':
@@ -680,7 +680,8 @@ class VarnishDebug {
 	 */
 	public static function bad_themes_results() {
 
-		$return  = array();
+		$return = array();
+
 		// Let's check our known bad themes.
 		$json_data = file_get_contents( plugin_dir_path( __FILE__ ) . 'debugger/themes.json' );
 		$themes    = json_decode( $json_data );
@@ -745,14 +746,15 @@ class VarnishDebug {
 		$return   = array();
 		$messages = array(
 			'addon'        => __( 'This plugin may require add-ons to ensure full compatibility. Please check their documentation.', 'varnish-http-purge' ),
-			'incompatible' => __( 'This plugin has unexpected results with caching, making not function properly.', 'varnish-http-purge' ),
+			'incompatible' => __( 'This plugin has unexpected results with caching, making things not function properly.', 'varnish-http-purge' ),
 			'translation'  => __( 'Translation plugins that use cookies and/or sessions prevent most server side caching from running properly.', 'varnish-http-purge' ),
 			'sessions'     => __( 'This plugin uses sessions, which conflicts with server side caching.', 'varnish-http-purge' ),
 			'cookies'      => __( 'This plugin uses cookies, which may prevent server side caching.', 'varnish-http-purge' ),
 			'cache'        => __( 'This type of caching plugin does not work well with server side caching.', 'varnish-http-purge' ),
 			'ancient'      => __( 'This plugin is not up to date with WordPress best practices and breaks caching.', 'varnish-http-purge' ),
 			'removed'      => __( 'This plugin was removed from WordPress.org and we do not recommend it\'s use.', 'varnish-http-purge' ),
-			'maybe'        => __( 'This plugin is usually fine, but may be configured in a way that breaks caching. Please resolve all other errors. If this is the only one left, and caching is running, you may safely ignore this message.', 'varnish-http-purge' ),
+			'maybe'        => __( 'This plugin is usually fine, but can be configured in a way that breaks caching. Please resolve all other errors. If this is the only one left, and caching is running, you may safely ignore this message.', 'varnish-http-purge' ),
+			'maybe-cache'  => __( 'This plugin is usually fine, however it has been known to have issues with caching. Sometimes its pages will not be properly updated. This is being worked on, but has no ETA for resolution.', 'varnish-http-purge' ),
 		);
 
 		$json_data = file_get_contents( plugin_dir_path( __FILE__ ) . 'debugger/plugins.json' );
@@ -830,26 +832,24 @@ class VarnishDebug {
 
 		// Server Results.
 		$server_results = self::server_results( $headers, $remote_ip, $varniship );
-		$output         = array_merge( $output, $server_results );
 
 		// Cache Results.
 		$cache_results = self::cache_results( $headers );
-		$output        = array_merge( $output, $cache_results );
 
 		// Cookies.
 		$cookie_results = self::cookie_results( $headers );
-		$output         = array_merge( $output, $cookie_results );
 
 		// Plugins that don't play nicely with Varnish.
 		$bad_plugins_results = self::bad_plugins_results();
-		$output              = array_merge( $output, $bad_plugins_results );
 
 		// Themes that don't play nicely with Varnish.
 		$bad_themes_results = self::bad_themes_results();
-		$output             = array_merge( $output, $bad_themes_results );
+
+		// Update Output
+		$output = array_merge( $output, $server_results, $cache_results, $cookie_results, $bad_plugins_results, $bad_themes_results );
 
 		// Update site option data
-		$debug_log = get_site_option( 'vhp_varnish_debug' );
+		$debug_log                                  = get_site_option( 'vhp_varnish_debug' );
 		$debug_log[ VarnishPurger::the_home_url() ] = $output;
 		update_site_option( 'vhp_varnish_debug', $debug_log );
 

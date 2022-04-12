@@ -149,7 +149,7 @@ class VarnishStatus {
 	 */
 	public function options_settings_maxposts() {
 		?>
-		<p><a name="#configuremaxposts"></a><?php esc_html_e( 'Since it\'s possible to purge multiple URLs in sequence, there can be cases where too many URLs are queued at a time. In order to minimize disruption, the plugin has a limit of how many URLs can be queued before it runs a "purge all" instead. You can customize that here.', 'varnish-http-purge' ); ?></strong></p>
+		<p><a name="#configuremaxposts"></a><?php esc_html_e( 'Since it\'s possible to purge multiple URLs in sequence, there can be cases where too many URLs are queued at a time. In order to minimize disruption, the plugin has a limit of how many URLs can be queued before it runs a "purge all" instead. You can customize that value here.', 'varnish-http-purge' ); ?></strong></p>
 		<?php
 	}
 

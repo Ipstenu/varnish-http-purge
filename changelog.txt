@@ -1,5 +1,30 @@
 ## CHANGELOG
 
+= 5.0.3 =
+* August 2021
+* PHP 8 Compat
+
+= 5.0.2 =
+* April 2021
+* Wrapping a function_exists check which shouldn't be needed, but it fataled for someone and an ounce of prevention yadda yadda.
+
+= 5.0.1 =
+* April 2021
+* Updating incompatibility lists
+* HHVM deprecation
+* Allow saving Proxy IP with ports
+* Add check for CloudFlare APO
+* Improve purge execution fails
+* Double check multiple varnish IPs
+
+= 5.0 =
+* March 2021
+* Now purges draft and pending posts (to account for people who un-publish) - props @jerlarke
+* Localhost the debugger json. They aren't updated that often, and the remote load is unnecessary.
+* More support for Health Check
+* Remove strtotime check on Age header - props Matt Fields
+* Support for multiple IPs (based on P.Brisson's work)
+
 = 4.8.1 =
 * May 2019
 * Compat with WP 5.2

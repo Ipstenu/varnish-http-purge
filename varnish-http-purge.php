@@ -3,7 +3,7 @@
  * Plugin Name: Proxy Cache Purge
  * Plugin URI: https://github.com/ipstenu/varnish-http-purge/
  * Description: Automatically empty cached pages when content on your site is modified.
- * Version: 5.1.0
+ * Version: 5.1.1
  * Author: Mika Epstein
  * Author URI: https://halfelf.org/
  * License: http://www.apache.org/licenses/LICENSE-2.0
@@ -14,7 +14,8 @@
  *
  * Copyright 2016-2022 Mika Epstein (email: ipstenu@halfelf.org)
  *
- * This file is part of Proxy Cache Purge, a plugin for WordPress.
+ * This file is part of Proxy Cache Purge (formerly Varnish HTTP Purge), a 
+ * plugin for WordPress.
  *
  * Proxy Cache Purge is free software: you can redistribute it and/or modify
  * it under the terms of the Apache License 2.0 license.
@@ -768,7 +769,7 @@ class VarnishPurger {
 			 * Allows dynamically changing the purge cache for custom purge location
 			 * or systems not supporting .* regex purge for example
 			 *
-			 * @since 5.1.1
+			 * @since 5.1
 			 */
 			$purgeme = apply_filters( 'vhp_purgeme_path', $purgeme, $schema, $one_host, $path, $pregex, $p );
 
@@ -1115,16 +1116,19 @@ if ( defined( 'WP_CLI' ) && WP_CLI ) {
 	include 'wp-cli.php';
 }
 
-/*
- * Settings Pages
- *
- * @since 4.0
- */
-// The settings PAGES aren't needed on the network admin page
-if ( ! is_network_admin() ) {
-	require_once 'settings.php';
-}
-require_once 'debug.php';
-require_once 'health-check.php';
+// Preventing people from forking this and hurting themselve by having two versions, though it may not work.
+if ( ! class_exists( 'VarnishPurger' ) ) {
+	/*
+	* Settings Pages
+	*
+	* @since 4.0
+	*/
+	// The settings PAGES aren't needed on the network admin page
+	if ( ! is_network_admin() ) {
+		require_once 'settings.php';
+	}
+	require_once 'debug.php';
+	require_once 'health-check.php';
 
-$purger = new VarnishPurger();
+	$purger = new VarnishPurger();
+}

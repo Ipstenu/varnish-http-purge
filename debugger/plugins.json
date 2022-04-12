@@ -17,6 +17,12 @@
 		"reason": "translation",
 		"always": true
 	},
+	"custom-simple-rss":{
+		"type": "warning",
+		"path": "custom-simple-rss/custom-simple-rss.php",
+		"reason": "maybe-cache",
+		"always": false
+	},
 	"divi-protect":{
 		"type": "bad",
 		"path": "divi-protect/divi-protect.php",
@@ -82,7 +88,6 @@
 		"path": "wp-user-avatar/wp-user-avatar.php",
 		"reason": "cookies",
 		"always": true
-	},
 	},
 	"quick-cache":{
 		"type": "bad",

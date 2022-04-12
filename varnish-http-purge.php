@@ -3,7 +3,7 @@
  * Plugin Name: Proxy Cache Purge
  * Plugin URI: https://github.com/ipstenu/varnish-http-purge/
  * Description: Automatically empty cached pages when content on your site is modified.
- * Version: 5.1.1
+ * Version: 5.1.2
  * Author: Mika Epstein
  * Author URI: https://halfelf.org/
  * License: http://www.apache.org/licenses/LICENSE-2.0
@@ -1117,7 +1117,7 @@ if ( defined( 'WP_CLI' ) && WP_CLI ) {
 }
 
 // Preventing people from forking this and hurting themselve by having two versions, though it may not work.
-if ( ! class_exists( 'VarnishPurger' ) ) {
+if ( ! class_exists( 'VarnishStatus' ) ) {
 	/*
 	* Settings Pages
 	*

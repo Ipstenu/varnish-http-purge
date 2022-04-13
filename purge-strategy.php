@@ -15,7 +15,7 @@ class VarnishPurgeStrategy {
 	 *
 	 * @var VarnishPurger
 	 */
-	private VarnishPurger $plugin;
+	protected VarnishPurger $plugin;
 	/**
 	 * List of URLs to be purged
 	 *
@@ -28,27 +28,27 @@ class VarnishPurgeStrategy {
 	/**
 	 * @var string[]
 	 */
-	private array $noarchive_post_type;
+	protected array $noarchive_post_type;
 	/**
 	 * @var string[]
 	 */
-	private array $invalid_post_type;
+	protected array $invalid_post_type;
 	/**
 	 * @var string[]
 	 */
-	private array $valid_post_status;
+	protected array $valid_post_status;
 	/**
 	 * @var string
 	 */
-	private string $rest_api_route = 'wp/v2';
+	protected string $rest_api_route = 'wp/v2';
 	/**
 	 * @var bool
 	 */
-	private bool $json_disabled = true;
+	protected bool $json_disabled = true;
 	/**
 	 * @var string[]
 	 */
-	private array $json_disablers;
+	protected array $json_disablers;
 
 	public function __construct( VarnishPurger $plugin ) {
 		$this->plugin = $plugin;
@@ -464,7 +464,7 @@ class VarnishPurgeStrategy {
 		return $this->purge_urls;
 	}
 
-	private function purge_post_permalink( $post ) {
+	protected function purge_post_permalink( $post ) {
 		$post        = get_post( $post );
 		$post_status = get_post_status( $post );
 		$permalink   = get_permalink( $post );
@@ -500,7 +500,7 @@ class VarnishPurgeStrategy {
 		);
 	}
 
-	private function purge_post_rest_endpoints( $post ) {
+	protected function purge_post_rest_endpoints( $post ) {
 		$urls      = [];
 		$post      = get_post( $post );
 		$post_type = get_post_type( $post );
@@ -545,7 +545,7 @@ class VarnishPurgeStrategy {
 		);
 	}
 
-	private function purge_post_taxonomies( $post ) {
+	protected function purge_post_taxonomies( $post ) {
 		$post = get_post( $post );
 
 		$urls = [];
@@ -600,7 +600,7 @@ class VarnishPurgeStrategy {
 		);
 	}
 
-	private function purge_author_archive( $post ) {
+	protected function purge_author_archive( $post ) {
 		$author_id = get_post_field( 'post_author', $post );
 		$urls      = [
 			get_author_posts_url( $author_id ),
@@ -617,7 +617,7 @@ class VarnishPurgeStrategy {
 		);
 	}
 
-	private function purge_post_feeds( $post ) {
+	protected function purge_post_feeds( $post ) {
 		$post = get_post( $post );
 		$urls = [
 			get_bloginfo_rss( 'rdf_url' ),
@@ -636,7 +636,7 @@ class VarnishPurgeStrategy {
 		);
 	}
 
-	private function purge_post_archives( $post ) {
+	protected function purge_post_archives( $post ) {
 		$post      = get_post( $post );
 		$post_type = get_post_type( $post );
 		$urls      = [];
@@ -654,7 +654,7 @@ class VarnishPurgeStrategy {
 		);
 	}
 
-	private function purge_posts_pages( $post ) {
+	protected function purge_posts_pages( $post ) {
 		$post = get_post( $post );
 		$urls = [
 			$this->the_home_url(),
@@ -689,7 +689,7 @@ class VarnishPurgeStrategy {
 	 *
 	 * @return array
 	 */
-	private function flatten_urls( $array ) {
+	protected function flatten_urls( $array ) {
 		$output = [];
 
 		$values = array_values( (array) $array );
@@ -780,7 +780,7 @@ class VarnishPurgeStrategy {
 	 *
 	 * @return void
 	 */
-	private function check_rest_api() {
+	protected function check_rest_api() {
 		if ( version_compare( get_bloginfo( 'version' ), '4.7', '>=' ) ) {
 			$this->json_disabled = false;
 

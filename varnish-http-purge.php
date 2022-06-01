@@ -3,7 +3,7 @@
  * Plugin Name: Proxy Cache Purge
  * Plugin URI: https://github.com/ipstenu/varnish-http-purge/
  * Description: Automatically empty cached pages when content on your site is modified.
- * Version: 5.1.2
+ * Version: 5.1.3
  * Author: Mika Epstein
  * Author URI: https://halfelf.org/
  * License: http://www.apache.org/licenses/LICENSE-2.0
@@ -475,7 +475,7 @@ class VarnishPurger {
 
 		$fill = ( false !== $icon_color ) ? sanitize_hex_color( $icon_color ) : '#82878c';
 
-		if ( is_admin() && false === $icon_color ) {
+		if ( is_admin() && false === $icon_color && get_user_option( 'admin_color' ) ) {
 			$admin_colors  = json_decode( wp_json_encode( $_wp_admin_css_colors ), true );
 			$current_color = get_user_option( 'admin_color' );
 			$fill          = $admin_colors[ $current_color ]['icon_colors']['base'];

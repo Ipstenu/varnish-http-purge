@@ -3,7 +3,7 @@
  * Plugin Name: Proxy Cache Purge
  * Plugin URI: https://github.com/ipstenu/varnish-http-purge/
  * Description: Automatically empty cached pages when content on your site is modified.
- * Version: 5.1.3
+ * Version: 5.2
  * Author: Mika Epstein
  * Author URI: https://halfelf.org/
  * License: http://www.apache.org/licenses/LICENSE-2.0
@@ -410,20 +410,6 @@ class VarnishPurger {
 				);
 			}
 
-			// If we're on a front end page and the current user can edit published posts, then they can do this.
-			if ( ! is_admin() && get_post() !== false && current_user_can( 'edit_published_posts' ) ) {
-				$page_url = esc_url( home_url( $wp->request ) );
-				$args[]   = array(
-					'parent' => 'purge-varnish-cache',
-					'id'     => 'purge-varnish-cache-this',
-					'title'  => __( 'Purge Cache (This Page)', 'varnish-http-purge' ),
-					'href'   => wp_nonce_url( add_query_arg( 'vhp_flush_do', $page_url . '/' ), 'vhp-flush-do' ),
-					'meta'   => array(
-						'title' => __( 'Purge Cache (This Page)', 'varnish-http-purge' ),
-					),
-				);
-			}
-
 			// If Devmode is in the config, don't allow it to be disabled.
 			if ( ! VHP_DEVMODE ) {
 				// Populate enable/disable cache button.
@@ -451,6 +437,20 @@ class VarnishPurger {
 					),
 				);
 			}
+		}
+
+		// If we're on a front end page AND the current user can edit published posts, then they can do this.
+		if ( ! is_admin() && get_post() !== false && current_user_can( 'edit_published_posts' ) ) {
+			$page_url = esc_url( home_url( $wp->request ) );
+			$args[]   = array(
+				'parent' => 'purge-varnish-cache',
+				'id'     => 'purge-varnish-cache-this',
+				'title'  => __( 'Purge Cache (This Page)', 'varnish-http-purge' ),
+				'href'   => wp_nonce_url( add_query_arg( 'vhp_flush_do', $page_url . '/' ), 'vhp-flush-do' ),
+				'meta'   => array(
+					'title' => __( 'Purge Cache (This Page)', 'varnish-http-purge' ),
+				),
+			);
 		}
 
 		if ( $can_purge ) {

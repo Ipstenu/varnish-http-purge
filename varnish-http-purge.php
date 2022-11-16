@@ -14,7 +14,7 @@
  *
  * Copyright 2016-2022 Mika Epstein (email: ipstenu@halfelf.org)
  *
- * This file is part of Proxy Cache Purge (formerly Varnish HTTP Purge), a 
+ * This file is part of Proxy Cache Purge (formerly Varnish HTTP Purge), a
  * plugin for WordPress.
  *
  * Proxy Cache Purge is free software: you can redistribute it and/or modify

@@ -105,11 +105,11 @@ If you have code patches, [pull requests are welcome](https://github.com/Ipstenu
 
 This is not an official DreamHost plugin nor is it a DreamHost _only_ plugin.
 
-I worked for DreamHost and, at that time, adopted and enhanced this plugin to allow it to work for DreamHost's managed hosting platform: DreamPress.
+I worked for DreamHost until end of 2022 and, at that time, adopted and enhanced this plugin to allow it to work for DreamHost's managed hosting platform: DreamPress.
 
 While this plugin is installed by default for _all_ DreamPress installs on DreamHost, and I maintain it, it is unofficial at this time.
 
-I will continue to support all users to the best of my ability, however I will no longer be able to look at people's servers nor provide assistance with Varnish rule.
+I will continue to support all users to the best of my ability, however I will no longer be able to look at people's servers nor provide assistance with Varnish rules on any host.
 
 = Is this plugin caching my data? =
 

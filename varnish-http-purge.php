@@ -604,7 +604,7 @@ class VarnishPurger {
 			if ( defined( 'VHP_VARNISH_MAXPOSTS' ) && false !== VHP_VARNISH_MAXPOSTS ) {
 				$max_posts = VHP_VARNISH_MAXPOSTS;
 			} else {
-				$max_posts = get_option( 'vhp_varnish_max_posts_before_all' );
+				$max_posts = get_site_option( 'vhp_varnish_max_posts_before_all' );
 			}
 
 			// If there are more than vhp_varnish_max_posts_before_all URLs to purge (default 50),

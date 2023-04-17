@@ -250,6 +250,11 @@ Yes _IF_ the service has an interface. Sadly Nginx does not. [Detailed direction
 
 == Changelog ==
 
+= 5.2.1 =
+* April 2023
+* Fix typo in deactivate (Props florian-digital-tree-company)
+* Site Options for multisite (Props jespervnielsen)
+
 = 5.2 =
 * November 2022
 * Allow people who can edit a page to purge a page

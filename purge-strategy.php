@@ -583,7 +583,7 @@ class VarnishPurgeStrategy {
 			foreach ( $taxonomies as $taxonomy ) {
 				$features = (array) get_taxonomy( $taxonomy );
 				if ( isset( $features['public'] ) && $features['public'] ) {
-					$terms = wp_get_post_terms( $post, $taxonomy );
+					$terms = wp_get_post_terms( $post->ID, $taxonomy );
 					foreach ( $terms as $term ) {
 						$urls[] = get_term_link( $term );
 						$urls[] = rest_url( "{$this->rest_api_route}/{$term->taxonomy}/{$term->slug}/" );

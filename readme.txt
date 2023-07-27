@@ -3,7 +3,7 @@ Contributors: Ipstenu, mikeschroder, techpriester, danielbachhuber
 Tags: proxy, purge, cache, varnish, nginx
 Requires at least: 5.0
 Tested up to: 6.3
-Stable tag: 5.1.3
+Stable tag: 5.2.0
 Requires PHP: 5.6
 
 Automatically empty proxy cached content when your site is modified.
@@ -248,26 +248,9 @@ Yes _IF_ the service has an interface. Sadly Nginx does not. [Detailed direction
 
 == Changelog ==
 
-= 5.1.3 =
-* June 2022
-* Check if a required option exists before trying to use it
-
-= 5.1.2 = 
-* April 2022
-* Fix typo in readme
-
-= 5.1.1 =
-* April 2022
-* Prevent two versions of the plugin from running at once.
-* Correct JSON
-
-= 5.1 =
-* February 2022
-* WP 5.9 Compat
-* Rate limiting to prevent abuse - if you try to purge more than the max number of posts in a go (default 50), a purge ALL is triggered
-* Allows customizing the purge URL to support: (credit mickaelperrin)
-- Nginx cache purge mechanism that doesn't support regex directives
-- Custom purge location
+= 5.2.0 =
+* July 2023
+* Fix debug for if Via headers are an array (props @iverok)
 
 == Screenshots ==
 

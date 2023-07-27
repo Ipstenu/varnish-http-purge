@@ -1,8 +1,14 @@
 <?xml version="1.0"?>
 <ruleset name="Proxy Cache Purge Coding Standards">
-    <description>A custom ruleset to take in account both WordPress and DreamHost standards.</description>
-    <rule ref="WordPress-Extra">
-        <exclude name="WordPress.Files.FileName.InvalidClassFileName" />
-        <exclude name="WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode" />
-    </rule>
+	<description>A custom ruleset to take in account both WordPress and DreamHost standards.</description>
+	<!--
+	Prevent errors caused by WordPress Coding Standards not supporting PHP 8.0+.
+	See https://github.com/WordPress/WordPress-Coding-Standards/issues/2035
+	-->
+	<ini name="error_reporting" value="E_ALL &#38; ~E_DEPRECATED" />
+
+	<rule ref="WordPress-Extra">
+		<exclude name="WordPress.Files.FileName.InvalidClassFileName" />
+		<exclude name="WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode" />
+	</rule>
 </ruleset>

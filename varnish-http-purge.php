@@ -3,7 +3,7 @@
  * Plugin Name: Proxy Cache Purge
  * Plugin URI: https://github.com/ipstenu/varnish-http-purge/
  * Description: Automatically empty cached pages when content on your site is modified.
- * Version: 5.1.3
+ * Version: 5.2.0
  * Author: Mika Epstein
  * Author URI: https://halfelf.org/
  * License: http://www.apache.org/licenses/LICENSE-2.0
@@ -12,9 +12,9 @@
  *
  * @package varnish-http-purge
  *
- * Copyright 2016-2022 Mika Epstein (email: ipstenu@halfelf.org)
+ * Copyright 2016-2023 Mika Epstein (email: ipstenu@halfelf.org)
  *
- * This file is part of Proxy Cache Purge (formerly Varnish HTTP Purge), a 
+ * This file is part of Proxy Cache Purge (formerly Varnish HTTP Purge), a
  * plugin for WordPress.
  *
  * Proxy Cache Purge is free software: you can redistribute it and/or modify
@@ -410,20 +410,6 @@ class VarnishPurger {
 				);
 			}
 
-			// If we're on a front end page and the current user can edit published posts, then they can do this.
-			if ( ! is_admin() && get_post() !== false && current_user_can( 'edit_published_posts' ) ) {
-				$page_url = esc_url( home_url( $wp->request ) );
-				$args[]   = array(
-					'parent' => 'purge-varnish-cache',
-					'id'     => 'purge-varnish-cache-this',
-					'title'  => __( 'Purge Cache (This Page)', 'varnish-http-purge' ),
-					'href'   => wp_nonce_url( add_query_arg( 'vhp_flush_do', $page_url . '/' ), 'vhp-flush-do' ),
-					'meta'   => array(
-						'title' => __( 'Purge Cache (This Page)', 'varnish-http-purge' ),
-					),
-				);
-			}
-
 			// If Devmode is in the config, don't allow it to be disabled.
 			if ( ! VHP_DEVMODE ) {
 				// Populate enable/disable cache button.
@@ -431,7 +417,7 @@ class VarnishPurger {
 					$purge_devmode_title = __( 'Restart Cache', 'varnish-http-purge' );
 					$vhp_add_query_arg   = array(
 						'vhp_flush_do'    => 'devmode',
-						'vhp_set_devmode' => 'dectivate',
+						'vhp_set_devmode' => 'deactivate',
 					);
 				} else {
 					$purge_devmode_title = __( 'Pause Cache (24h)', 'varnish-http-purge' );
@@ -451,6 +437,20 @@ class VarnishPurger {
 					),
 				);
 			}
+		}
+
+		// If we're on a front end page AND the current user can edit published posts, then they can do this.
+		if ( ! is_admin() && get_post() !== false && current_user_can( 'edit_published_posts' ) ) {
+			$page_url = esc_url( home_url( $wp->request ) );
+			$args[]   = array(
+				'parent' => 'purge-varnish-cache',
+				'id'     => 'purge-varnish-cache-this',
+				'title'  => __( 'Purge Cache (This Page)', 'varnish-http-purge' ),
+				'href'   => wp_nonce_url( add_query_arg( 'vhp_flush_do', $page_url . '/' ), 'vhp-flush-do' ),
+				'meta'   => array(
+					'title' => __( 'Purge Cache (This Page)', 'varnish-http-purge' ),
+				),
+			);
 		}
 
 		if ( $can_purge ) {

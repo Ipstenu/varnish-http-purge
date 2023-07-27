@@ -246,6 +246,10 @@ This is a question beyond the support of plugin. I do not have the resources ava
 
 Yes _IF_ the service has an interface. Sadly Nginx does not. [Detailed directions can be found on the debugging section on GitHub](https://github.com/Ipstenu/varnish-http-purge/wiki). Bear in mind, these interfaces tend to be command-line only.
 
+= Caching is detected but cannot be confirmed. What does that mean? =
+
+It means that somewhere your server's headers aren't returning the data the plugin needs to see, in order to determine if the cache is working. The most common cause is that your server isn't returning the `X-Varnish` header or the `Age` header.
+
 == Changelog ==
 
 = 5.2.0 =

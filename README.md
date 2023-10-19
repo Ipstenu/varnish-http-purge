@@ -1,11 +1,15 @@
 Proxy Cache Purge
 ==================
 
+**19 OCTOBER 2023 -- WARNING: THIS PLUGIN IS NOT BEING ACTIVELY MAINTAINED.**
+
+If you're interested in adopting this plugin, please read [Requests to Take Over Development](https://github.com/Ipstenu/varnish-http-purge/wiki/Requests-to-Take-Over-Development).
+
+## Description
+
 This is the development repository for the Proxy Cache Purge plugin (formerly known as Varnish HTTP Purge).
 
 You should install the plugin from the [WordPress.org Repository](http://wordpress.org/plugins/varnish-http-purge/) however the master branch will mirror that. Development happens on various `REL` branches.
-
-If you find a new theme or plugin with known conflict, please open a new issue in [Ipstenu/varnish-debug-service](https://github.com/Ipstenu/varnish-debug-service) and I'll update the master list.
 
 ## Helpful Links
 

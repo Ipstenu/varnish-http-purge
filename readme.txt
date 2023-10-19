@@ -10,6 +10,10 @@ Automatically empty proxy cached content when your site is modified.
 
 == Description ==
 
+<strong><em>19 OCTOBER 2023 -- WARNING: THIS PLUGIN IS NOT BEING ACTIVELY MAINTAINED.</em></strong>
+
+If you're interested in adopting this plugin, please read [Requests to Take Over Development](https://github.com/Ipstenu/varnish-http-purge/wiki/Requests-to-Take-Over-Development).
+
 <strong>This plugin <em>does not</em> install nor configure a cache proxy. It acts as an interface with such services.</strong>
 
 One common method of caching content for websites is via the use of reverse proxy caching. Common examples of this are <a href="https://www.varnish-cache.org/">Varnish</a> and <a href="https://www.nginx.com/">Nginx</a>. These systems allow a website to update content and have the visitor's experience cached without the need for complex plugins storing the files locally and using up a user's disk space.
@@ -107,7 +111,7 @@ This plugin was originally adopted and updated for DreamHost's DreamPress server
 
 I worked at DreamHost from 2012 to 2022, and have maintained the plugin since around 2014 or so.
 
-This plugin is installed by default for _all_ DreamPress installs on DreamHost, and I still maintain it, but it was not originally an official DreamHost plugin which means I will continue to support all users to the best of my ability.
+As of October 2023, this plugin is _NO LONGER_ installed by default on DreamPress.
 
 = Is this plugin caching my data? =
 

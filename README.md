@@ -3,7 +3,7 @@ Proxy Cache Purge
 
 **19 OCTOBER 2023 -- WARNING: THIS PLUGIN IS NOT BEING ACTIVELY MAINTAINED.**
 
-If you're interested in adopting this plugin, please read [Requests to Take Over Development](https://github.com/Ipstenu/varnish-http-purge/wiki/Requests-to-Take-Over-Development).
+You can follow the new developer at https://github.com/dvershinin/varnish-http-purge
 
 ## Description
 
